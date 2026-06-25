@@ -60,6 +60,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* 脈動する溶岩エフェクト */
         @keyframes lava-pulse {
             0%, 100% { transform: scale(1); opacity: 0.9; }
             50% { transform: scale(1.15); opacity: 1; fill: #ff1100; }
@@ -77,6 +78,7 @@
             animation: smoke-drift 4s infinite linear;
         }
 
+        /* 設定画面のスライドトランジション */
         .settings-overlay {
             backdrop-filter: blur(8px);
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -85,6 +87,7 @@
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
+        /* ティッカー速報アニメーション */
         @keyframes ticker-scroll {
             0% { transform: translate3d(100%, 0, 0); }
             100% { transform: translate3d(-100%, 0, 0); }
@@ -134,7 +137,7 @@
     <!-- メインコンテナ -->
     <main class="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6">
 
-        <!-- ヘッダー -->
+        <!-- ヘッダー (M3 Expressive iPad最適化) -->
         <header class="bg-[#1D1B20] dark:bg-[#121115] text-white p-6 sm:p-8 rounded-m3-large mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-m3-elevation-2 relative overflow-hidden border border-white/5">
             <div class="absolute -right-6 -top-6 w-48 h-48 bg-red-600 rounded-full opacity-10 blur-2xl"></div>
             <div id="header-accent-glow" class="absolute -left-6 -bottom-6 w-48 h-48 bg-purple-600 rounded-full opacity-10 blur-2xl transition-all duration-500"></div>
@@ -155,7 +158,9 @@
                 </div>
             </div>
 
+            <!-- 右側：ステータス & 各種コントロール -->
             <div class="flex flex-wrap items-center gap-3 relative z-10 w-full lg:w-auto justify-start lg:justify-end">
+                
                 <!-- ☁️ 同期ステータスバッジ -->
                 <div id="sync-status-badge" class="bg-[#F1ECEB] dark:bg-[#201A19] text-[#5F6368] dark:text-[#E2E2E9] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-gray-200 dark:border-gray-800 transition-all shadow-sm">
                     <span id="sync-dot" class="w-2.5 h-2.5 bg-gray-500 dark:bg-gray-400 rounded-full inline-block"></span>
@@ -175,6 +180,7 @@
             </div>
         </header>
 
+        <!-- iPad向け：2カラム分割レイアウト -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
             
             <!-- 左カラム: 管理コンソール -->
@@ -317,9 +323,7 @@
 
     </main>
 
-    <!-- -------------------------------------------------------------
-         ⚙️ Material 3 設定モーダル
-    -------------------------------------------------------------- -->
+    <!-- ⚙️ Material 3 設定モーダル -->
     <div id="settings-modal" class="settings-overlay fixed inset-0 bg-black/60 z-50 flex justify-end items-stretch opacity-0 pointer-events-none invisible transition-all duration-300">
         <div id="settings-sheet" class="settings-sheet w-full max-w-md bg-white dark:bg-[#1E1F22] shadow-2xl p-6 flex flex-col justify-between transform translate-x-full rounded-l-m3-large">
             
@@ -337,7 +341,7 @@
 
                 <div class="space-y-6 overflow-y-auto max-h-[75vh] pr-1">
                     
-                    <!-- 1. 管理者ログインセクション -->
+                    <!-- 管理者ログインセクション -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800/50">
                         <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-2 flex items-center gap-1.5">
                             <span class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">shield</span>
@@ -367,7 +371,7 @@
                         </div>
                     </div>
 
-                    <!-- 2. ダークモード切り替え -->
+                    <!-- ダークモード切り替え -->
                     <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#111318] rounded-m3-small border border-gray-100 dark:border-gray-800">
                         <div>
                             <span class="text-xs font-bold block dark:text-white">ダークテーマ (夜間防災モード)</span>
@@ -379,7 +383,7 @@
                         </label>
                     </div>
 
-                    <!-- 3. アクセントカラー選択セクション -->
+                    <!-- アクセントカラー選択セクション -->
                     <div>
                         <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-3 flex items-center gap-1.5">
                             <span class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">palette</span>
@@ -405,7 +409,7 @@
                         </div>
                     </div>
 
-                    <!-- 4. 通知テスト ＆ チャイムテスト -->
+                    <!-- 通知テスト ＆ チャイムテスト -->
                     <div>
                         <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-3 flex items-center gap-1.5">
                             <span class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">notifications</span>
@@ -414,9 +418,9 @@
                         <p class="text-[10px] text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
                             通知の受信テストと、防災行政無線チャイム（ピンポンパンポン）の音声テストを実行します。
                         </p>
-                        <button onclick="testNotificationFlow()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full transition flex items-center justify-center gap-2">
+                        <button id="notification-btn" onclick="requestNotificationPermission()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full transition flex items-center justify-center gap-2">
                             <span class="material-symbols-rounded text-sm">volume_up</span>
-                            通知 ＆ 防災チャイムのテスト
+                            <span id="notification-status-text">プッシュ通知を有効にしてテスト</span>
                         </button>
                     </div>
 
@@ -424,7 +428,7 @@
             </div>
 
             <div class="border-t dark:border-gray-800 pt-4 text-center">
-                <span class="text-[9px] text-gray-400 font-mono tracking-wider">disaster-monitoring-m3 v1.4.2 (Final)</span>
+                <span class="text-[9px] text-gray-400 font-mono tracking-wider">disaster-monitoring-m3 v1.4.3</span>
             </div>
 
         </div>
@@ -450,14 +454,13 @@
         // =============================================================
         // 🔒 [友達と共有するためにここにFirebase Configを貼り付けてください]
         // =============================================================
-        // Firebaseに接続する場合は以下の "" の中にJSONを貼り付けてください。
-        // 例: const firebaseConfig = '{"apiKey": "...", "authDomain": "..."}';
         const firebaseConfig = ""; 
 
         // 1. 変数定義
         let volcanoData = [];
         let currentTabs = {}; 
         let activeTheme = 'purple'; 
+        let lastKnownLevels = {}; // 前回の火山警戒レベルを記憶
 
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
 
@@ -466,7 +469,6 @@
         let auth = null;
         let currentSyncUnsubscribe = null;
 
-        // 3. アプリ起動初期化
         window.onload = function() {
             tickClock();
             setInterval(tickClock, 1000);
@@ -483,7 +485,6 @@
 
             tryAutoConnectFirebase();
 
-            // パスワード入力のEnterキー処理
             document.getElementById("modal-admin-pass").addEventListener("keypress", function(e) {
                 if (e.key === "Enter") {
                     checkAdminPassword();
@@ -578,6 +579,17 @@
                     
                     volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
                     
+                    // 🔔 リアルタイム更新検知（バックグラウンド通知の鍵）
+                    volcanoData.forEach(vol => {
+                        const prevLevel = lastKnownLevels[vol.id];
+                        // 以前の記録があり、今回レベルが変更された場合に自動システムプッシュ通知を発行
+                        if (prevLevel !== undefined && prevLevel !== vol.level) {
+                            triggerSystemNotification(vol.name, vol.level, vol.comment);
+                            playSiren();
+                        }
+                        lastKnownLevels[vol.id] = vol.level; // 最新を記録
+                    });
+
                     saveLocalVolcanos();
                     renderUI();
                     
@@ -757,7 +769,6 @@
                 renderUI();
             }
 
-            // 更新時は「サイレン音」と「プッシュ通知」のみ実行する
             playSiren();
             triggerSystemNotification(volcanoData[index].name, level, comment || volcanoData[index].comment);
         }
@@ -796,7 +807,7 @@
             if (show && inputText) {
                 textSpan.innerText = inputText;
                 ticker.classList.remove("hidden");
-                playSiren(); // テロップ配信時もサイレンを鳴らす
+                playSiren(); 
                 showToast("緊急速報配信中", "画面上部に緊急災害ニュース速報をオーバーレイ表示しました。", true);
             } else {
                 ticker.classList.add("hidden");
@@ -847,30 +858,24 @@
             }
         }
 
-        // 🔊 各カードの「読み上げボタン」が押されたときに呼ばれる関数
         function playEmergencyBroadcastById(volId) {
             const vol = volcanoData.find(v => v.id === volId);
             if (!vol) return;
 
-            // 防災無線の4音チャイム（ピン・ポン・パン・ポン♪）
             const chimeNotes = [
-                { frequency: 440, duration: 0.6 },  // A4
-                { frequency: 554, duration: 0.6 },  // C#5
-                { frequency: 659, duration: 0.6 },  // E5
-                { frequency: 880, duration: 0.9 }   // A5
+                { frequency: 440, duration: 0.6 },  
+                { frequency: 554, duration: 0.6 },  
+                { frequency: 659, duration: 0.6 },  
+                { frequency: 880, duration: 0.9 }   
             ];
 
-            // チャイムを鳴らした後に音声を読み上げる
             playChimeNotes(chimeNotes, () => {
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
-                    
-                    // 入力されたコメント（vol.comment）を文章の最後に含めて読み上げる
                     const text = `火山防災情報。${vol.name}の現在の警戒レベルは、レベル${vol.level}です。状況をお伝えします。${vol.comment}`;
-                    
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = "ja-JP";
-                    utterance.rate = 0.95; // 落ち着いた速度
+                    utterance.rate = 0.95; 
                     utterance.pitch = 1.0;
                     window.speechSynthesis.speak(utterance);
                 } else {
@@ -912,7 +917,6 @@
                 const cardHTML = `
                     <div class="bg-white dark:bg-[#1E1F22] border border-[#E1E2EC] dark:border-gray-800 rounded-m3-large p-6 sm:p-7 shadow-m3-elevation-1 hover:shadow-m3-elevation-3 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
                         
-                        <!-- 動的警戒アクセント -->
                         <div class="absolute inset-0 bg-gradient-to-br from-transparent to-${theme.badge}/5 pointer-events-none"></div>
 
                         <div>
@@ -932,14 +936,12 @@
 
                             <!-- 火山ダイナミックSVG -->
                             <div class="w-full h-36 bg-gradient-to-b from-sky-100 to-sky-200 dark:from-slate-800 dark:to-slate-900 rounded-m3-medium mb-5 relative overflow-hidden flex items-end justify-center border border-gray-200/50 dark:border-gray-800 shadow-inner">
-                                <!-- 煙 -->
                                 <svg class="absolute bottom-12 left-1/2 -translate-x-1/2 w-24 h-24" viewBox="0 0 100 100" style="opacity: ${smokeDensity}">
                                     <circle cx="50" cy="50" r="10" fill="#78909c" class="drift-smoke" style="animation-delay: 0s" />
                                     <circle cx="45" cy="45" r="13" fill="#90a4ae" class="drift-smoke" style="animation-delay: 1.3s" />
                                     <circle cx="53" cy="48" r="9" fill="#b0bec5" class="drift-smoke" style="animation-delay: 2.6s" />
                                 </svg>
 
-                                <!-- 山 -->
                                 <svg class="w-56 h-28 relative z-10" viewBox="0 0 200 100">
                                     <polygon points="15,100 100,15 185,100" fill="#3e2723" />
                                     <ellipse cx="100" cy="17" rx="14" ry="4" fill="${theme.lava}" class="pulse-lava" />
@@ -947,7 +949,6 @@
                                     <path d="M 101 17 Q 107 55 114 75" stroke="${theme.lava}" stroke-width="3" fill="none" style="display: ${showLava}" />
                                 </svg>
 
-                                <!-- 地面 -->
                                 <div class="absolute bottom-0 inset-x-0 h-4 bg-[#2e7d32] z-20"></div>
                             </div>
 
@@ -964,12 +965,12 @@
                             <!-- タブ内容 -->
                             <div class="relative z-10 min-h-[110px]">
                                 ${currentTabs[vol.id] === 0 ? `
-                                    <div class="bg-gray-50 dark:bg-[#111318] border border-gray-100 dark:border-gray-800 rounded-m3-medium p-4 text-xs sm:text-sm text-[#44474E] dark:text-gray-300 leading-relaxed font-semibold">
+                                    <div class="bg-gray-50 dark:bg-[#111318] border border-gray-100 dark:border-gray-800 rounded-m3-medium p-4 text-xs sm:text-sm text-[#44474E] dark:text-gray-300 leading-relaxed font-semibold font-sans">
                                         ${vol.comment}
                                     </div>
                                 ` : `
                                     <div class="bg-gray-50 dark:bg-[#111318] border border-gray-100 dark:border-gray-800 rounded-m3-medium p-3 text-xs text-[#44474E] dark:text-gray-300 max-h-[110px] overflow-y-auto font-medium">
-                                        <ul class="space-y-2">
+                                        <ul class="space-y-2 font-sans">
                                             ${vol.history.map(hist => `
                                                 <li class="border-b border-gray-200/50 dark:border-gray-800 pb-1.5 last:border-0 flex items-start gap-2">
                                                     <span class="material-symbols-rounded text-xs text-red-500 mt-0.5">info</span>
@@ -982,7 +983,7 @@
                             </div>
                         </div>
 
-                        <!-- 最終更新 と ★読み上げボタン★ -->
+                        <!-- 最終更新と読み上げボタン -->
                         <div class="mt-5 pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center relative z-10">
                             <div class="flex flex-col gap-0.5">
                                 <div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold flex items-center gap-1">
@@ -993,7 +994,6 @@
                                 </div>
                             </div>
                             
-                            <!-- 🔊 状況読み上げボタン -->
                             <button onclick="playEmergencyBroadcastById(${vol.id})" class="flex items-center gap-1.5 bg-[#E1E2EC]/40 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2.5 rounded-m3-full text-[10px] sm:text-xs font-black transition-all shadow-sm">
                                 <span class="material-symbols-rounded text-sm">volume_up</span>
                                 状況を読み上げ
@@ -1142,27 +1142,51 @@
             }
         }
 
+        // 🔔 プッシュ通知の登録 ＆ 許可要求（iPadOS用）
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                showToast("非対応", "このブラウザまたは端末はプッシュ通知に対応していません。");
+                return;
+            }
+
+            Notification.requestPermission().then(perm => {
+                const btn = document.getElementById("notification-btn");
+                const statusText = document.getElementById("notification-status-text");
+
+                if (perm === "granted") {
+                    btn.className = "w-full py-3 bg-[#D2E4FF] text-[#001D36] rounded-m3-full text-xs font-black transition flex items-center justify-center gap-2";
+                    statusText.innerText = "プッシュ通知：有効中";
+                    showToast("通知が有効になりました！", "火山情報がリアルタイムに更新された際、通知でお知らせします。");
+                    testNotificationFlow(); // 正常に許可されたらテスト通知を飛ばす
+                } else {
+                    btn.className = "w-full py-3 bg-red-100 text-red-800 rounded-m3-full text-xs font-bold transition flex items-center justify-center gap-2";
+                    statusText.innerText = "プッシュ通知：ブロック中";
+                }
+            });
+        }
+
         function triggerSystemNotification(name, level, comment) {
-            const title = `🚨 【防災速報】${name}`;
-            const body = `警戒レベル ${level}に移行。${comment}`;
+            const title = `🚨 【火山警報】${name}`;
+            const body = `警戒レベル ${level}。${comment}`;
 
             if (Notification.permission === "granted") {
+                // Service Workerを通してバックグラウンド配信
                 navigator.serviceWorker.ready.then(reg => {
                     reg.showNotification(title, {
                         body: body,
-                        icon: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=128&h=128&fit=crop',
+                        icon: './icon-192.png',
                         vibrate: [300, 100, 300, 100, 400],
-                        tag: 'volcano-alert',
+                        tag: 'volcano-alert-' + name,
                         requireInteraction: true
                     });
                 }).catch(() => {
-                    new Notification(title, { body: body });
+                    // フォールバック
+                    new Notification(title, { body: body, icon: './icon-192.png' });
                 });
             }
             showToast(title, body, true);
         }
 
-        // 設定画面内の「通知＆防災チャイムのテスト」用
         function testNotificationFlow() {
             const chimeNotes = [
                 { frequency: 440, duration: 0.6 },
@@ -1173,7 +1197,7 @@
             playChimeNotes(chimeNotes, () => {
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
-                    const text = "これは、火山防災情報局の、通知および音声読み上げのテスト放送です。";
+                    const text = "これは火山防災情報局のテスト放送です。";
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = "ja-JP";
                     utterance.rate = 0.95;
@@ -1181,7 +1205,7 @@
                     window.speechSynthesis.speak(utterance);
                 }
             });
-            triggerSystemNotification("テスト通知", 5, "これはプッシュ通知と音声の動作確認テストです。");
+            triggerSystemNotification("システムテスト", 5, "プッシュ通知機能のテスト通知です。iPadのホーム画面で正常に動作しています。");
         }
 
         function showToast(title, message, isUrgent = false) {
@@ -1234,23 +1258,12 @@
 
         function runDynamicServiceWorker() {
             if ('serviceWorker' in navigator) {
-                const swContent = `
-                    self.addEventListener('install', (e) => {
-                        self.skipWaiting();
-                    });
-                    self.addEventListener('activate', (e) => {
-                        e.waitUntil(clients.claim());
-                    });
-                    self.addEventListener('fetch', (e) => {
-                        e.respondWith(fetch(e.request).catch(() => new Response("Offline active")));
-                    });
-                `;
-                const blob = new Blob([swContent], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(reg => console.log("M3 PWA SW loaded."))
-                    .catch(err => console.error(err));
+                // 外部の sw.js ファイルを登録します（プッシュ通知完全対応）
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => {
+                        console.log("Service Worker registered on branch scope:", reg.scope);
+                    })
+                    .catch(err => console.error("Service Worker registration failed:", err));
             }
         }
 
@@ -1273,4 +1286,3 @@
     </script>
 </body>
 </html>
-
