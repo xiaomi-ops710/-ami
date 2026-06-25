@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -109,7 +110,7 @@
             </span>
             <div class="w-full overflow-hidden">
                 <span id="ticker-text" class="animate-ticker text-sm font-black pl-4">
-                    【緊急地震速報】大網家にて最大震度6強の「ざわざわ」を観測しました。朝学習中のざわざわに極めて警戒してください。
+                    【緊急地震速報】大網家にて最大震度 6 強の「ざわざわ」を観測しました。朝学習中のざわざわに極めて警戒してください。
                 </span>
             </div>
         </div>
@@ -161,10 +162,17 @@
             <!-- 右側：ステータス & 各種コントロール -->
             <div class="flex flex-wrap items-center gap-3 relative z-10 w-full lg:w-auto justify-start lg:justify-end">
                 
-                <!-- ☁️ 同期ステータスバッジ -->
-                <div id="sync-status-badge" class="bg-[#F1ECEB] dark:bg-[#201A19] text-[#5F6368] dark:text-[#E2E2E9] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-gray-200 dark:border-gray-800 transition-all shadow-sm">
-                    <span id="sync-dot" class="w-2.5 h-2.5 bg-gray-500 dark:bg-gray-400 rounded-full inline-block"></span>
-                    <span id="sync-text">ローカルデータモード</span>
+                <!-- ☁️ 同期ステータスバッジ ＆ 手動強制同期ボタン -->
+                <div class="flex items-center gap-2">
+                    <div id="sync-status-badge" class="bg-[#F1ECEB] dark:bg-[#201A19] text-[#5F6368] dark:text-[#E2E2E9] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-gray-200 dark:border-gray-800 transition-all shadow-sm">
+                        <span id="sync-dot" class="w-2.5 h-2.5 bg-gray-500 dark:bg-gray-400 rounded-full inline-block"></span>
+                        <span id="sync-text">未接続・ローカルデータモード</span>
+                    </div>
+                    
+                    <!-- 🔄 強制同期ボタン -->
+                    <button onclick="forceSyncFromFirebase()" title="クラウドから最新データを手動同期" class="bg-white/10 hover:bg-white/20 text-white w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md border border-white/5">
+                        <span id="sync-button-icon" class="material-symbols-rounded text-xl">sync</span>
+                    </button>
                 </div>
 
                 <!-- ライブ時計 -->
@@ -237,9 +245,9 @@
                             <textarea id="update-comment" rows="3" placeholder="火山活動の様子やおもしろ身内コメントを入力..." class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3.5 text-xs font-semibold text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#6750A4] resize-none"></textarea>
                         </div>
 
-                        <button onclick="submitUpdateVolcano()" class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-m3-full transition shadow-md flex items-center justify-center gap-2">
-                            <span class="material-symbols-rounded text-sm">campaign</span>
-                            情報を書き換えて警報を発令
+                        <button id="btn-update-volcano" onclick="submitUpdateVolcano()" class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-m3-full transition shadow-md flex items-center justify-center gap-2">
+                            <span class="material-symbols-rounded text-sm" id="btn-update-icon">campaign</span>
+                            <span id="btn-update-text">情報を書き換えて警報を発令</span>
                         </button>
                     </div>
 
@@ -269,9 +277,9 @@
                             <textarea id="create-comment" rows="3" placeholder="身内の解説エピソードなど..." class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3.5 text-xs font-semibold text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#6750A4] resize-none"></textarea>
                         </div>
 
-                        <button onclick="submitCreateVolcano()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-m3-full transition shadow-md flex items-center justify-center gap-2">
-                            <span class="material-symbols-rounded text-sm">add_circle</span>
-                            データベースに新規登録
+                        <button id="btn-create-volcano" onclick="submitCreateVolcano()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-m3-full transition shadow-md flex items-center justify-center gap-2">
+                            <span class="material-symbols-rounded text-sm" id="btn-create-icon">add_circle</span>
+                            <span id="btn-create-text">データベースに新規登録</span>
                         </button>
                     </div>
 
@@ -282,7 +290,7 @@
                         </p>
                         <div>
                             <label class="block text-[11px] font-black text-[#44474E] dark:text-gray-400 mb-1.5 uppercase">速報テロップのメッセージ</label>
-                            <textarea id="eq-text-input" rows="3" class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3.5 text-xs font-semibold text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#6750A4] resize-none">【緊急速報】大網家周辺にて、最大震度6強の「ざわざわ」が発生しました。これに伴い朝学習中のざわざわに厳重な警戒が必要です。</textarea>
+                            <textarea id="eq-text-input" rows="3" class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3.5 text-xs font-semibold text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#6750A4] resize-none">【緊急速報】大網家周辺にて、最大震度 6 強の「ざわざわ」が発生しました。これに伴い朝学習中のざわざわに厳重な警戒が必要です。</textarea>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="triggerEarthquakeTicker(false)" class="flex-1 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white text-xs font-bold rounded-m3-full transition">
@@ -383,6 +391,20 @@
                         </label>
                     </div>
 
+                    <!-- Firebase 同期情報診断パネル -->
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800/50">
+                        <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-2 flex items-center gap-1.5">
+                            <span class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">cloud_sync</span>
+                            Firebase 接続情報
+                        </h4>
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed space-y-1 font-mono">
+                            <div>• <span class="font-bold">Project ID:</span> ohamigo-425a8</div>
+                            <div>• <span class="font-bold">Database:</span> Cloud Firestore</div>
+                            <div>• <span class="font-bold">Collection:</span> artifacts/public/data/volcanos</div>
+                            <div>• <span class="font-bold">Auth:</span> Anonymous Authentication</div>
+                        </div>
+                    </div>
+
                     <!-- アクセントカラー選択セクション -->
                     <div>
                         <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-3 flex items-center gap-1.5">
@@ -455,13 +477,13 @@
         // 🔒 [友達と共有するためにここにFirebase Configを貼り付けてください]
         // =============================================================
         const firebaseConfig = {
-  apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOFUpc",
-  authDomain: "ohamigo-425a8.firebaseapp.com",
-  projectId: "ohamigo-425a8",
-  storageBucket: "ohamigo-425a8.firebasestorage.app",
-  messagingSenderId: "342829309449",
-  appId: "1:342829309449:web:9937c81eaa8f48436262d8"
-};
+            apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOfUpc",
+            authDomain: "ohamigo-425a8.firebaseapp.com",
+            projectId: "ohamigo-425a8",
+            storageBucket: "ohamigo-425a8.firebasestorage.app",
+            messagingSenderId: "342829309449",
+            appId: "1:342829309449:web:9937c81eaa8f48436262d8"
+        };
 
         // 1. 変数定義
         let volcanoData = [];
@@ -520,6 +542,15 @@
             }
         }
 
+        // ローカルおよびFirestore同期完了時の共通タイムスタンプ更新
+        function getNowTimeStr() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const i = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            return `${h}:${i}:${s}`;
+        }
+
         function saveLocalVolcanos() {
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(volcanoData));
         }
@@ -554,7 +585,7 @@
             } else if (typeof firebaseConfig === 'string' && firebaseConfig !== "") {
                 await connectFirebase(firebaseConfig);
             } else {
-                updateSyncStatus('offline', 'ローカルデータモード');
+                updateSyncStatus('offline', '未接続・ローカルデータモード');
             }
         }
 
@@ -586,30 +617,100 @@
                     
                     volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
                     
-                    // 🔔 リアルタイム更新検知（バックグラウンド通知の鍵）
+                    // 🔔 リアルタイム更新検知
                     volcanoData.forEach(vol => {
                         const prevLevel = lastKnownLevels[vol.id];
-                        // 以前の記録があり、今回レベルが変更された場合に自動システムプッシュ通知を発行
                         if (prevLevel !== undefined && prevLevel !== vol.level) {
                             triggerSystemNotification(vol.name, vol.level, vol.comment);
                             playSiren();
                         }
-                        lastKnownLevels[vol.id] = vol.level; // 最新を記録
+                        lastKnownLevels[vol.id] = vol.level;
                     });
 
                     saveLocalVolcanos();
                     renderUI();
                     
-                    updateSyncStatus('connected', '同期済み / Firebase接続済み');
+                    // 同期時刻を正確に表示
+                    updateSyncStatus('connected', `データベース接続済み (最終同期: ${getNowTimeStr()})`);
                 }, (error) => {
                     console.error("Firestore同期にエラーが発生しました:", error);
-                    updateSyncStatus('offline', 'ローカルデータモード');
+                    updateSyncStatus('offline', '未接続・ローカルデータモード');
                 });
 
             } catch (err) {
                 console.error("Firebaseへの自動同期開始に失敗しました:", err);
-                updateSyncStatus('offline', 'ローカルデータモード');
+                updateSyncStatus('offline', '未接続・ローカルデータモード');
             }
+        }
+
+        // 強制手動再同期ボタン
+        async function forceSyncFromFirebase() {
+            const syncIcon = document.getElementById("sync-button-icon");
+            syncIcon.classList.add("animate-spin");
+            
+            showToast("同期リクエスト送信", "Firebaseデータベースから最新の火山データを強制同期しています...", false);
+            
+            if (db && auth.currentUser) {
+                try {
+                    const colRef = firebase.collection(db, 'artifacts', appId, 'public', 'data', 'volcanos');
+                    const snapshot = await firebase.getDocs(colRef);
+                    const list = [];
+                    snapshot.forEach(doc => {
+                        list.push({ docId: doc.id, ...doc.data() });
+                    });
+                    
+                    if (list.length > 0) {
+                        volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
+                        saveLocalVolcanos();
+                        renderUI();
+                        
+                        playPingSound();
+                        showToast("手動同期完了", "データベースから最新の火山情報を100%取得・同期しました！", false);
+                        updateSyncStatus('connected', `データベース接続済み (最終同期: ${getNowTimeStr()})`);
+                    } else {
+                        showToast("同期通知", "接続は正常ですが、データベース上に火山がまだ1件もありません。左側から山を登録してください。", false);
+                        updateSyncStatus('connected', `データベース接続済み (最終同期: ${getNowTimeStr()})`);
+                    }
+                } catch (e) {
+                    console.error("手動同期エラー:", e);
+                    showToast("同期エラー", "データベースへのアクセスに失敗しました。", true);
+                    updateSyncStatus('offline', '未接続・ローカルデータモード');
+                }
+            } else {
+                setTimeout(() => {
+                    showToast("ローカル同期", "ローカルストレージから火山データを再構築しました。", false);
+                    loadLocalVolcanos();
+                    updateSyncStatus('offline', '未接続・ローカルデータモード');
+                }, 800);
+            }
+
+            setTimeout(() => {
+                syncIcon.classList.remove("animate-spin");
+            }, 1000);
+        }
+
+        // ピピッというシステム通信成功音 (Web Audio)
+        function playPingSound() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.08);
+                
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.25);
+            } catch (e) {}
         }
 
 
@@ -700,6 +801,11 @@
                 return;
             }
 
+            const btnText = document.getElementById("btn-create-text");
+            const btnIcon = document.getElementById("btn-create-icon");
+            btnText.innerText = "クラウドに登録・同期中...";
+            btnIcon.classList.add("animate-spin");
+
             const now = new Date();
             const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             const newId = Date.now();
@@ -729,9 +835,14 @@
                 renderUI();
             }
 
-            document.getElementById("create-name").value = "";
-            document.getElementById("create-comment").value = "";
-            showToast("登録成功", `${name} の監視をスタートしました。`);
+            setTimeout(() => {
+                btnText.innerText = "データベースに新規登録";
+                btnIcon.classList.remove("animate-spin");
+                
+                document.getElementById("create-name").value = "";
+                document.getElementById("create-comment").value = "";
+                showToast("登録成功", `${name} の監視データをクラウドに完全同期しました！`);
+            }, 800);
         }
 
         async function submitUpdateVolcano() {
@@ -745,6 +856,11 @@
                 showToast("未選択エラー", "更新対象の火山を選んでください。", true);
                 return;
             }
+
+            const btnText = document.getElementById("btn-update-text");
+            const btnIcon = document.getElementById("btn-update-icon");
+            btnText.innerText = "変更データをクラウドに同期中...";
+            btnIcon.classList.add("animate-spin");
 
             const now = new Date();
             const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -776,8 +892,13 @@
                 renderUI();
             }
 
-            playSiren();
-            triggerSystemNotification(volcanoData[index].name, level, comment || volcanoData[index].comment);
+            setTimeout(() => {
+                btnText.innerText = "情報を書き換えて警報を発令";
+                btnIcon.classList.remove("animate-spin");
+
+                playSiren();
+                triggerSystemNotification(volcanoData[index].name, level, comment || volcanoData[index].comment);
+            }, 800);
         }
 
         async function clearAllVolcanos() {
@@ -1149,35 +1270,11 @@
             }
         }
 
-        // 🔔 プッシュ通知の登録 ＆ 許可要求（iPadOS用）
-        function requestNotificationPermission() {
-            if (!("Notification" in window)) {
-                showToast("非対応", "このブラウザまたは端末はプッシュ通知に対応していません。");
-                return;
-            }
-
-            Notification.requestPermission().then(perm => {
-                const btn = document.getElementById("notification-btn");
-                const statusText = document.getElementById("notification-status-text");
-
-                if (perm === "granted") {
-                    btn.className = "w-full py-3 bg-[#D2E4FF] text-[#001D36] rounded-m3-full text-xs font-black transition flex items-center justify-center gap-2";
-                    statusText.innerText = "プッシュ通知：有効中";
-                    showToast("通知が有効になりました！", "火山情報がリアルタイムに更新された際、通知でお知らせします。");
-                    testNotificationFlow(); // 正常に許可されたらテスト通知を飛ばす
-                } else {
-                    btn.className = "w-full py-3 bg-red-100 text-red-800 rounded-m3-full text-xs font-bold transition flex items-center justify-center gap-2";
-                    statusText.innerText = "プッシュ通知：ブロック中";
-                }
-            });
-        }
-
         function triggerSystemNotification(name, level, comment) {
-            const title = `🚨 【火山警報】${name}`;
-            const body = `警戒レベル ${level}。${comment}`;
+            const title = `🚨 【防災速報】${name}`;
+            const body = `警戒レベル ${level}に移行。${comment}`;
 
             if (Notification.permission === "granted") {
-                // Service Workerを通してバックグラウンド配信
                 navigator.serviceWorker.ready.then(reg => {
                     reg.showNotification(title, {
                         body: body,
@@ -1187,7 +1284,6 @@
                         requireInteraction: true
                     });
                 }).catch(() => {
-                    // フォールバック
                     new Notification(title, { body: body, icon: './icon-192.png' });
                 });
             }
@@ -1265,7 +1361,6 @@
 
         function runDynamicServiceWorker() {
             if ('serviceWorker' in navigator) {
-                // 外部の sw.js ファイルを登録します（プッシュ通知完全対応）
                 navigator.serviceWorker.register('./sw.js')
                     .then(reg => {
                         console.log("Service Worker registered on branch scope:", reg.scope);
@@ -1293,3 +1388,5 @@
     </script>
 </body>
 </html>
+
+```
