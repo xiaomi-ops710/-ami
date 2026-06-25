@@ -8,7 +8,6 @@ const urlsToCache = [
   './icon-512.png'
 ];
 
-// インストール時にキャッシュを保持
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -17,7 +16,6 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// オフラインキャッシュのハンドリング
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
@@ -25,7 +23,6 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// アクティベート処理
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -60,7 +57,7 @@ self.addEventListener('push', event => {
     data: {
       url: './index.html'
     },
-    requireInteraction: true // ユーザーが閉じるまで通知を保持（iPadOSで目立たせる）
+    requireInteraction: true 
   };
 
   event.waitUntil(
@@ -68,7 +65,6 @@ self.addEventListener('push', event => {
   );
 });
 
-// 通知がタップされたらアプリを開く
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
