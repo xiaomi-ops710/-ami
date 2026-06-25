@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -163,7 +164,7 @@
                 
                 <!-- ☁️ 同期ステータスバッジ ＆ 手動強制同期ボタン -->
                 <div class="flex items-center gap-2">
-                    <div id="sync-status-badge" class="bg-[#F1ECEB] dark:bg-[#201A19] text-[#5F6368] dark:text-[#E2E2E9] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-gray-200 dark:border-gray-800 transition-all shadow-sm">
+                    <div id="sync-status-badge" onclick="toggleSettingsModal(true)" class="cursor-pointer hover:opacity-90 bg-[#F1ECEB] dark:bg-[#201A19] text-[#5F6368] dark:text-[#E2E2E9] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-gray-200 dark:border-gray-800 transition-all shadow-sm">
                         <span id="sync-dot" class="w-2.5 h-2.5 bg-gray-500 dark:bg-gray-400 rounded-full inline-block"></span>
                         <span id="sync-text">未接続・ローカルデータモード</span>
                     </div>
@@ -390,18 +391,34 @@
                         </label>
                     </div>
 
-                    <!-- Firebase 同期情報診断パネル -->
+                    <!-- 🛠️ Firebase 同期情報診断パネル ＆ エラー詳細表示 -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800/50">
                         <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-2 flex items-center gap-1.5">
                             <span class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">cloud_sync</span>
-                            Firebase 接続情報
+                            Firebase 接続＆トラブル解決
                         </h4>
-                        <div class="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed space-y-1 font-mono">
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed space-y-1 font-mono mb-3">
                             <div>• <span class="font-bold">Project ID:</span> ohamigo-425a8</div>
                             <div>• <span class="font-bold">Database:</span> Cloud Firestore</div>
                             <div>• <span class="font-bold">Collection:</span> artifacts/public/data/volcanos</div>
-                            <div>• <span class="font-bold">Auth:</span> Anonymous Authentication</div>
-                            <div class="pt-2 text-xs font-bold text-red-500" id="firebase-error-log"></div>
+                        </div>
+                        
+                        <!-- エラー表示とトラブル診断 -->
+                        <div id="diagnostics-box" class="hidden border-t pt-3 mt-3 border-gray-200 dark:border-gray-800">
+                            <div class="text-xs font-bold text-red-500 flex items-center gap-1.5 mb-1.5">
+                                <span class="material-symbols-rounded text-sm">error</span>
+                                接続障害が発生しています
+                            </div>
+                            <div class="p-2.5 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-[10px] font-semibold font-mono rounded-lg border border-red-200/50 break-all leading-normal" id="firebase-error-log"></div>
+                            
+                            <!-- AIおたすけアドバイス -->
+                            <div class="mt-2.5 text-[10px] text-amber-600 dark:text-amber-400 leading-relaxed bg-amber-50 dark:bg-amber-950/10 p-2.5 rounded-lg border border-amber-200/40">
+                                <div class="font-bold flex items-center gap-1 mb-1">
+                                    <span class="material-symbols-rounded text-xs">help</span>
+                                    解決のためのチェックポイント：
+                                </div>
+                                <div id="diagnostics-advice"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -556,7 +573,7 @@
 
 
         // -------------------------------------------------------------
-        // ☁️ Firebase 同期・接続管理
+        // ☁️ Firebase 同期・接続管理 ＆ エラーライブ診断
         // -------------------------------------------------------------
         function updateSyncStatus(status, text) {
             const badge = document.getElementById("sync-status-badge");
@@ -567,14 +584,17 @@
                 badge.className = "bg-[#E6F4EA] dark:bg-[#1B3624] text-[#137333] dark:text-[#81C995] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-[#A3E2B6] dark:border-[#3C5A42] transition-all shadow-sm";
                 dot.className = "w-2.5 h-2.5 bg-[#137333] dark:bg-[#81C995] rounded-full inline-block animate-pulse";
                 statusText.innerText = text;
+                document.getElementById("diagnostics-box").classList.add("hidden"); // エラー無ければ非表示
             } else if (status === 'connecting') {
                 badge.className = "bg-[#FEF7E0] dark:bg-[#3C2E15] text-[#B06000] dark:text-[#FDD663] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-[#FDE293] dark:border-[#5E4717] transition-all shadow-sm";
                 dot.className = "w-2.5 h-2.5 bg-[#B06000] dark:bg-[#FDD663] rounded-full inline-block animate-ping";
                 statusText.innerText = text;
             } else {
-                badge.className = "bg-[#F1ECEB] dark:bg-[#201A19] text-[#5F6368] dark:text-[#E2E2E9] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-gray-200 dark:border-gray-800 transition-all shadow-sm";
-                dot.className = "w-2.5 h-2.5 bg-gray-500 dark:bg-gray-400 rounded-full inline-block";
-                statusText.innerText = text;
+                // 未接続 / エラー時は「⚠️」マークにする
+                badge.className = "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-red-200 dark:border-red-900/50 transition-all shadow-sm";
+                dot.className = "w-2.5 h-2.5 bg-red-600 dark:bg-red-500 rounded-full inline-block";
+                statusText.innerHTML = `⚠️ 未接続・エラー検知 (設定を確認)`;
+                document.getElementById("diagnostics-box").classList.remove("hidden");
             }
         }
 
@@ -590,21 +610,17 @@
 
         async function connectFirebase(configJson) {
             updateSyncStatus('connecting', 'Firebase 接続中...');
-            document.getElementById("firebase-error-log").innerText = ""; // 過去のログをクリア
             
             try {
-                // すべてのFirebase Appインスタンスを安全にクリーンアップして初期化
                 if (firebase.apps.length > 0) {
                     await Promise.all(firebase.apps.map(app => app.delete()));
                 }
 
                 const config = JSON.parse(configJson);
-                // 🛠️ HTML compat APIに基づく正しい初期化方式
                 const app = firebase.initializeApp(config);
                 auth = firebase.auth();
                 db = firebase.firestore();
 
-                // 🛠️ 匿名ログイン
                 auth.signInAnonymously().then(() => {
                     if (currentSyncUnsubscribe) {
                         currentSyncUnsubscribe();
@@ -620,7 +636,6 @@
                         
                         volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
                         
-                        // 🔔 リアルタイム更新検知
                         volcanoData.forEach(vol => {
                             const prevLevel = lastKnownLevels[vol.id];
                             if (prevLevel !== undefined && prevLevel !== vol.level) {
@@ -636,20 +651,61 @@
                         updateSyncStatus('connected', `データベース接続済み (最終同期: ${getNowTimeStr()})`);
                     }, (error) => {
                         console.error("Firestore同期にエラーが発生しました:", error);
-                        document.getElementById("firebase-error-log").innerText = `⚠️ Firestoreエラー: ${error.message}`;
-                        updateSyncStatus('offline', '未接続・ローカルデータモード');
+                        handleFirebaseError(error, "Firestore Database");
                     });
                 }).catch((authError) => {
                     console.error("Firebase認証エラー:", authError);
-                    document.getElementById("firebase-error-log").innerText = `⚠️ 認証エラー: ${authError.message}`;
-                    updateSyncStatus('offline', '未接続・ローカルデータモード');
+                    handleFirebaseError(authError, "Authentication");
                 });
 
             } catch (err) {
                 console.error("Firebase初期化失敗:", err);
-                document.getElementById("firebase-error-log").innerText = `⚠️ 初期化エラー: ${err.message}`;
-                updateSyncStatus('offline', '未接続・ローカルデータモード');
+                handleFirebaseError(err, "Initialization");
             }
+        }
+
+        // Firebaseエラーを判別して、具体的な対策アドバイスを表示する
+        function handleFirebaseError(error, phase) {
+            const errLog = document.getElementById("firebase-error-log");
+            const adviceBox = document.getElementById("diagnostics-advice");
+            
+            errLog.innerText = `[${phase} エラー] ${error.message || error}`;
+            updateSyncStatus('offline', '同期エラー');
+
+            let advice = "";
+            const msg = (error.message || "").toLowerCase();
+
+            if (msg.includes("api-key-not-valid") || msg.includes("api key") || msg.includes("invalid-api-key")) {
+                advice = `
+                    <ol class="list-decimal pl-4 space-y-1">
+                        <li>コピー元の <b>apiKey</b> の英数字が途中で切れていないか、前後に余分な空白（スペース）が入っていないか再度確認してください。</li>
+                        <li>Firebaseの設定コードをボタンから「丸ごとコピー」し、もう一度コード内に綺麗に貼り付けてください。</li>
+                    </ol>
+                `;
+            } else if (msg.includes("permission-denied") || msg.includes("missing or insufficient permissions")) {
+                advice = `
+                    <ol class="list-decimal pl-4 space-y-1">
+                        <li>Firebaseコンソール内の <b>Firestore Database</b> ＞ <b>「ルール」タブ</b> を開いてください。</li>
+                        <li>セキュリティルールがテストモード（<code>allow read, write: if true;</code>）になっているか、期限が切れていないか確認してください。</li>
+                    </ol>
+                `;
+            } else if (msg.includes("network-request-failed") || msg.includes("offline")) {
+                advice = `
+                    <ol class="list-decimal pl-4 space-y-1">
+                        <li>iPadがインターネットに繋がっているか通信状況を確認してください。</li>
+                        <li>一時的な接続不良です。手動同期ボタン（右上）を数秒後に押し直してください。</li>
+                    </ol>
+                `;
+            } else {
+                advice = `
+                    <ol class="list-decimal pl-4 space-y-1">
+                        <li>Firebaseの構成オブジェクト（Config）に一文字でも誤字・脱字がないか再度確認してください。</li>
+                        <li>Firebase内のウェブアプリ登録情報から Config をコピーし直してみてください。</li>
+                    </ol>
+                `;
+            }
+
+            adviceBox.innerHTML = advice;
         }
 
         // 手動強制同期ボタン
@@ -1398,3 +1454,4 @@
 </body>
 </html>
 
+```
