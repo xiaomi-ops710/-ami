@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -19,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
-    <!-- Firebase SDK (Compat版で高い互換性を維持) -->
+    <!-- Firebase SDK (Compat版) -->
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
@@ -239,6 +240,37 @@
                             </div>
                         </div>
 
+                        <!-- 🖼️ 山画像・アニメーションの設定変更 -->
+                        <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
+                            <label class="block text-[11px] font-black text-[#44474E] dark:text-gray-400 uppercase">山のビジュアルスタイル変更</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setVisualType('update', 'animation')" id="vtype-update-animation" class="py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
+                                    標準SVG
+                                </button>
+                                <button onclick="setVisualType('update', 'preset')" id="vtype-update-preset" class="py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800">
+                                    イラスト
+                                </button>
+                                <button onclick="setVisualType('update', 'custom')" id="vtype-update-custom" class="py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800">
+                                    写真アップ
+                                </button>
+                            </div>
+                            
+                            <!-- プリセットセレクター -->
+                            <div id="vstyle-update-preset-box" class="hidden">
+                                <select id="update-visual-preset" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-lg p-2 text-xs font-bold">
+                                    <option value="fuji">富士山風 (雪化粧)</option>
+                                    <option value="island">海に浮かぶ火山島</option>
+                                    <option value="sci-fi">未来SFドーム型火山</option>
+                                </select>
+                            </div>
+
+                            <!-- アップローダー -->
+                            <div id="vstyle-update-custom-box" class="hidden">
+                                <input type="file" id="update-visual-file" accept="image/*" onchange="processCustomImage('update', this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#6750A4] file:text-white hover:file:bg-[#4F378B]">
+                                <input type="hidden" id="update-visual-base64">
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-[11px] font-black text-[#44474E] dark:text-gray-400 mb-1.5 uppercase">現在の状況・アドバイス文</label>
                             <textarea id="update-comment" rows="3" placeholder="火山活動の様子やおもしろ身内コメントを入力..." class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3.5 text-xs font-semibold text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#6750A4] resize-none"></textarea>
@@ -268,6 +300,37 @@
                                     <option value="5">レベル5 [避難]</option>
                                 </select>
                                 <span class="material-symbols-rounded absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+
+                        <!-- 🖼️ 新規：山画像・アニメーションの設定変更 -->
+                        <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
+                            <label class="block text-[11px] font-black text-[#44474E] dark:text-gray-400 uppercase">山のビジュアルスタイル</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setVisualType('create', 'animation')" id="vtype-create-animation" class="py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
+                                    標準SVG
+                                </button>
+                                <button onclick="setVisualType('create', 'preset')" id="vtype-create-preset" class="py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800">
+                                    イラスト
+                                </button>
+                                <button onclick="setVisualType('create', 'custom')" id="vtype-create-custom" class="py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800">
+                                    写真アップ
+                                </button>
+                            </div>
+                            
+                            <!-- プリセットセレクター -->
+                            <div id="vstyle-create-preset-box" class="hidden">
+                                <select id="create-visual-preset" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-lg p-2 text-xs font-bold">
+                                    <option value="fuji">富士山風 (雪化粧)</option>
+                                    <option value="island">海に浮かぶ火山島</option>
+                                    <option value="sci-fi">未来SFドーム型火山</option>
+                                </select>
+                            </div>
+
+                            <!-- アップローダー -->
+                            <div id="vstyle-create-custom-box" class="hidden">
+                                <input type="file" id="create-visual-file" accept="image/*" onchange="processCustomImage('create', this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#6750A4] file:text-white hover:file:bg-[#4F378B]">
+                                <input type="hidden" id="create-visual-base64">
                             </div>
                         </div>
 
@@ -338,7 +401,7 @@
                 <!-- モーダルヘッダー -->
                 <div class="flex items-center justify-between border-b pb-4 mb-6 dark:border-gray-800">
                     <h3 class="text-lg font-black text-[#1C1B1F] dark:text-white flex items-center gap-2">
-                        <span class="material-symbols-rounded text-[#6750A4] dark:text-purple-400" id="modal-title-icon">settings</span>
+                        <span id="modal-title-icon" class="material-symbols-rounded text-[#6750A4] dark:text-purple-400">settings</span>
                         アプリ設定と管理者認証
                     </h3>
                     <button onclick="toggleSettingsModal(false)" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center text-gray-800 dark:text-gray-200">
@@ -390,10 +453,10 @@
                         </label>
                     </div>
 
-                    <!-- 🛠️ Firebase 同期情報診断パネル ＆ エラー詳細表示 -->
+                    <!-- Firebase 同期情報診断パネル -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800/50">
                         <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-2 flex items-center gap-1.5">
-                            <span class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">cloud_sync</span>
+                            <span id="theme-card-sync-icon" class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">cloud_sync</span>
                             Firebase 接続＆トラブル解決
                         </h4>
                         <div class="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed space-y-1 font-mono mb-3">
@@ -424,39 +487,39 @@
                     <!-- アクセントカラー選択セクション -->
                     <div>
                         <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-3 flex items-center gap-1.5">
-                            <span class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">palette</span>
+                            <span id="theme-card-palette-icon" class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">palette</span>
                             アプリのアクセントカラー
                         </h4>
                         <div class="grid grid-cols-4 gap-2">
-                            <button onclick="setThemeColor('purple')" class="theme-btn-purple border-2 border-transparent p-2.5 rounded-m3-medium bg-[#F1ECFB] dark:bg-purple-950/20 text-[#21005D] dark:text-purple-200 text-xs font-black transition flex flex-col items-center gap-1">
+                            <button id="theme-btn-purple" onclick="setThemeColor('purple')" class="border-2 border-transparent p-2.5 rounded-m3-medium bg-[#F1ECFB] dark:bg-purple-950/20 text-[#21005D] dark:text-purple-200 text-xs font-black transition flex flex-col items-center gap-1">
                                 <span class="w-6 h-6 rounded-full bg-[#6750A4] inline-block"></span>
                                 紫
                             </button>
-                            <button onclick="setThemeColor('blue')" class="theme-btn-blue border-2 border-transparent p-2.5 rounded-m3-medium bg-[#E8F0FE] dark:bg-blue-950/20 text-[#001D36] dark:text-blue-200 text-xs font-black transition flex flex-col items-center gap-1">
+                            <button id="theme-btn-blue" onclick="setThemeColor('blue')" class="border-2 border-transparent p-2.5 rounded-m3-medium bg-[#E8F0FE] dark:bg-blue-950/20 text-[#001D36] dark:text-blue-200 text-xs font-black transition flex flex-col items-center gap-1">
                                 <span class="w-6 h-6 rounded-full bg-[#1A73E8] inline-block"></span>
                                 青
                             </button>
-                            <button onclick="setThemeColor('terracotta')" class="theme-btn-terracotta border-2 border-transparent p-2.5 rounded-m3-medium bg-[#FBECEB] dark:bg-red-950/20 text-[#310000] dark:text-red-200 text-xs font-black transition flex flex-col items-center gap-1">
+                            <button id="theme-btn-terracotta" onclick="setThemeColor('terracotta')" class="border-2 border-transparent p-2.5 rounded-m3-medium bg-[#FBECEB] dark:bg-red-950/20 text-[#310000] dark:text-red-200 text-xs font-black transition flex flex-col items-center gap-1">
                                 <span class="w-6 h-6 rounded-full bg-[#BF360C] inline-block"></span>
                                 朱
                             </button>
-                            <button onclick="setThemeColor('emerald')" class="theme-btn-emerald border-2 border-transparent p-2.5 rounded-m3-medium bg-[#EBFBF0] dark:bg-emerald-950/20 text-[#002107] dark:text-emerald-200 text-xs font-black transition flex flex-col items-center gap-1">
+                            <button id="theme-btn-emerald" onclick="setThemeColor('emerald')" class="border-2 border-transparent p-2.5 rounded-m3-medium bg-[#EBFBF0] dark:bg-emerald-950/20 text-[#002107] dark:text-emerald-200 text-xs font-black transition flex flex-col items-center gap-1">
                                 <span class="w-6 h-6 rounded-full bg-[#00897B] inline-block"></span>
                                 翠
                             </button>
                         </div>
                     </div>
 
-                    <!-- 通知テスト ＆ チャイムテスト -->
+                    <!-- 🔔 プッシュ通知テスト（ユーザーインタラクションを分離） -->
                     <div>
                         <h4 class="text-xs font-black text-[#1C1B1F] dark:text-white uppercase mb-3 flex items-center gap-1.5">
-                            <span class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">notifications</span>
+                            <span id="theme-card-bell-icon" class="material-symbols-rounded text-sm text-[#6750A4] dark:text-purple-400">notifications</span>
                             プッシュ通知のオプション
                         </h4>
                         <p class="text-[10px] text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
-                            通知の受信テストと、防災行政無線チャイム（ピンポンパンポン）の音声テストを実行します。
+                            通知の許可ウィンドウをトリガーし、防災無線チャイム（ピンポンパンポン）の音声テストを実行します。
                         </p>
-                        <button id="notification-btn" onclick="requestNotificationPermission()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full transition flex items-center justify-center gap-2">
+                        <button id="notification-btn" class="w-full py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full transition flex items-center justify-center gap-2">
                             <span class="material-symbols-rounded text-sm">volume_up</span>
                             <span id="notification-status-text">プッシュ通知を有効にしてテスト</span>
                         </button>
@@ -490,7 +553,7 @@
     -------------------------------------------------------------- -->
     <script>
         // =============================================================
-        // 🔒 [友達と共有するためにここにFirebase Configを貼り付けてください]
+        // 🔒 Firebase Config (同期設定)
         // =============================================================
         const firebaseConfig = {
   apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOFUpc",
@@ -506,6 +569,10 @@
         let currentTabs = {}; 
         let activeTheme = 'purple'; 
         let lastKnownLevels = {}; // 前回の火山警戒レベルを記憶
+
+        // 火山ビジュアルスタイル設定 (create or update)
+        let visualTypeCreate = 'animation'; // animation, preset, custom
+        let visualTypeUpdate = 'animation';
 
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
 
@@ -535,6 +602,35 @@
                     checkAdminPassword();
                 }
             });
+
+            // 🔔 iOS/iPadOSのPWAセキュリティ制限への完全対応
+            // タップイベントに直接Permission要求をバインドすることで、iPadOSが許可ポップアップを100%トリガーするようにします。
+            const notifyBtn = document.getElementById("notification-btn");
+            if (notifyBtn) {
+                notifyBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    requestNotificationPermission();
+                });
+            }
+
+            // 火山変更用ドロップダウン選択時の初期設定反映
+            const updateSelector = document.getElementById("update-volcano-id");
+            if (updateSelector) {
+                updateSelector.addEventListener("change", function() {
+                    const selectedId = this.value;
+                    const vol = volcanoData.find(v => String(v.id) === selectedId);
+                    if (vol) {
+                        document.getElementById("update-level").value = vol.level;
+                        document.getElementById("update-comment").value = vol.comment;
+                        // ビジュアルを適用
+                        const type = vol.visualType || 'animation';
+                        setVisualType('update', type);
+                        if (type === 'preset') {
+                            document.getElementById("update-visual-preset").value = vol.visualPreset || 'fuji';
+                        }
+                    }
+                });
+            }
         };
 
 
@@ -583,13 +679,12 @@
                 badge.className = "bg-[#E6F4EA] dark:bg-[#1B3624] text-[#137333] dark:text-[#81C995] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-[#A3E2B6] dark:border-[#3C5A42] transition-all shadow-sm";
                 dot.className = "w-2.5 h-2.5 bg-[#137333] dark:bg-[#81C995] rounded-full inline-block animate-pulse";
                 statusText.innerText = text;
-                document.getElementById("diagnostics-box").classList.add("hidden"); // エラー無ければ非表示
+                document.getElementById("diagnostics-box").classList.add("hidden"); 
             } else if (status === 'connecting') {
                 badge.className = "bg-[#FEF7E0] dark:bg-[#3C2E15] text-[#B06000] dark:text-[#FDD663] px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-[#FDE293] dark:border-[#5E4717] transition-all shadow-sm";
                 dot.className = "w-2.5 h-2.5 bg-[#B06000] dark:bg-[#FDD663] rounded-full inline-block animate-ping";
                 statusText.innerText = text;
             } else {
-                // 未接続 / エラー時は「⚠️」マークにする
                 badge.className = "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 px-4 py-2.5 rounded-m3-full text-xs font-black flex items-center gap-2 border border-red-200 dark:border-red-900/50 transition-all shadow-sm";
                 dot.className = "w-2.5 h-2.5 bg-red-600 dark:bg-red-500 rounded-full inline-block";
                 statusText.innerHTML = `⚠️ 未接続・エラー検知 (設定を確認)`;
@@ -663,7 +758,6 @@
             }
         }
 
-        // Firebaseエラーを判別して、具体的な対策アドバイスを表示する
         function handleFirebaseError(error, phase) {
             const errLog = document.getElementById("firebase-error-log");
             const adviceBox = document.getElementById("diagnostics-advice");
@@ -681,25 +775,17 @@
                         <li>Firebaseの設定コードをボタンから「丸ごとコピー」し、もう一度コード内に綺麗に貼り付けてください。</li>
                     </ol>
                 `;
-            } else if (msg.includes("permission-denied") || msg.includes("missing or insufficient permissions")) {
+            } else if (msg.includes("permission-denied") || msg.includes("missing or insufficient permissions") || msg.includes("configuration-not-found")) {
                 advice = `
                     <ol class="list-decimal pl-4 space-y-1">
-                        <li>Firebaseコンソール内の <b>Firestore Database</b> ＞ <b>「ルール」タブ</b> を開いてください。</li>
+                        <li>Firebaseコンソールの <b>Authentication</b> ＞ <b>Sign-in method</b> を開き、<b>匿名（Anonymous）</b> ログイン方法を<b>有効（ON）</b>に設定して保存してください。</li>
                         <li>セキュリティルールがテストモード（<code>allow read, write: if true;</code>）になっているか、期限が切れていないか確認してください。</li>
-                    </ol>
-                `;
-            } else if (msg.includes("network-request-failed") || msg.includes("offline")) {
-                advice = `
-                    <ol class="list-decimal pl-4 space-y-1">
-                        <li>iPadがインターネットに繋がっているか通信状況を確認してください。</li>
-                        <li>一時的な接続不良です。手動同期ボタン（右上）を数秒後に押し直してください。</li>
                     </ol>
                 `;
             } else {
                 advice = `
                     <ol class="list-decimal pl-4 space-y-1">
                         <li>Firebaseの構成オブジェクト（Config）に一文字でも誤字・脱字がないか再度確認してください。</li>
-                        <li>Firebase内のウェブアプリ登録情報から Config をコピーし直してみてください。</li>
                     </ol>
                 `;
             }
@@ -707,7 +793,7 @@
             adviceBox.innerHTML = advice;
         }
 
-        // 手動強制同期ボタン
+        // 手動強制同期
         async function forceSyncFromFirebase() {
             const syncIcon = document.getElementById("sync-button-icon");
             syncIcon.classList.add("animate-spin");
@@ -753,7 +839,6 @@
             }, 1000);
         }
 
-        // ピピッというシステム通信成功音 (Web Audio)
         function playPingSound() {
             try {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -775,6 +860,65 @@
                 osc.start();
                 osc.stop(ctx.currentTime + 0.25);
             } catch (e) {}
+        }
+
+
+        // -------------------------------------------------------------
+        // 🖼️ 画像切り替え ＆ カスタム画像アップロード処理
+        // -------------------------------------------------------------
+        function setVisualType(mode, type) {
+            if (mode === 'create') {
+                visualTypeCreate = type;
+                ['animation', 'preset', 'custom'].forEach(t => {
+                    const btn = document.getElementById(`vtype-create-${t}`);
+                    if (t === type) {
+                        btn.className = "py-2 text-[10px] font-bold rounded-lg border text-center border-gray-400 bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white";
+                    } else {
+                        btn.className = "py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800 text-gray-500 hover:bg-gray-100/50";
+                    }
+                });
+                document.getElementById("vstyle-create-preset-box").style.display = (type === 'preset') ? 'block' : 'none';
+                document.getElementById("vstyle-create-custom-box").style.display = (type === 'custom') ? 'block' : 'none';
+            } else {
+                visualTypeUpdate = type;
+                ['animation', 'preset', 'custom'].forEach(t => {
+                    const btn = document.getElementById(`vtype-update-${t}`);
+                    if (t === type) {
+                        btn.className = "py-2 text-[10px] font-bold rounded-lg border text-center border-gray-400 bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white";
+                    } else {
+                        btn.className = "py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800 text-gray-500 hover:bg-gray-100/50";
+                    }
+                });
+                document.getElementById("vstyle-update-preset-box").style.display = (type === 'preset') ? 'block' : 'none';
+                document.getElementById("vstyle-update-custom-box").style.display = (type === 'custom') ? 'block' : 'none';
+            }
+        }
+
+        // カメラ・アルバムから選択された画像をBase64にエンコードする処理
+        function processCustomImage(mode, input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // iPadOSでの通信量を抑えるため、画像を適正サイズ(幅400px程度)にリサイズ圧縮
+                        const canvas = document.createElement("canvas");
+                        const ctx = canvas.getContext("2d");
+                        const maxW = 400;
+                        const scale = maxW / img.width;
+                        canvas.width = maxW;
+                        canvas.height = img.height * scale;
+                        
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const base64Resized = canvas.toDataURL("image/jpeg", 0.7); // 圧縮品質70%
+                        
+                        document.getElementById(`${mode}-visual-base64`).value = base64Resized;
+                        showToast("画像処理完了", "画像をアプリ向けに自動圧縮して登録しました。");
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
 
@@ -874,6 +1018,11 @@
             const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             const newId = Date.now();
 
+            // ビジュアルデータを収集
+            const visualType = visualTypeCreate;
+            const visualPreset = document.getElementById("create-visual-preset").value;
+            const visualCustomBase64 = document.getElementById("create-visual-base64").value;
+
             const newVol = {
                 id: newId,
                 name: name,
@@ -881,6 +1030,9 @@
                 level: level,
                 comment: comment,
                 updateTime: timeStr,
+                visualType: visualType,
+                visualPreset: visualPreset,
+                visualCustom: visualCustomBase64,
                 history: [
                     `${now.getFullYear()}/${timeStr}: 警報【レベル ${level}】でシステム監視を開始しました。`
                 ]
@@ -905,6 +1057,8 @@
                 
                 document.getElementById("create-name").value = "";
                 document.getElementById("create-comment").value = "";
+                document.getElementById("create-visual-base64").value = "";
+                document.getElementById("create-visual-file").value = "";
                 showToast("登録成功", `${name} の監視データをクラウドに完全同期しました！`);
             }, 800);
         }
@@ -937,6 +1091,14 @@
             if (comment) volcanoData[index].comment = comment;
             volcanoData[index].updateTime = timeStr;
 
+            // ビジュアルデータの反映
+            volcanoData[index].visualType = visualTypeUpdate;
+            volcanoData[index].visualPreset = document.getElementById("update-visual-preset").value;
+            const customBase64 = document.getElementById("update-visual-base64").value;
+            if (customBase64) {
+                volcanoData[index].visualCustom = customBase64;
+            }
+
             const levelLabel = getLevelLabel(level);
             if (oldLevel !== level) {
                 volcanoData[index].history.unshift(`${now.getFullYear()}/${timeStr}: 警戒レベルが「${levelLabel}」に更新されました。`);
@@ -959,6 +1121,9 @@
             setTimeout(() => {
                 btnText.innerText = "情報を書き換えて警報を発令";
                 btnIcon.classList.remove("animate-spin");
+
+                document.getElementById("update-visual-base64").value = "";
+                document.getElementById("update-visual-file").value = "";
 
                 playSiren();
                 triggerSystemNotification(volcanoData[index].name, level, comment || volcanoData[index].comment);
@@ -1078,7 +1243,7 @@
 
 
         // -------------------------------------------------------------
-        // 🎨 M3 UI構築
+        // 🎨 M3 UI構築 ＆ 動的イラストレンダラー
         // -------------------------------------------------------------
         function renderUI() {
             const grid = document.getElementById("monitor-area");
@@ -1103,11 +1268,72 @@
                 const tab0Class = currentTabs[vol.id] === 0 ? "bg-white dark:bg-[#1E1F22] text-gray-900 dark:text-white shadow-sm font-black" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50";
                 const tab1Class = currentTabs[vol.id] === 1 ? "bg-white dark:bg-[#1E1F22] text-gray-900 dark:text-white shadow-sm font-black" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50";
                 
-                const showLava = vol.level >= 3 ? "block" : "none";
-                const smokeDensity = vol.level / 5;
+                // ビジュアルレンダリングロジックの判別
+                let visualContentHTML = "";
+                const type = vol.visualType || 'animation';
+
+                if (type === 'custom' && vol.visualCustom) {
+                    // カスタムアップロード画像表示
+                    visualContentHTML = `
+                        <div class="absolute inset-0 w-full h-full bg-cover bg-center" style="background-image: url('${vol.visualCustom}');">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                        </div>
+                    `;
+                } else if (type === 'preset') {
+                    // プリセットイラストの選択
+                    const preset = vol.visualPreset || 'fuji';
+                    if (preset === 'fuji') {
+                        // 富士山
+                        visualContentHTML = `
+                            <div class="absolute inset-0 bg-gradient-to-b from-[#b3e5fc] to-[#e1f5fe] dark:from-slate-800 dark:to-slate-900"></div>
+                            <svg class="w-56 h-28 relative z-10" viewBox="0 0 200 100">
+                                <polygon points="15,100 100,15 185,100" fill="#4e342e" />
+                                <polygon points="75,45 100,15 125,45" fill="#ffffff" /> <!-- 雪キャップ -->
+                                <ellipse cx="100" cy="18" rx="10" ry="3" fill="${theme.lava}" class="pulse-lava" />
+                            </svg>
+                        `;
+                    } else if (preset === 'island') {
+                        // 火山島
+                        visualContentHTML = `
+                            <div class="absolute inset-0 bg-gradient-to-b from-sky-300 to-blue-400 dark:from-slate-800 dark:to-slate-950"></div>
+                            <svg class="w-56 h-28 relative z-10" viewBox="0 0 200 100">
+                                <polygon points="35,100 100,35 165,100" fill="#2d3748" />
+                                <ellipse cx="100" cy="36" rx="8" ry="2.5" fill="${theme.lava}" class="pulse-lava" />
+                                <path d="M 0 90 Q 50 85 100 90 T 200 90 L 200 100 L 0 100 Z" fill="#0077c2" /> <!-- 海面 -->
+                            </svg>
+                        `;
+                    } else {
+                        // 未来SF風ドーム火山
+                        visualContentHTML = `
+                            <div class="absolute inset-0 bg-gradient-to-b from-purple-900 to-indigo-950"></div>
+                            <svg class="w-56 h-28 relative z-10" viewBox="0 0 200 100">
+                                <circle cx="100" cy="80" r="45" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="4,4" class="animate-pulse" /> <!-- ホログラムドーム -->
+                                <polygon points="45,100 100,45 155,100" fill="#111" />
+                                <ellipse cx="100" cy="46" rx="6" ry="2" fill="${theme.lava}" class="pulse-lava" />
+                            </svg>
+                        `;
+                    }
+                } else {
+                    // 標準SVG（煙・溶岩流アニメーション）
+                    const showLava = vol.level >= 3 ? "block" : "none";
+                    visualContentHTML = `
+                        <div class="absolute inset-0 bg-gradient-to-b from-sky-100 to-sky-200 dark:from-slate-800 dark:to-slate-900"></div>
+                        <svg class="absolute bottom-12 left-1/2 -translate-x-1/2 w-24 h-24" viewBox="0 0 100 100" style="opacity: ${smokeDensity}">
+                            <circle cx="50" cy="50" r="10" fill="#78909c" class="drift-smoke" style="animation-delay: 0s" />
+                            <circle cx="45" cy="45" r="13" fill="#90a4ae" class="drift-smoke" style="animation-delay: 1.3s" />
+                            <circle cx="53" cy="48" r="9" fill="#b0bec5" class="drift-smoke" style="animation-delay: 2.6s" />
+                        </svg>
+                        <svg class="w-56 h-28 relative z-10" viewBox="0 0 200 100">
+                            <polygon points="15,100 100,15 185,100" fill="#3e2723" />
+                            <ellipse cx="100" cy="17" rx="14" ry="4" fill="${theme.lava}" class="pulse-lava" />
+                            <path d="M 100 17 Q 96 45 92 65" stroke="${theme.lava}" stroke-width="4.5" fill="none" style="display: ${showLava}" />
+                            <path d="M 101 17 Q 107 55 114 75" stroke="${theme.lava}" stroke-width="3" fill="none" style="display: ${showLava}" />
+                        </svg>
+                    `;
+                }
 
                 const cardHTML = `
-                    <div class="bg-white dark:bg-[#1E1F22] border border-[#E1E2EC] dark:border-gray-800 rounded-m3-large p-6 sm:p-7 shadow-m3-elevation-1 hover:shadow-m3-elevation-3 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+                    <div id="vol-card-${vol.id}" class="bg-white dark:bg-[#1E1F22] border border-[#E1E2EC] dark:border-gray-800 rounded-m3-large p-6 sm:p-7 shadow-m3-elevation-1 hover:shadow-m3-elevation-3 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
                         
                         <div class="absolute inset-0 bg-gradient-to-br from-transparent to-${theme.badge}/5 pointer-events-none"></div>
 
@@ -1126,21 +1352,9 @@
                                 </div>
                             </div>
 
-                            <!-- 火山ダイナミックSVG -->
-                            <div class="w-full h-36 bg-gradient-to-b from-sky-100 to-sky-200 dark:from-slate-800 dark:to-slate-900 rounded-m3-medium mb-5 relative overflow-hidden flex items-end justify-center border border-gray-200/50 dark:border-gray-800 shadow-inner">
-                                <svg class="absolute bottom-12 left-1/2 -translate-x-1/2 w-24 h-24" viewBox="0 0 100 100" style="opacity: ${smokeDensity}">
-                                    <circle cx="50" cy="50" r="10" fill="#78909c" class="drift-smoke" style="animation-delay: 0s" />
-                                    <circle cx="45" cy="45" r="13" fill="#90a4ae" class="drift-smoke" style="animation-delay: 1.3s" />
-                                    <circle cx="53" cy="48" r="9" fill="#b0bec5" class="drift-smoke" style="animation-delay: 2.6s" />
-                                </svg>
-
-                                <svg class="w-56 h-28 relative z-10" viewBox="0 0 200 100">
-                                    <polygon points="15,100 100,15 185,100" fill="#3e2723" />
-                                    <ellipse cx="100" cy="17" rx="14" ry="4" fill="${theme.lava}" class="pulse-lava" />
-                                    <path d="M 100 17 Q 96 45 92 65" stroke="${theme.lava}" stroke-width="4.5" fill="none" style="display: ${showLava}" />
-                                    <path d="M 101 17 Q 107 55 114 75" stroke="${theme.lava}" stroke-width="3" fill="none" style="display: ${showLava}" />
-                                </svg>
-
+                            <!-- 火山ダイナミック描画コンテナ -->
+                            <div class="w-full h-36 rounded-m3-medium mb-5 relative overflow-hidden flex items-end justify-center border border-gray-200/50 dark:border-gray-800 shadow-inner">
+                                ${visualContentHTML}
                                 <div class="absolute bottom-0 inset-x-0 h-4 bg-[#2e7d32] z-20"></div>
                             </div>
 
@@ -1186,7 +1400,7 @@
                                 </div>
                             </div>
                             
-                            <button onclick="playEmergencyBroadcastById(${vol.id})" class="flex items-center gap-1.5 bg-[#E1E2EC]/40 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2.5 rounded-m3-full text-[10px] sm:text-xs font-black transition-all shadow-sm">
+                            <button onclick="playEmergencyBroadcastById(${vol.id})" class="readout-btn flex items-center gap-1.5 bg-[#E1E2EC]/40 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2.5 rounded-m3-full text-[10px] sm:text-xs font-black transition-all shadow-sm">
                                 <span class="material-symbols-rounded text-sm">volume_up</span>
                                 状況を読み上げ
                             </button>
@@ -1197,6 +1411,7 @@
             });
 
             populateVolcanoSelector();
+            applyThemeColorsToDynamicElements(); // テーマカラーのクラス一括同期
         }
 
         function setTab(volId, tabIdx) {
@@ -1238,7 +1453,7 @@
 
 
         // -------------------------------------------------------------
-        // 🎨 M3 ダークモード・アクセントカラー制御
+        // 🎨 M3 ダークモード・アクセントカラー制御 (完全適用)
         // -------------------------------------------------------------
         function toggleDarkMode(isDark) {
             const html = document.documentElement;
@@ -1259,29 +1474,77 @@
             const iconBox = document.getElementById("header-icon-box");
             const modalTitleIcon = document.getElementById("modal-title-icon");
 
-            const buttons = document.querySelectorAll('[class*="theme-btn-"]');
-            buttons.forEach(btn => btn.style.borderColor = 'transparent');
+            // カードアイコン
+            const cardSyncIcon = document.getElementById("theme-card-sync-icon");
+            const cardPaletteIcon = document.getElementById("theme-card-palette-icon");
+            const cardBellIcon = document.getElementById("theme-card-bell-icon");
 
+            // 全ボタンから枠線を解除してリセット
+            ['purple', 'blue', 'terracotta', 'emerald'].forEach(t => {
+                const btn = document.getElementById(`theme-btn-${t}`);
+                if (btn) btn.style.borderColor = 'transparent';
+            });
+
+            // カラーごとの適用カラー定義
+            let colorHex = "#6750A4"; // デフォルト紫
             if (theme === 'purple') {
-                headerGlow.style.backgroundColor = "#6750A4";
-                iconBox.style.backgroundColor = "#6750A4";
-                modalTitleIcon.style.color = "#6750A4";
-                document.querySelector('.theme-btn-purple').style.borderColor = '#6750A4';
+                colorHex = "#6750A4";
+                if (document.getElementById('theme-btn-purple')) document.getElementById('theme-btn-purple').style.borderColor = '#6750A4';
             } else if (theme === 'blue') {
-                headerGlow.style.backgroundColor = "#1A73E8";
-                iconBox.style.backgroundColor = "#1A73E8";
-                modalTitleIcon.style.color = "#1A73E8";
-                document.querySelector('.theme-btn-blue').style.borderColor = '#1A73E8';
+                colorHex = "#1A73E8";
+                if (document.getElementById('theme-btn-blue')) document.getElementById('theme-btn-blue').style.borderColor = '#1A73E8';
             } else if (theme === 'terracotta') {
-                headerGlow.style.backgroundColor = "#BF360C";
-                iconBox.style.backgroundColor = "#BF360C";
-                modalTitleIcon.style.color = "#BF360C";
-                document.querySelector('.theme-btn-terracotta').style.borderColor = '#BF360C';
+                colorHex = "#BF360C";
+                if (document.getElementById('theme-btn-terracotta')) document.getElementById('theme-btn-terracotta').style.borderColor = '#BF360C';
             } else if (theme === 'emerald') {
-                headerGlow.style.backgroundColor = "#00897B";
-                iconBox.style.backgroundColor = "#00897B";
-                modalTitleIcon.style.color = "#00897B";
-                document.querySelector('.theme-btn-emerald').style.borderColor = '#00897B';
+                colorHex = "#00897B";
+                if (document.getElementById('theme-btn-emerald')) document.getElementById('theme-btn-emerald').style.borderColor = '#00897B';
+            }
+
+            // ヘッダーや主要コンポーネントへの適用
+            if (headerGlow) headerGlow.style.backgroundColor = colorHex;
+            if (iconBox) iconBox.style.backgroundColor = colorHex;
+            if (modalTitleIcon) modalTitleIcon.style.color = colorHex;
+            if (cardSyncIcon) cardSyncIcon.style.color = colorHex;
+            if (cardPaletteIcon) cardPaletteIcon.style.color = colorHex;
+            if (cardBellIcon) cardBellIcon.style.color = colorHex;
+
+            applyThemeColorsToDynamicElements(); // 動的読み込みボタン等へも一斉同期
+        }
+
+        // 動的に生成されるボタンやアイコンへのアクセントカラー反映
+        function applyThemeColorsToDynamicElements() {
+            let colorHex = "#6750A4";
+            let bgClass = "bg-[#6750A4]";
+            let textClass = "text-[#6750A4]";
+            let hoverBgClass = "hover:bg-[#4F378B]";
+
+            if (activeTheme === 'blue') {
+                colorHex = "#1A73E8";
+                bgClass = "bg-[#1A73E8]";
+                textClass = "text-[#1A73E8]";
+                hoverBgClass = "hover:bg-[#1557B0]";
+            } else if (activeTheme === 'terracotta') {
+                colorHex = "#BF360C";
+                bgClass = "bg-[#BF360C]";
+                textClass = "text-[#BF360C]";
+                hoverBgClass = "hover:bg-[#8E2400]";
+            } else if (activeTheme === 'emerald') {
+                colorHex = "#00897B";
+                bgClass = "bg-[#00897B]";
+                textClass = "text-[#00897B]";
+                hoverBgClass = "hover:bg-[#005B52]";
+            }
+
+            // カードの読み上げボタン、コントロールパネル内の登録/更新などのアクションパーツに一斉同期
+            const readButtons = document.querySelectorAll('.readout-btn');
+            readButtons.forEach(btn => {
+                btn.style.color = colorHex;
+            });
+
+            const ctrlPanelUpdate = document.getElementById("btn-update-volcano");
+            if (ctrlPanelUpdate) {
+                ctrlPanelUpdate.style.backgroundColor = colorHex;
             }
         }
 
@@ -1334,9 +1597,32 @@
             }
         }
 
+        // 🔔 プッシュ通知の登録 ＆ 許可要求（iOS/iPadOS対応）
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                showToast("非対応", "このブラウザまたは端末はプッシュ通知に対応していません。");
+                return;
+            }
+
+            Notification.requestPermission().then(perm => {
+                const btn = document.getElementById("notification-btn");
+                const statusText = document.getElementById("notification-status-text");
+
+                if (perm === "granted") {
+                    btn.className = "w-full py-3 bg-[#D2E4FF] text-[#001D36] rounded-m3-full text-xs font-black transition flex items-center justify-center gap-2";
+                    statusText.innerText = "プッシュ通知：有効中";
+                    showToast("通知が有効になりました！", "火山情報がリアルタイムに更新された際、通知でお知らせします。");
+                    testNotificationFlow(); 
+                } else {
+                    btn.className = "w-full py-3 bg-red-100 text-red-800 rounded-m3-full text-xs font-bold transition flex items-center justify-center gap-2";
+                    statusText.innerText = "プッシュ通知：ブロック中";
+                }
+            });
+        }
+
         function triggerSystemNotification(name, level, comment) {
-            const title = `🚨 【防災速報】${name}`;
-            const body = `警戒レベル ${level}に移行。${comment}`;
+            const title = `🚨 【火山警報】${name}`;
+            const body = `警戒レベル ${level}。${comment}`;
 
             if (Notification.permission === "granted") {
                 navigator.serviceWorker.ready.then(reg => {
@@ -1452,3 +1738,5 @@
     </script>
 </body>
 </html>
+
+```
