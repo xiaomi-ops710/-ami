@@ -25,6 +25,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 
     <script>
         tailwind.config = {
@@ -549,9 +550,18 @@
 
                     <!-- 通知テスト -->
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm text-[#6750A4]">notifications</span> プッシュ通知</h4>
-                        <button id="notification-btn" onclick="requestNotificationPermission()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full flex justify-center gap-2">
-                            <span class="material-symbols-rounded text-sm">volume_up</span> <span id="notification-status-text">プッシュ通知を許可・テスト</span>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm text-[#6750A4]">notifications</span> バックグラウンドPush通信</h4>
+                        <div class="p-3 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 mb-3">
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed mb-3">
+                                アプリを閉じている時にも通知を受信するには、FirebaseのVAPIDキーと送信元(GAS)のURLをセットしてください。
+                            </p>
+                            <div class="space-y-2">
+                                <input type="text" id="vapid-key-input" placeholder="Firebase VAPID Key" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
+                                <input type="text" id="gas-url-input" placeholder="GAS Webhook URL" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
+                            </div>
+                        </div>
+                        <button id="notification-btn" class="w-full py-3 bg-gray-100 dark:bg-gray-800 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full flex justify-center gap-2">
+                            <span class="material-symbols-rounded text-sm">send_to_mobile</span> <span id="notification-status-text">トークンを取得して通知を有効化</span>
                         </button>
                     </div>
                 </div>
@@ -575,7 +585,7 @@
         // =============================================================
         // 🔒 Firebase Config
         // =============================================================
-        const firebaseConfig = {
+       const firebaseConfig = {
   apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOFUpc",
   authDomain: "ohamigo-425a8.firebaseapp.com",
   projectId: "ohamigo-425a8",
@@ -583,6 +593,7 @@
   messagingSenderId: "342829309449",
   appId: "1:342829309449:web:9937c81eaa8f48436262d8"
 };
+
 
         // =============================================================
         // 変数定義
@@ -602,10 +613,13 @@
         
         let db = null;
         let auth = null;
+        let messaging = null;
         let currentSyncUnsubscribe = null;
         let currentSortOrder = 'id_asc';
         let connectionTimeout = null; // タイムアウト用
 
+        let isFirstLoad = true; // 初回ロード検知用
+        let isAdmin = false;
         // =============================================================
         // 🚀 初期化処理
         // =============================================================
@@ -756,6 +770,7 @@
                 const app = firebase.initializeApp(config);
                 auth = firebase.auth();
                 db = firebase.firestore();
+                messaging = firebase.messaging();
 
                 auth.signInAnonymously().then(() => {
                     if (currentSyncUnsubscribe) currentSyncUnsubscribe();
@@ -997,7 +1012,10 @@
             if(visualTypeCreate === 'custom') newVol.customImage = document.getElementById("create-visual-base64").value;
 
             if(db && auth && auth.currentUser) {
-                try { await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(nid)).set(newVol); }
+                try { 
+                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(nid)).set(newVol); 
+                    sendBackgroundPushNotification(`🚨【新規警報】${name}`, `警戒レベル ${level}で監視が開始されました。`);
+                }
                 catch(e) { console.log(e); }
             } else { volcanoData.push(newVol); saveLocalVolcanos(); renderUI(); }
 
@@ -1028,7 +1046,10 @@
             volcanoData[idx].history.unshift(`${now.getFullYear()}/${timeStr}: 【レベル${level}】に更新。状況: ${comment}`);
 
             if(db && auth && auth.currentUser) {
-                try { await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(tid)).set(volcanoData[idx]); }
+                try { 
+                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(tid)).set(volcanoData[idx]); 
+                    sendBackgroundPushNotification(`🚨【状況更新】${volcanoData[idx].name}`, `警戒レベル ${level}: ${volcanoData[idx].comment}`);
+                }
                 catch(e){}
             } else { saveLocalVolcanos(); renderUI(); }
 
@@ -1186,27 +1207,64 @@
                 const b = document.getElementById("notification-btn"); const s = document.getElementById("notification-status-text");
                 if(p === "granted") {
                     b.className = "w-full py-3 bg-[#D2E4FF] text-[#001D36] rounded-m3-full text-xs font-black flex justify-center gap-2";
-                    s.innerText = "プッシュ通知：有効中";
-                    triggerSystemNotification("システムテスト", 5, "これはiPadOS上の本物のプッシュ通知テストです。");
-                    
-                    // iOSブロック回避のためのダミー無音発声と、カンマによる沈黙タメの実行
-                    if('speechSynthesis' in window) {
-                        window.speechSynthesis.cancel();
-                        window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+                    s.innerText = "プッシュ通知：許可済み";
+                    showToast("通知許可", "ブラウザのプッシュ通知を許可しました。");
+
+                    // 入力されたVAPIDキーを使ってトークンを取得し、データベースに保存
+                    const vapidKey = document.getElementById("vapid-key-input").value.trim();
+                    if (messaging && vapidKey) {
+                        messaging.getToken({ vapidKey: vapidKey }).then((currentToken) => {
+                            if (currentToken) {
+                                db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({
+                                    token: currentToken,
+                                    updatedAt: new Date()
+                                }).then(() => {
+                                    s.innerText = "バックグラウンドPush：有効！";
+                                    showToast("Push有効化完了", "バックグラウンド通知の準備が完了しました！");
+                                });
+                            }
+                        }).catch((err) => {
+                            console.error('トークン取得エラー:', err);
+                            s.innerText = "VAPIDキーエラー";
+                        });
                     }
-                    playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]);
-                    setTimeout(() => {
-                        if('speechSynthesis' in window) {
-                            const u = new SpeechSynthesisUtterance("、、、、、、通知のテストです。");
-                            u.lang="ja-JP"; u.rate=speechRate; u.pitch=speechPitch;
-                            window.speechSynthesis.speak(u);
-                        }
-                    }, 300);
                 } else {
                     b.className = "w-full py-3 bg-red-100 text-red-800 rounded-m3-full text-xs font-bold flex justify-center gap-2";
                     s.innerText = "プッシュ通知：ブロック中";
                 }
             });
+        }
+
+        // 👈 そのすぐ下に、GASへ通知送信の指令を出す関数を追加
+        async function sendBackgroundPushNotification(title, bodyText) {
+            const gasUrl = localStorage.getItem("volcano_gas_url");
+            if (!gasUrl || !db) return; // GASのURLがない場合はスキップ
+
+            try {
+                // 保存されている全端末のトークンを取得
+                const snapshot = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').get();
+                const tokens = [];
+                snapshot.forEach(doc => {
+                    if (doc.data().token) tokens.push(doc.data().token);
+                });
+                
+                if (tokens.length === 0) return;
+
+                // GASへ送信
+                fetch(gasUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: title,
+                        body: bodyText,
+                        tokens: tokens
+                    })
+                });
+            } catch(e) {
+                console.error("バックグラウンド通知送信失敗", e);
+            }
+        }
         }
 
         function playEmergencyBroadcastById(id) {
@@ -1395,4 +1453,3 @@
     </script>
 </body>
 </html>
-
