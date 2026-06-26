@@ -1,5 +1,5 @@
 ```javascript
-const CACHE_NAME = 'volcano-monitor-v1.4.3';
+const CACHE_NAME = 'volcano-monitor-v1.5-pro';
 const urlsToCache = [
   './',
   './index.html',
@@ -9,27 +9,17 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
   self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  );
+  event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))
-      );
-    })
+    caches.keys().then(cacheNames => Promise.all(cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))))
   );
   self.clients.claim();
 });
@@ -54,17 +44,14 @@ self.addEventListener('push', event => {
     icon: './icon-192.png',
     badge: './icon-192.png',
     vibrate: [300, 100, 300, 100, 400],
-    data: {
-      url: './index.html'
-    },
-    requireInteraction: true 
+    data: { url: './index.html' },
+    requireInteraction: true // iPadの画面にユーザーが消すまで残り続ける設定
   };
 
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
+// 通知がタップされたらアプリを開く
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
@@ -72,9 +59,7 @@ self.addEventListener('notificationclick', event => {
       if (clientList.length > 0) {
         let client = clientList[0];
         for (let i = 0; i < clientList.length; i++) {
-          if (clientList[i].focused) {
-            client = clientList[i];
-          }
+          if (clientList[i].focused) client = clientList[i];
         }
         return client.focus();
       }
@@ -82,5 +67,6 @@ self.addEventListener('notificationclick', event => {
     })
   );
 });
+
 
 ```
