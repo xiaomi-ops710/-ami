@@ -582,6 +582,34 @@
     </div>
 
     <script>
+        // ... existing code ...
+        let speechRate = 1.0;
+        let speechPitch = 1.0;
+        let m3Expressive = true;
+
+        const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'volcano-app-pwa-m3';
+        
+        let db = null;
+        let auth = null;
+        let messaging = null;
+        let currentSyncUnsubscribe = null;
+        let currentSortOrder = 'id_asc';
+        let connectionTimeout = null;
+        
+        let isFirstLoad = true; // 初回ロード検知用
+        let isAdmin = false;
+
+        // 👇=== ここから追加 ===👇
+        // 💡 ここに直接キーとURLを埋め込みます
+        const MY_VAPID_KEY = "gLRd2fkyQkSq5QJ7WaN36k4q1znic4uP6RoNgyOJwi4
+";
+        const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbwh_6uOJP7LTT4iaYxNtFS02tr23Z54ZQwSar2XrxBB9Js1wVL8AJokLqueD6KpPhTD/exec";
+        // 👆=== ここまで追加 ===👆
+
+        // =============================================================
+        // 🚀 初期化・イベント設定
+// ... existing code ...
         // =============================================================
         // 🔒 Firebase Config
         // =============================================================
@@ -1011,9 +1039,10 @@
             if(visualTypeCreate === 'preset') newVol.visualPreset = document.getElementById("create-visual-preset").value;
             if(visualTypeCreate === 'custom') newVol.customImage = document.getElementById("create-visual-base64").value;
 
-            if(db && auth && auth.currentUser) {
+           if(db && auth && auth.currentUser) {
                 try { 
                     await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(nid)).set(newVol); 
+                    // ▼ここに追加：GAS経由でPush送信
                     sendBackgroundPushNotification(`🚨【新規警報】${name}`, `警戒レベル ${level}で監視が開始されました。`);
                 }
                 catch(e) { console.log(e); }
@@ -1200,7 +1229,7 @@
             } catch(e){}
         }
 
-        function requestNotificationPermission() {
+       function requestNotificationPermission() {
             if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です");
             
             Notification.requestPermission().then(p => {
@@ -1210,10 +1239,9 @@
                     s.innerText = "プッシュ通知：許可済み";
                     showToast("通知許可", "ブラウザのプッシュ通知を許可しました。");
 
-                    // 入力されたVAPIDキーを使ってトークンを取得し、データベースに保存
-                    const vapidKey = document.getElementById("vapid-key-input").value.trim();
-                    if (messaging && vapidKey) {
-                        messaging.getToken({ vapidKey: vapidKey }).then((currentToken) => {
+                    // 💡 コードに埋め込んだ VAPID_KEY を使用してトークンを取得
+                    if (messaging && MY_VAPID_KEY && MY_VAPID_KEY !== "ここにFirebaseの短いVAPIDキーを貼り付けます") {
+                        messaging.getToken({ vapidKey: MY_VAPID_KEY }).then((currentToken) => {
                             if (currentToken) {
                                 db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({
                                     token: currentToken,
@@ -1226,13 +1254,45 @@
                         }).catch((err) => {
                             console.error('トークン取得エラー:', err);
                             s.innerText = "VAPIDキーエラー";
+                            showToast("エラー", "VAPIDキーが間違っているか通信エラーです。", true);
                         });
+                    } else {
+                        showToast("設定エラー", "コード内の MY_VAPID_KEY が設定されていません。", true);
                     }
                 } else {
                     b.className = "w-full py-3 bg-red-100 text-red-800 rounded-m3-full text-xs font-bold flex justify-center gap-2";
                     s.innerText = "プッシュ通知：ブロック中";
                 }
             });
+        }
+
+        async function sendBackgroundPushNotification(title, bodyText) {
+            // 💡 コードに埋め込んだ GAS_URL を使用して送信
+            if (!MY_GAS_URL || MY_GAS_URL === "ここにGASのURLを貼り付けます" || !db) return;
+
+            try {
+                const snapshot = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').get();
+                const tokens = [];
+                snapshot.forEach(doc => {
+                    if (doc.data().token) tokens.push(doc.data().token);
+                });
+                
+                if (tokens.length === 0) return;
+
+                fetch(MY_GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: title,
+                        body: bodyText,
+                        tokens: tokens
+                    })
+                });
+                console.log("バックグラウンドPushを送信しました。");
+            } catch(e) {
+                console.error("バックグラウンド通知送信失敗", e);
+            }
         }
 
         // 👈 そのすぐ下に、GASへ通知送信の指令を出す関数を追加
