@@ -651,7 +651,7 @@
         // =============================================================
         // 🚀 初期化処理
         // =============================================================
-        window.onload = function() {
+                window.onload = function() {
             // ✨ 1.2秒後に100%確実にスプラッシュを隠す
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
@@ -683,6 +683,27 @@
             document.getElementById("speech-rate").value = savedRate;
             document.getElementById("speech-pitch").value = savedPitch;
             updateSpeechSettings();
+
+            // 🚫 ここが重要！起動時の自動同期を停止（コメントアウト）しました
+            // これにより、起動時にFirebaseの接続を待つことも、エラーで止まることもありません。
+            // tryAutoConnectFirebase();
+
+            // WebPush用設定の復元（通知関連を実装した場合はここにあります）
+            document.getElementById("vapid-key-input").value = localStorage.getItem("volcano_vapid_key") || "";
+            document.getElementById("gas-url-input").value = localStorage.getItem("volcano_gas_url") || "";
+
+            // 管理者コントロールの同期用リスナー
+            document.getElementById("update-volcano-id").addEventListener("change", function() {
+                const vol = volcanoData.find(v => String(v.id) === this.value);
+                if (vol) {
+                    document.getElementById("update-level").value = vol.level;
+                    document.getElementById("update-comment").value = vol.comment;
+                    setVisualType('update', vol.visualType || 'animation');
+                    if (vol.visualType === 'preset') document.getElementById("update-visual-preset").value = vol.visualPreset || 'fuji';
+                }
+            });
+        };
+
 
             // Firebaseのバックグラウンド自動同期を開始
             tryAutoConnectFirebase();
