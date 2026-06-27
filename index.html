@@ -373,6 +373,10 @@
                         <div id="diagnostics-box" class="hidden border-t pt-3 mt-3 dark:border-gray-800">
                             <div class="text-xs font-bold text-red-500 mb-1">⚠️ 接続障害</div>
                             <div id="firebase-error-log" class="p-2 bg-red-50 text-red-600 text-[10px] font-semibold font-mono rounded-lg break-all"></div>
+                            <div class="mt-2.5 text-[10px] text-amber-600 bg-amber-50 p-2 rounded border border-amber-200">
+                                <div class="font-bold mb-1">💡 解決理由:</div>
+                                <div id="diagnostics-advice"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -388,19 +392,15 @@
 
                     <!-- 🔔 バックグラウンド Push 通信の設定パネル -->
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm text-[#6750A4]">notifications</span> バックグラウンドPush通信</h4>
-                        <div class="p-3 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 mb-3">
-                            <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed mb-3">※コード内に設定されたVAPIDキーとGAS Webhookを使用します。</p>
-                            <div class="space-y-2">
-                                <input type="text" id="vapid-key-input" placeholder="Firebase VAPID Key" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
-                                <input type="text" id="gas-url-input" placeholder="GAS Webhook URL" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
-                            </div>
-                        </div>
-                        <button onclick="requestNotificationPermission()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full flex justify-center gap-2">
-                            <span class="material-symbols-rounded text-sm">send_to_mobile</span> <span id="notification-status-text">通知を許可してFCMへ登録</span>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm text-[#6750A4]">notifications</span> プッシュ通知</h4>
+                        <button id="notification-btn" onclick="requestNotificationPermission()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full flex justify-center gap-2">
+                            <span class="material-symbols-rounded text-sm">volume_up</span> <span id="notification-status-text">プッシュ通知を許可して登録</span>
                         </button>
                     </div>
                 </div>
+            </div>
+            <div class="border-t dark:border-gray-800 pt-4 text-center">
+                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v3.5 (Ultimate Pro)</span>
             </div>
         </div>
     </div>
@@ -443,9 +443,18 @@
         let auth = null;
         let messaging = null; 
 
-        // 💡💡💡 【重要】あなたの大切な設定キーをここに直埋め込み 💡💡💡
+        // 💡💡💡 【重要】あなたの大切な設定キー 💡💡💡
         const MY_VAPID_KEY = "gLRd2fkyQkSq5QJ7WaN36k4q1znic4uP6RoNgyOJwi4";
         const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbwh_6uOJP7LTT4iaYxNtFS02tr23Z54ZQwSar2XrxBB9Js1wVL8AJokLqueD6KpPhTD/exec";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOfUpc",
+            authDomain: "ohamigo-425a8.firebaseapp.com",
+            projectId: "ohamigo-425a8",
+            storageBucket: "ohamigo-425a8.firebasestorage.app",
+            messagingSenderId: "342829309449",
+            appId: "1:342829309449:web:9937c81eaa8f48436262d8"
+        };
 
         let currentSyncUnsubscribe = null;
         let currentSortOrder = 'id_asc';
@@ -457,17 +466,15 @@
         // 🚀 起動処理 (絶対クラッシュしない堅牢設計)
         // =============================================================
         window.onload = function() {
-            // ① 1.2秒で必ずスプラッシュ画面を消す (通信待機なし)
+            // ① スプラッシュ画面を最優先で消す
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if (splash) splash.classList.add('hide');
             }, 1200);
 
-            // ② 時計と基本UIを瞬時に起動
             try { tickClock(); setInterval(tickClock, 1000); } catch(e){}
             try { loadLocalVolcanos(); } catch(e){}
 
-            // ③ 各種設定の復元
             try {
                 const savedTheme = safeStorage.getItem("volcano_accent_theme") || 'purple';
                 setThemeColor(savedTheme);
@@ -480,17 +487,30 @@
                 const savedM3 = safeStorage.getItem("volcano_m3_expressive") !== "false";
                 document.getElementById("m3-expressive-toggle").checked = savedM3;
                 toggleM3Expressive(savedM3);
-
-                document.getElementById("vapid-key-input").value = MY_VAPID_KEY;
-                document.getElementById("gas-url-input").value = MY_GAS_URL;
+                
+                document.getElementById("speech-rate").value = safeStorage.getItem("volcano_speech_rate") || "1.0";
+                document.getElementById("speech-pitch").value = safeStorage.getItem("volcano_speech_pitch") || "1.0";
+                updateSpeechSettings();
             } catch(e){}
 
-            // 🚫 起動時の自動同期は行いません (オフラインで高速起動)
-            // tryAutoConnectFirebase(); 
+            document.getElementById("update-volcano-id").addEventListener("change", function() {
+                const vol = volcanoData.find(v => String(v.id) === this.value);
+                if (vol) {
+                    document.getElementById("update-level").value = vol.level;
+                    document.getElementById("update-comment").value = vol.comment;
+                    setVisualType('update', vol.visualType || 'animation');
+                    if (vol.visualType === 'preset') document.getElementById("update-visual-preset").value = vol.visualPreset || 'fuji';
+                }
+            });
+
+            // 🌐 起動時の自動同期は行わず、裏側で1.5秒後にこっそり同期を開始する（画面フリーズ対策）
+            setTimeout(() => {
+                tryAutoConnectFirebase();
+            }, 1500);
         };
 
         // =======================
-        // 🕒 基本UIコントロール
+        // 🕒 UIコントロール
         // =======================
         function tickClock() {
             const c = document.getElementById("live-clock"); if(!c) return; const n = new Date();
@@ -515,34 +535,60 @@
             }
         }
 
-        function stopAllSpeechAndAlarms() {
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-            showToast("緊急停止", "アラート音および音声読み上げを強制停止しました。");
+        // =======================
+        // ☁️ Firebase 接続とエラーハンドリング
+        // =======================
+        function updateSyncStatus(status, text) {
+            const badge = document.getElementById("sync-status-badge");
+            const dot = document.getElementById("sync-dot");
+            const textEl = document.getElementById("sync-text");
+            const localBtn = document.getElementById("switch-local-btn");
+            const diagBox = document.getElementById("diagnostics-box");
+
+            if (status === 'connected') {
+                if (badge) badge.className = "cursor-pointer hover:opacity-80 flex items-center gap-2";
+                document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-[#E6F4EA] dark:bg-[#1B3624] border border-[#A3E2B6] dark:border-[#3C5A42] rounded-m3-full p-1 pl-4 shadow-sm transition-all";
+                if (dot) dot.className = "w-2.5 h-2.5 bg-[#137333] dark:bg-[#81C995] rounded-full inline-block animate-pulse";
+                if (textEl) { textEl.innerText = text; textEl.className = "text-[11px] font-black text-[#137333] dark:text-[#81C995]"; }
+                if (localBtn) localBtn.classList.add("hidden");
+                if (diagBox) diagBox.classList.add("hidden");
+            } else if (status === 'offline') {
+                document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-m3-full p-1 pl-4 shadow-sm transition-all";
+                if (dot) dot.className = "w-2.5 h-2.5 bg-red-600 dark:bg-red-500 rounded-full inline-block";
+                if (textEl) { textEl.innerHTML = text; textEl.className = "text-[11px] font-black text-red-600 dark:text-red-400"; }
+                if (localBtn) localBtn.classList.remove("hidden"); 
+                if (diagBox) diagBox.classList.remove("hidden");
+            } else {
+                document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-[#F1ECEB] dark:bg-[#201A19] border border-gray-200 dark:border-gray-800 rounded-m3-full p-1 pl-4 shadow-sm transition-all";
+                if (dot) dot.className = "w-2.5 h-2.5 bg-gray-500 rounded-full inline-block";
+                if (textEl) { textEl.innerText = text; textEl.className = "text-[11px] font-black text-gray-500"; }
+                if (localBtn) localBtn.classList.add("hidden");
+            }
         }
 
-        // =======================
-        // 💾 ローカルデータ管理
-        // =======================
-        function loadLocalVolcanos() {
-            const raw = safeStorage.getItem(LOCAL_STORAGE_KEY);
-            if (raw) { try { volcanoData = JSON.parse(raw); renderUI(); } catch(e) { volcanoData = []; renderUI(); } }
-            else { volcanoData = []; renderUI(); }
-        }
-        function saveLocalVolcanos() { safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(volcanoData)); }
-
-        // =======================
-        // ☁️ Firebase 接続・エラーハンドリング
-        // =======================
         function switchToLocalMode() {
             if (currentSyncUnsubscribe) currentSyncUnsubscribe();
             if (connectionTimeout) clearTimeout(connectionTimeout);
             loadLocalVolcanos();
-            document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-[#F1ECEB] dark:bg-[#201A19] border border-gray-200 dark:border-gray-800 rounded-m3-full p-1 pl-4 shadow-sm transition-all";
-            document.getElementById("sync-dot").className = "w-2.5 h-2.5 bg-gray-500 rounded-full inline-block";
-            document.getElementById("sync-text").innerText = "ローカル専用モード稼働中";
-            document.getElementById("sync-text").className = "text-[11px] font-black text-gray-500";
-            document.getElementById("switch-local-btn").classList.add("hidden");
+            updateSyncStatus('local', 'ローカル専用モード稼働中');
             showToast("モード切替", "クラウド通信を切断し、端末内のデータで起動しました。");
+        }
+
+        function tryAutoConnectFirebase() {
+            if (connectionTimeout) clearTimeout(connectionTimeout);
+            connectionTimeout = setTimeout(() => {
+                const text = document.getElementById("sync-text").innerText;
+                if (text.includes("同期中")) {
+                    updateSyncStatus('offline', '⚠️ 同期タイムアウト');
+                    showToast("通信エラー", "サーバーからの応答がありません。ローカルに切り替えてください。", true);
+                }
+            }, 5000);
+
+            if (firebaseConfig && firebaseConfig.apiKey) {
+                connectFirebase(JSON.stringify(firebaseConfig));
+            } else {
+                updateSyncStatus('offline', '⚠️ 未接続・設定エラー');
+            }
         }
 
         async function forceSyncFromFirebase() {
@@ -551,10 +597,9 @@
             if(btnIcon) btnIcon.classList.add("hidden"); 
             if(spinner) spinner.classList.remove("hidden");
             
-            showToast("手動同期", "Firebaseに接続してデータを同期しています...", false);
+            showToast("手動同期", "Firebaseから最新データを手動同期しています...", false);
             
-            // 初回の手動接続時のみFirebaseを初期化する
-            if (!db && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
+            if (!db && firebaseConfig && firebaseConfig.apiKey) {
                 await connectFirebase(JSON.stringify(firebaseConfig));
             }
 
@@ -566,11 +611,19 @@
                     volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
                     saveLocalVolcanos(); renderUI();
                     
-                    const textEl = document.getElementById("sync-text");
-                    document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-[#E6F4EA] dark:bg-[#1B3624] border border-[#A3E2B6] dark:border-[#3C5A42] rounded-m3-full p-1 pl-4 shadow-sm transition-all";
-                    document.getElementById("sync-dot").className = "w-2.5 h-2.5 bg-[#137333] dark:bg-[#81C995] rounded-full inline-block animate-pulse";
-                    if(textEl) { textEl.innerText = `データベース接続済み`; textEl.className = "text-[11px] font-black text-[#137333] dark:text-[#81C995]"; }
-                } catch (e) { showToast("エラー", "同期に失敗しました", true); }
+                    try {
+                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                        osc.type = 'sine'; osc.frequency.setValueAtTime(880, ctx.currentTime);
+                        osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.08);
+                        gain.gain.setValueAtTime(0.08, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                        osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.25);
+                    } catch(e) {}
+                    
+                    updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
+                } catch (e) { handleFirebaseError(e, "Manual Sync"); }
+            } else {
+                switchToLocalMode();
             }
             
             setTimeout(() => { 
@@ -580,50 +633,80 @@
         }
 
         async function connectFirebase(configJson) {
+            updateSyncStatus('connecting', 'サーバー同期中...');
+            const errLog = document.getElementById("firebase-error-log");
+            if (errLog) errLog.innerText = "";
+
             try {
                 if (firebase.apps.length > 0) await Promise.all(firebase.apps.map(app => app.delete()));
                 const config = JSON.parse(configJson);
                 const app = firebase.initializeApp(config);
                 auth = firebase.auth();
                 db = firebase.firestore();
-                messaging = firebase.messaging(); // FCMロード
+                
+                try { messaging = firebase.messaging(); } catch(e){}
 
                 auth.signInAnonymously().then(() => {
                     if (currentSyncUnsubscribe) currentSyncUnsubscribe();
                     const colRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos');
+                    
                     currentSyncUnsubscribe = colRef.onSnapshot((snapshot) => {
                         const list = [];
                         snapshot.forEach(doc => { list.push({ docId: doc.id, ...doc.data() }); });
                         volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
                         saveLocalVolcanos(); renderUI();
+                        
+                        isFirstLoad = false;
+                        if (connectionTimeout) clearTimeout(connectionTimeout);
+                        updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
+                    }, (error) => {
+                        handleFirebaseError(error, "Firestore Database");
                     });
-                });
-            } catch (err) { console.error("Firebase Initialization Failed", err); }
+                }).catch((authError) => { handleFirebaseError(authError, "Authentication"); });
+
+            } catch (err) { handleFirebaseError(err, "Initialization"); }
         }
 
-        function getNowTimeStr() {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const i = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            return `${h}:${i}:${s}`;
+        function handleFirebaseError(error, phase) {
+            if (connectionTimeout) clearTimeout(connectionTimeout);
+            const errLog = document.getElementById("firebase-error-log");
+            if (errLog) errLog.innerText = `[${phase}] ${error.message || error}`;
+            updateSyncStatus('offline', '⚠️ 同期障害・エラー');
+            
+            let advice = "通信障害です。Wi-Fiを確認するか、ローカルモードに切り替えてください。";
+            const msg = (error.message || "").toLowerCase();
+            if (msg.includes("api-key-not-valid") || msg.includes("api key")) advice = "APIキーが間違っています。設定コードを確認してください。";
+            else if (msg.includes("permission-denied") || msg.includes("configuration-not-found")) advice = "Firebaseコンソールで「匿名ログイン」を有効にし、ルールをテストモードに設定してください。";
+            
+            const adviceBox = document.getElementById("diagnostics-advice");
+            if (adviceBox) adviceBox.innerHTML = advice;
         }
+
+        function loadLocalVolcanos() {
+            const raw = safeStorage.getItem(LOCAL_STORAGE_KEY);
+            if (raw) { try { volcanoData = JSON.parse(raw); renderUI(); } catch(e) { volcanoData = []; renderUI(); } }
+            else { volcanoData = []; renderUI(); }
+        }
+        function saveLocalVolcanos() { safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(volcanoData)); }
+
 
         // =============================================================
-        // 🔔 バックグラウンド Push 通信の準備（通知許可＆トークン取得 ＆ GAS連動）
+        // 🔔 バックグラウンド Push 通信
         // =============================================================
         function requestNotificationPermission() {
             if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です");
             
             Notification.requestPermission().then(p => {
                 const s = document.getElementById("notification-status-text");
+                const b = document.getElementById("notification-btn");
                 if(p === "granted") {
                     if (s) s.innerText = "プッシュ通知：許可済み";
+                    if (b) b.className = "w-full py-3 bg-[#D2E4FF] text-[#001D36] rounded-m3-full text-xs font-black flex justify-center gap-2";
                     showToast("通知許可", "ブラウザのプッシュ通知を許可しました。");
 
                     if (messaging && MY_VAPID_KEY) {
                         messaging.getToken({ vapidKey: MY_VAPID_KEY }).then((currentToken) => {
-                            if (currentToken && db && auth.currentUser) {
+                            if (currentToken && db && auth && auth.currentUser) {
                                 db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({
                                     token: currentToken,
                                     updatedAt: new Date()
@@ -639,6 +722,7 @@
                     }
                 } else {
                     if (s) s.innerText = "プッシュ通知：ブロック中";
+                    if (b) b.className = "w-full py-3 bg-red-100 text-red-800 rounded-m3-full text-xs font-bold flex justify-center gap-2";
                 }
             });
         }
@@ -658,15 +742,9 @@
                     method: 'POST',
                     mode: 'no-cors', 
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: title,
-                        body: bodyText,
-                        tokens: tokens
-                    })
+                    body: JSON.stringify({ title: title, body: bodyText, tokens: tokens })
                 });
-            } catch(e) {
-                console.error("バックグラウンド通知送信失敗", e);
-            }
+            } catch(e) { console.error("バックグラウンド通知送信失敗", e); }
         }
 
         // =============================================================
@@ -693,7 +771,6 @@
             if(db && auth && auth.currentUser) {
                 try { 
                     await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(nid)).set(newVol); 
-                    // 🔔 登録時に全iPadへPush通知を発射！
                     sendBackgroundPushNotification(`🚨【新規警報】${name}`, `警戒レベル ${level}で監視が開始されました。`);
                 }
                 catch(e) { console.log(e); }
@@ -728,7 +805,6 @@
             if(db && auth && auth.currentUser) {
                 try { 
                     await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(tid)).set(volcanoData[idx]); 
-                    // 🔔 更新時に全iPadへPush通知を発射！
                     sendBackgroundPushNotification(`🚨【状況更新】${volcanoData[idx].name}`, `警戒レベル ${level}: ${volcanoData[idx].comment}`);
                 }
                 catch(e){}
@@ -745,7 +821,6 @@
                 isAdmin = true; document.getElementById("modal-admin-pass").value = "";
                 showToast("認証成功", "管理パネルが有効になりました", false);
                 document.getElementById("admin-panel").classList.remove("hidden");
-                document.getElementById("monitor-section").className = "flex-1 flex flex-col gap-5 transition-all duration-300 w-full overflow-hidden";
                 document.getElementById("settings-admin-login").classList.add("hidden");
                 document.getElementById("settings-admin-status").classList.remove("hidden");
                 toggleSettingsModal(false); populateSelector(); renderUI();
@@ -754,7 +829,6 @@
         function logoutAdmin() {
             isAdmin = false; showToast("ログアウト", "閲覧モードに戻りました", false);
             document.getElementById("admin-panel").classList.add("hidden");
-            document.getElementById("monitor-section").className = "xl:col-span-12 flex flex-col gap-5 transition-all duration-300 w-full overflow-hidden";
             document.getElementById("settings-admin-login").classList.remove("hidden");
             document.getElementById("settings-admin-status").classList.add("hidden");
             renderUI();
@@ -762,7 +836,7 @@
 
         function switchAdminSubTab(t) {
             ['update','create','earthquake'].forEach(x => {
-                document.getElementById(`subtab-${x}`).className = x===t ? "flex-1 text-center py-2 text-[10px] font-black rounded-m3-full bg-white dark:bg-gray-700 text-gray-950 dark:text-white shadow-sm" : "flex-1 text-center py-2 text-[10px] font-black rounded-m3-full text-gray-500 hover:bg-gray-100/50 dark:hover:bg-gray-900";
+                document.getElementById(`subtab-${x}`).className = x===t ? "flex-1 py-2 text-[10px] font-black rounded-m3-full bg-white dark:bg-gray-700 text-gray-950 dark:text-white shadow-sm" : "flex-1 py-2 text-[10px] font-black rounded-m3-full text-gray-500 hover:bg-gray-100/50";
                 document.getElementById(`admin-form-${x}`).classList.toggle("hidden", x!==t);
             });
         }
@@ -778,24 +852,13 @@
         // =============================================================
         // 🎨 M3 Expressive / UIシステム
         // =============================================================
-        function toggleM3Expressive(isM3) {
-            m3Expressive = isM3; safeStorage.setItem("volcano_m3_expressive", isM3);
-            if (isM3) document.body.classList.add("m3-expressive"); else document.body.classList.remove("m3-expressive");
-            renderUI();
-        }
-        function toggleDarkMode(isDark) {
-            if (isDark) { document.documentElement.classList.add('dark'); safeStorage.setItem("volcano_dark_mode", "true"); }
-            else { document.documentElement.classList.remove('dark'); safeStorage.setItem("volcano_dark_mode", "false"); }
-        }
-        function toggleCompactMode(isCompact) {
-            if (isCompact) { document.body.classList.add('compact-mode'); safeStorage.setItem("volcano_compact_mode", "true"); }
-            else { document.body.classList.remove('compact-mode'); safeStorage.setItem("volcano_compact_mode", "false"); }
-        }
+        function toggleM3Expressive(isM3) { m3Expressive = isM3; safeStorage.setItem("volcano_m3_expressive", isM3); if (isM3) document.body.classList.add("m3-expressive"); else document.body.classList.remove("m3-expressive"); renderUI(); }
+        function toggleDarkMode(isDark) { if (isDark) { document.documentElement.classList.add('dark'); safeStorage.setItem("volcano_dark_mode", "true"); } else { document.documentElement.classList.remove('dark'); safeStorage.setItem("volcano_dark_mode", "false"); } }
+        function toggleCompactMode(isCompact) { if (isCompact) { document.body.classList.add('compact-mode'); safeStorage.setItem("volcano_compact_mode", "true"); } else { document.body.classList.remove('compact-mode'); safeStorage.setItem("volcano_compact_mode", "false"); } }
 
         function setThemeColor(theme) {
             activeTheme = theme; safeStorage.setItem("volcano_accent_theme", theme);
-            let hex = "#6750A4"; 
-            if (theme === 'purple') hex = "#6750A4"; else if (theme === 'blue') hex = "#1A73E8"; else if (theme === 'terracotta') hex = "#BF360C"; else if (theme === 'emerald') hex = "#00897B";
+            let hex = "#6750A4"; if (theme === 'purple') hex = "#6750A4"; else if (theme === 'blue') hex = "#1A73E8"; else if (theme === 'terracotta') hex = "#BF360C"; else if (theme === 'emerald') hex = "#00897B";
             ["header-accent-glow", "header-icon-box"].forEach(id => { const el = document.getElementById(id); if(el) el.style.backgroundColor = hex; });
             ["modal-title-icon", "theme-card-sync-icon", "theme-card-palette-icon", "theme-card-bell-icon"].forEach(id => { const el = document.getElementById(id); if(el) el.style.color = hex; });
             applyThemeColorsToDynamicElements(hex);
@@ -812,8 +875,8 @@
             if (mode === 'create') visualTypeCreate = type; else visualTypeUpdate = type;
             ['animation', 'preset', 'custom'].forEach(t => {
                 const btn = document.getElementById(`vtype-${mode}-${t}`);
-                if (t === type) btn.className = "py-2 text-[10px] font-bold rounded-lg border text-center border-gray-400 bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white";
-                else btn.className = "py-2 text-[10px] font-bold rounded-lg border text-center border-gray-200 dark:border-gray-800 text-gray-500 hover:bg-gray-100/50";
+                if (t === type) btn.className = "py-2 text-[10px] font-bold rounded-lg border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white";
+                else btn.className = "py-2 text-[10px] font-bold rounded-lg border text-gray-500 dark:border-gray-800 hover:bg-gray-100/50";
             });
             document.getElementById(`vstyle-${mode}-preset-box`).style.display = (type === 'preset') ? 'block' : 'none';
             document.getElementById(`vstyle-${mode}-custom-box`).style.display = (type === 'custom') ? 'block' : 'none';
@@ -928,7 +991,7 @@
         }
 
         // =============================================================
-        // 🔄 ソート ＆ 全画面 ＆ 読み上げ
+        // 🔄 ソート ＆ 全画面
         // =============================================================
         function handleSortChange() { currentSortOrder = document.getElementById("sort-order-select").value; renderUI(); }
         function getSortedData() {
@@ -943,9 +1006,20 @@
         function toggleFullScreen() {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             const body = document.body;
+            const fsText = document.getElementById("fullscreen-text");
+            const fsIcon = document.getElementById("fullscreen-icon");
+
             if (isStandalone) {
-                if (!body.classList.contains("zen-mode")) { body.classList.add("zen-mode"); showToast("没入モードオン", "ヘッダーを非表示にしました。"); }
-                else { body.classList.remove("zen-mode"); }
+                if (!body.classList.contains("zen-mode")) {
+                    body.classList.add("zen-mode");
+                    if(fsText) fsText.innerText = "通常表示に戻す";
+                    if(fsIcon) fsIcon.innerText = "fullscreen_exit";
+                    showToast("没入モードオン", "ヘッダーを非表示にしました。");
+                } else {
+                    body.classList.remove("zen-mode");
+                    if(fsText) fsText.innerText = "全画面モード";
+                    if(fsIcon) fsIcon.innerText = "fullscreen";
+                }
                 renderUI();
             } else {
                 if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(()=>{ body.classList.add("zen-mode"); }); }
@@ -953,23 +1027,12 @@
             }
         }
 
-        function copyVolcanoReport(name, level, comment, time) {
-            const reportText = `【火山防災情報レポート】\n火山名: ${name}\n警戒レベル: ${level}\n発表日時: ${time}\n状況: ${comment}`;
-            const textArea = document.createElement("textarea"); textArea.value = reportText; textArea.style.position = "fixed";
-            document.body.appendChild(textArea); textArea.focus(); textArea.select();
-            try { document.execCommand('copy'); showToast("コピー完了", "状況レポートをコピーしました。"); } catch (err) { showToast("エラー", "失敗しました。", true); }
-            document.body.removeChild(textArea);
-        }
-
-        function shareVolcano(name, level) {
-            const text = `【火山防災情報発表】${name}は警戒レベル「レベル${level}」に指定されています。`;
-            if (navigator.share) { navigator.share({ title: '火山防災速報', text: text, url: window.location.href }).catch(()=>{}); }
-            else { showToast("共有", "URLをコピーしてご家族へ送信してください。"); }
-        }
-
-        function openMap(name) {
-            showToast("避難所検索", `${name}周辺の避難所情報を検索中...`);
-            setTimeout(() => { window.open(`https://www.google.com/maps/search/避難所+${name}`, '_blank'); }, 800);
+        // =============================================================
+        // 📋 共有 ＆ 避難マップ ＆ コピー ＆ 読み上げ
+        // =============================================================
+        function stopAllSpeechAndAlarms() {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            showToast("緊急停止", "アラート音および音声読み上げを強制停止しました。");
         }
 
         function playChimeNotes(notes, cb) {
@@ -1032,6 +1095,41 @@
             safeStorage.setItem("volcano_speech_rate", speechRate);
             safeStorage.setItem("volcano_speech_pitch", speechPitch);
         }
+
+        function copyVolcanoReport(name, level, comment, time) {
+            const reportText = `【火山防災情報レポート】\n火山名: ${name}\n警戒レベル: ${level}\n発表日時: ${time}\n状況: ${comment}`;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(reportText).then(() => {
+                    showToast("コピー完了", "状況レポートをクリップボードにコピーしました。");
+                }).catch(err => { fallbackCopyTextToClipboard(reportText); });
+            } else { fallbackCopyTextToClipboard(reportText); }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text; textArea.style.position = "fixed";
+            document.body.appendChild(textArea); textArea.focus(); textArea.select();
+            try { document.execCommand('copy'); showToast("コピー完了", "状況レポートをクリップボードにコピーしました。"); } catch (err) { showToast("エラー", "コピーに失敗しました。", true); }
+            document.body.removeChild(textArea);
+        }
+
+        function shareVolcano(name, level) {
+            const text = `【火山防災情報発表】${name}は警戒レベル「レベル${level}」に指定されています。`;
+            if (navigator.share) { navigator.share({ title: '火山防災速報', text: text, url: window.location.href }).catch(()=>{}); }
+            else { showToast("共有", "URLをコピーしてご家族へ送信してください。"); }
+        }
+
+        function openMap(name) {
+            showToast("避難所検索", `${name}周辺の最寄りの避難所情報を検索中...`);
+            setTimeout(() => { window.open(`https://www.google.com/maps/search/避難所+${name}`, '_blank'); }, 800);
+        }
+
+        // PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById("install-banner").classList.remove("hidden"); });
+        function triggerInstall() { if(deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById("install-banner").classList.add("hidden"); }); } }
+        function dismissInstallBanner() { document.getElementById("install-banner").classList.add("hidden"); }
+        function runDynamicServiceWorker() { if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(console.error); }
     </script>
 </body>
 </html>
