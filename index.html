@@ -32,15 +32,8 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Noto Sans JP', 'sans-serif'],
-                    },
-                    borderRadius: {
-                        'm3-full': '100px',
-                        'm3-large': '28px',
-                        'm3-medium': '16px',
-                        'm3-small': '12px',
-                    },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'Noto Sans JP', 'sans-serif'], },
+                    borderRadius: { 'm3-full': '100px', 'm3-large': '28px', 'm3-medium': '16px', 'm3-small': '12px', },
                     boxShadow: {
                         'm3-elevation-1': '0px 1px 3px 1px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.12)',
                         'm3-elevation-2': '0px 2px 6px 2px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.15)',
@@ -52,16 +45,8 @@
     </script>
 
     <style>
-        .material-symbols-rounded {
-            font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
-            display: inline-block;
-            vertical-align: middle;
-        }
-        body {
-            transition: background-color 0.4s ease, color 0.4s ease;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+        body { transition: background-color 0.4s ease, color 0.4s ease; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
         @keyframes lava-pulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.15); opacity: 1; fill: #ff1100; } }
         .pulse-lava { animation: lava-pulse 2s infinite ease-in-out; }
@@ -81,15 +66,14 @@
         .settings-overlay { backdrop-filter: blur(12px); transition: opacity 0.3s ease, visibility 0.3s ease; }
         .settings-sheet { transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
-        #splash-screen { transition: opacity 0.5s ease, transform 0.5s ease; }
-        #splash-screen.hide { opacity: 0; transform: scale(1.08); pointer-events: none; }
-
         body.m3-expressive .m3-card { border-radius: 28px !important; box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.08); transform: scale(1); transition: transform 0.2s; }
         body.m3-expressive .m3-card:hover { transform: scale(1.02); }
         body.m3-expressive .m3-btn { border-radius: 100px !important; }
         body.m3-expressive .m3-visual-box { border-radius: 20px !important; }
+        
         body:not(.m3-expressive) .m3-card { border-radius: 4px !important; box-shadow: none !important; border: 1px solid #ddd; }
         body:not(.m3-expressive) .m3-btn { border-radius: 2px !important; }
+        body:not(.m3-expressive) .m3-visual-box { border-radius: 2px !important; }
 
         body.compact-mode .card-container { padding: 16px !important; }
         body.compact-mode .card-visual { aspect-ratio: 16 / 9 !important; margin-bottom: 12px !important; }
@@ -98,15 +82,6 @@
     </style>
 </head>
 <body id="app-body" class="bg-[#F3F4F9] dark:bg-[#111318] text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen pb-16 antialiased m3-expressive">
-
-    <!-- ✨ 起動スプラッシュスクリーン -->
-    <div id="splash-screen" class="fixed inset-0 z-[100] bg-[#1D1B20] flex flex-col items-center justify-center text-white">
-        <div class="w-24 h-24 bg-[#6750A4] rounded-3xl flex items-center justify-center animate-pulse shadow-[0_0_40px_rgba(103,80,164,0.4)] mb-6">
-            <span class="material-symbols-rounded text-6xl">volcano</span>
-        </div>
-        <h1 class="text-2xl font-black tracking-widest mb-2">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">v3.5 Ultimate Pro</p>
-    </div>
 
     <!-- 緊急災害テロップ -->
     <div id="emergency-ticker" class="hidden bg-red-600 dark:bg-red-700 text-white py-2.5 overflow-hidden relative z-50 shadow-md">
@@ -117,23 +92,6 @@
             <div class="w-full overflow-hidden">
                 <span id="ticker-text" class="animate-ticker text-sm font-black pl-4"></span>
             </div>
-        </div>
-    </div>
-
-    <!-- PWAインストールバナー -->
-    <div id="install-banner" class="hidden bg-[#D3E4FF] dark:bg-[#004A77] text-[#001C38] dark:text-[#DFE2EB] px-6 py-4 flex flex-col md:flex-row items-center justify-between sticky top-0 z-50 shadow-md gap-3">
-        <div class="flex items-center gap-4">
-            <div class="bg-[#004A77] dark:bg-[#BAC8DB] text-white dark:text-[#001C38] w-10 h-10 rounded-full flex items-center justify-center shadow-md">
-                <span class="material-symbols-rounded">install_mobile</span>
-            </div>
-            <div>
-                <span class="text-sm font-bold block">ホーム画面に追加</span>
-                <span class="text-xs opacity-90">ホーム画面から直接フルスクリーン起動でき、プッシュ通知が安定します。</span>
-            </div>
-        </div>
-        <div class="flex gap-2 w-full md:w-auto justify-end">
-            <button onclick="dismissInstallBanner()" class="px-5 py-2.5 text-xs font-bold hover:bg-[#BAC8DB]/30 rounded-m3-full transition">後で</button>
-            <button onclick="triggerInstall()" class="bg-[#004A77] dark:bg-white text-white dark:text-[#004A77] px-6 py-2.5 text-xs font-black rounded-m3-full shadow-md hover:opacity-90 transition">追加する</button>
         </div>
     </div>
 
@@ -162,7 +120,6 @@
             <!-- ステータス & コントロール -->
             <div class="flex flex-wrap items-center gap-3 relative z-10 w-full lg:w-auto justify-start lg:justify-end">
                 
-                <!-- 🔇 緊急消音ボタン -->
                 <button onclick="stopAllSpeechAndAlarms()" id="mute-panel-btn" class="bg-red-950/40 hover:bg-red-950/60 text-red-400 w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md border border-red-500/20 active:scale-95">
                     <span class="material-symbols-rounded text-xl">volume_off</span>
                 </button>
@@ -177,20 +134,17 @@
                     </button>
                 </div>
                 
-                <!-- 🔄 強制同期ボタン -->
-                <button id="force-sync-btn" class="bg-white/10 hover:bg-white/20 text-white w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md border border-white/5 relative">
+                <button onclick="forceSyncFromFirebase()" id="force-sync-btn" class="bg-white/10 hover:bg-white/20 text-white w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md border border-white/5 relative">
                     <span id="sync-button-icon" class="material-symbols-rounded text-xl">sync</span>
                     <svg id="sync-google-spinner" class="google-spinner absolute inset-0 m-auto hidden" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none" /></svg>
                 </button>
 
-                <!-- 📅 ライブ時計 -->
                 <div class="bg-white/10 px-4 py-2.5 rounded-m3-medium text-xs font-bold font-mono flex items-center gap-2 border border-white/5 shadow-sm">
                     <span class="material-symbols-rounded text-sm text-red-400">schedule</span>
                     <span id="live-clock">----/--/-- --:--:--</span>
                 </div>
 
-                <!-- ⚙️ 設定ボタン -->
-                <button id="settings-trigger-btn" class="bg-white/10 hover:bg-white/20 text-white w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md">
+                <button onclick="toggleSettingsModal(true)" id="settings-trigger-btn" class="bg-white/10 hover:bg-white/20 text-white w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md">
                     <span class="material-symbols-rounded text-2xl">settings</span>
                 </button>
             </div>
@@ -321,7 +275,7 @@
                     <h3 class="text-lg font-black text-[#1C1B1F] dark:text-white flex items-center gap-2">
                         <span id="modal-title-icon" class="material-symbols-rounded text-[#6750A4]">settings</span> アプリ設定と認証
                     </h3>
-                    <button id="settings-close-btn" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center text-gray-800 dark:text-gray-200">
+                    <button id="settings-close-btn" onclick="toggleSettingsModal(false)" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center text-gray-800 dark:text-gray-200">
                         <span class="material-symbols-rounded">close</span>
                     </button>
                 </div>
@@ -404,7 +358,7 @@
                                 <input type="text" id="gas-url-input" placeholder="GAS Webhook URL" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
                             </div>
                         </div>
-                        <button id="notification-btn" class="w-full py-3 bg-gray-100 dark:bg-gray-800 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full flex justify-center gap-2">
+                        <button onclick="requestNotificationPermission()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full flex justify-center gap-2">
                             <span class="material-symbols-rounded text-sm">volume_up</span> <span id="notification-status-text">プッシュ通知を許可して登録</span>
                         </button>
                     </div>
@@ -439,7 +393,7 @@
         // 🌟 必須の定数・変数定義
         // =============================================================
         
-        // 🔑 ユーザー提供の Firebase Config と 通知用キー群を復元！
+        // 🔑 ユーザー提供の Firebase Config と 通知用キー群を復元
         const firebaseConfig = {
             apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOFUpc",
             authDomain: "ohamigo-425a8.firebaseapp.com",
@@ -476,18 +430,7 @@
         // 🚀 起動処理 (絶対クラッシュしない堅牢設計)
         // =============================================================
         window.onload = function() {
-            // ① スプラッシュ画面を最優先で1.2秒で消す（通信を待たない）
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                if (splash) splash.classList.add('hide');
-            }, 1200);
-
-            // ② 時計と基本UIを瞬時に起動
             try { tickClock(); setInterval(tickClock, 1000); } catch(e){}
-
-            // ボタンのイベントリスナー設定
-            try { setupEventListeners(); } catch(e){}
-
             try { loadLocalVolcanos(); } catch(e){}
             try { runDynamicServiceWorker(); } catch(e){}
 
@@ -509,14 +452,12 @@
                 document.getElementById("speech-pitch").value = safeStorage.getItem("volcano_speech_pitch") || "1.0";
                 updateSpeechSettings();
 
-                // 入力欄にコード内のキーを復元
                 const vapidInput = document.getElementById("vapid-key-input");
                 if(vapidInput) vapidInput.value = MY_VAPID_KEY;
                 const gasInput = document.getElementById("gas-url-input");
                 if(gasInput) gasInput.value = MY_GAS_URL;
             } catch(e){}
 
-            // 管理者コントロールの同期用リスナー
             try {
                 const updateVolcanoId = document.getElementById("update-volcano-id");
                 if(updateVolcanoId) {
@@ -530,45 +471,13 @@
                         }
                     });
                 }
-
-                // 通知ボタンのリスナー設定
-                const notifBtn = document.getElementById("notification-btn");
-                if (notifBtn) {
-                    notifBtn.onclick = function(e) {
-                        e.preventDefault(); 
-                        requestNotificationPermission();
-                    };
-                }
             } catch(e){}
 
-            // 🌐 起動時の自動同期は行わず、裏側で1.5秒後にこっそり同期を開始する（画面フリーズ対策）
+            // 🌐 起動時の自動同期は行わず、裏側で1.5秒後にこっそり同期を開始する
             setTimeout(() => {
-                // tryAutoConnectFirebase(); // もし完全に起動時通信をなくす場合はここもコメントアウトしたままでOKです。
                 tryAutoConnectFirebase(); 
             }, 1500);
         };
-
-        // イベントリスナーを確実に紐付ける関数
-        function setupEventListeners() {
-            const settingsBtn = document.getElementById("settings-trigger-btn");
-            if (settingsBtn) {
-                settingsBtn.onclick = function(e) {
-                    e.preventDefault(); e.stopPropagation(); toggleSettingsModal(true);
-                };
-            }
-            const closeBtn = document.getElementById("settings-close-btn");
-            if (closeBtn) {
-                closeBtn.onclick = function(e) {
-                    e.preventDefault(); e.stopPropagation(); toggleSettingsModal(false);
-                };
-            }
-            const syncBtn = document.getElementById("force-sync-btn");
-            if (syncBtn) {
-                syncBtn.onclick = function(e) {
-                    e.preventDefault(); forceSyncFromFirebase();
-                };
-            }
-        }
 
         // =======================
         // 🕒 UIコントロール
@@ -645,53 +554,14 @@
             }, 5000);
 
             if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
-                connectFirebase(JSON.stringify(firebaseConfig));
+                connectFirebase(JSON.stringify(firebaseConfig)).catch(e => console.error("Auto connect failed", e));
             } else {
                 updateSyncStatus('offline', '⚠️ 未接続・設定エラー');
             }
         }
 
-        async function forceSyncFromFirebase() {
-            const btnIcon = document.getElementById("sync-button-icon");
-            const spinner = document.getElementById("sync-google-spinner");
-            if(btnIcon) btnIcon.classList.add("hidden"); 
-            if(spinner) spinner.classList.remove("hidden");
-            
-            showToast("手動同期", "Firebaseから最新データを同期しています...", false);
-            
-            if (!db && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
-                await connectFirebase(JSON.stringify(firebaseConfig));
-            } else if (db && auth && auth.currentUser) {
-                try {
-                    const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').get();
-                    const list = [];
-                    snap.forEach(doc => { list.push({ docId: doc.id, ...doc.data() }); });
-                    volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
-                    saveLocalVolcanos(); renderUI();
-                    
-                    try {
-                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                        const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                        osc.type = 'sine'; osc.frequency.setValueAtTime(880, ctx.currentTime);
-                        osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.08);
-                        gain.gain.setValueAtTime(0.08, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-                        osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.25);
-                    } catch(e) {}
-                    
-                    updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
-                } catch (e) { handleFirebaseError(e, "Manual Sync"); }
-            } else {
-                switchToLocalMode();
-            }
-            
-            setTimeout(() => { 
-                if(btnIcon) btnIcon.classList.remove("hidden"); 
-                if(spinner) spinner.classList.add("hidden"); 
-            }, 800);
-        }
-
         async function connectFirebase(configJson) {
-            updateSyncStatus('connecting', 'サーバー同期中...');
+            updateSyncStatus('connecting', 'サーバー接続中...');
             const errLog = document.getElementById("firebase-error-log");
             if (errLog) errLog.innerText = "";
 
@@ -704,40 +574,81 @@
                 
                 try { messaging = firebase.messaging(); } catch(e){ console.warn("FCM Load skipped", e); }
 
-                auth.signInAnonymously().then(() => {
-                    if (currentSyncUnsubscribe) currentSyncUnsubscribe();
-                    const colRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos');
-                    
-                    currentSyncUnsubscribe = colRef.onSnapshot((snapshot) => {
-                        const list = [];
-                        snapshot.forEach(doc => { list.push({ docId: doc.id, ...doc.data() }); });
-                        
-                        const newVolcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
-                        
-                        if (!isFirstLoad) {
-                            newVolcanoData.forEach(newVol => {
-                                const oldVol = volcanoData.find(v => v.id === newVol.id);
-                                if (!oldVol || oldVol.updateTime !== newVol.updateTime) {
-                                    triggerSystemNotification(newVol.name, newVol.level, newVol.comment);
-                                    if (newVol.level >= 4) playSiren(); 
-                                    else playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]);
-                                }
-                            });
-                        }
-                        
-                        volcanoData = newVolcanoData;
-                        saveLocalVolcanos();
-                        renderUI();
-                        
-                        isFirstLoad = false;
-                        if (connectionTimeout) clearTimeout(connectionTimeout);
-                        updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
-                    }, (error) => {
-                        handleFirebaseError(error, "Firestore Database");
-                    });
-                }).catch((authError) => { handleFirebaseError(authError, "Authentication"); });
+                // 📌 ここで await して接続完了を確実に待つ
+                await auth.signInAnonymously();
 
-            } catch (err) { handleFirebaseError(err, "Initialization"); }
+                if (currentSyncUnsubscribe) currentSyncUnsubscribe();
+                const colRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos');
+                
+                currentSyncUnsubscribe = colRef.onSnapshot((snapshot) => {
+                    const list = [];
+                    snapshot.forEach(doc => { list.push({ docId: doc.id, ...doc.data() }); });
+                    
+                    const newVolcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
+                    
+                    if (!isFirstLoad) {
+                        newVolcanoData.forEach(newVol => {
+                            const oldVol = volcanoData.find(v => v.id === newVol.id);
+                            if (!oldVol || oldVol.updateTime !== newVol.updateTime) {
+                                triggerSystemNotification(newVol.name, newVol.level, newVol.comment);
+                                if (newVol.level >= 4) playSiren(); 
+                                else playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]);
+                            }
+                        });
+                    }
+                    
+                    volcanoData = newVolcanoData;
+                    saveLocalVolcanos();
+                    renderUI();
+                    
+                    isFirstLoad = false;
+                    if (connectionTimeout) clearTimeout(connectionTimeout);
+                    updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
+                }, (error) => {
+                    handleFirebaseError(error, "Firestore Database");
+                });
+
+                return true;
+            } catch (err) { 
+                handleFirebaseError(err, "Initialization"); 
+                throw err;
+            }
+        }
+
+        async function forceSyncFromFirebase() {
+            const btnIcon = document.getElementById("sync-button-icon");
+            const spinner = document.getElementById("sync-google-spinner");
+            if(btnIcon) btnIcon.classList.add("hidden"); 
+            if(spinner) spinner.classList.remove("hidden");
+            
+            showToast("手動同期", "Firebaseに接続してデータを同期しています...", false);
+            
+            try {
+                if (!db && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
+                    await connectFirebase(JSON.stringify(firebaseConfig));
+                }
+
+                if (db && auth && auth.currentUser) {
+                    const snap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').get();
+                    const list = [];
+                    snap.forEach(doc => { list.push({ docId: doc.id, ...doc.data() }); });
+                    volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
+                    saveLocalVolcanos(); renderUI();
+                    
+                    playChimeNotes([{f:880,d:0.08},{f:1200,d:0.2}]);
+                    updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
+                } else {
+                    switchToLocalMode();
+                }
+            } catch (e) { 
+                showToast("エラー", "同期に失敗しました: " + e.message, true);
+                handleFirebaseError(e, "Manual Sync"); 
+            } finally {
+                setTimeout(() => { 
+                    if(btnIcon) btnIcon.classList.remove("hidden"); 
+                    if(spinner) spinner.classList.add("hidden"); 
+                }, 800);
+            }
         }
 
         function handleFirebaseError(error, phase) {
@@ -761,7 +672,6 @@
             else { volcanoData = []; renderUI(); }
         }
         function saveLocalVolcanos() { safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(volcanoData)); }
-
 
         // =============================================================
         // 🔔 バックグラウンド Push 通信
@@ -813,13 +723,17 @@
                 
                 if (tokens.length === 0) return;
 
-                fetch(MY_GAS_URL, {
+                const response = await fetch(MY_GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ title: title, body: bodyText, tokens: tokens })
                 });
-            } catch(e) { console.error("バックグラウンド通知送信失敗", e); }
+                console.log("バックグラウンドPushを送信しました。");
+            } catch(e) { 
+                console.error("バックグラウンド通知送信失敗", e); 
+                showToast("通知エラー", "プッシュ通知の送信に失敗しました: " + e.message, true);
+            }
         }
 
         // =============================================================
@@ -833,7 +747,9 @@
             if(!name) return showToast("エラー", "火山名を入力してください", true);
 
             const icon = document.getElementById("btn-create-icon"); const spin = document.getElementById("create-google-spinner");
-            document.getElementById("btn-create-text").innerText = "クラウド同期中..."; icon.classList.add("hidden"); spin.classList.remove("hidden");
+            if (icon) icon.classList.add("hidden"); 
+            if (spin) spin.classList.remove("hidden");
+            document.getElementById("btn-create-text").innerText = "クラウド同期中..."; 
 
             const timeStr = getNowTimeStr(); const now = new Date(); const nid = Date.now();
             const newVol = {
@@ -843,19 +759,32 @@
             if(visualTypeCreate === 'preset') newVol.visualPreset = document.getElementById("create-visual-preset").value;
             if(visualTypeCreate === 'custom') newVol.customImage = document.getElementById("create-visual-base64").value;
 
-            if(db && auth && auth.currentUser) {
-                try { 
-                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(nid)).set(newVol); 
-                    sendBackgroundPushNotification(`🚨【新規警報】${name}`, `警戒レベル ${level}で監視が開始されました。`);
+            try {
+                if (!db && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
+                    await connectFirebase(JSON.stringify(firebaseConfig));
                 }
-                catch(e) { console.log(e); }
-            } else { volcanoData.push(newVol); saveLocalVolcanos(); renderUI(); }
 
-            setTimeout(() => {
-                document.getElementById("btn-create-text").innerText = "データベースに新規登録"; icon.classList.remove("hidden"); spin.classList.add("hidden");
+                if(db && auth && auth.currentUser) {
+                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(nid)).set(newVol); 
+                    // 🔔 新規登録時に全iPadへPush通知を発射！
+                    await sendBackgroundPushNotification(`🚨【新規警報】${name}`, `警戒レベル ${level}で監視が開始されました。`);
+                } else { 
+                    volcanoData.push(newVol); saveLocalVolcanos(); renderUI(); 
+                }
+
                 document.getElementById("create-name").value=""; document.getElementById("create-comment").value=""; document.getElementById("create-visual-base64").value="";
                 showToast("登録成功", `${name} を追加しました`);
-            }, 800);
+
+            } catch (e) {
+                console.error(e);
+                showToast("通信エラー", "クラウドへの登録に失敗しました: " + e.message, true);
+            } finally {
+                setTimeout(() => {
+                    document.getElementById("btn-create-text").innerText = "データベースに新規登録"; 
+                    if (icon) icon.classList.remove("hidden"); 
+                    if (spin) spin.classList.add("hidden");
+                }, 800);
+            }
         }
 
         async function submitUpdateVolcano() {
@@ -866,7 +795,9 @@
             if(!tid) return showToast("エラー", "対象を選択してください", true);
 
             const icon = document.getElementById("btn-update-icon"); const spin = document.getElementById("update-google-spinner");
-            document.getElementById("btn-update-text").innerText = "クラウド同期中..."; icon.classList.add("hidden"); spin.classList.remove("hidden");
+            if(icon) icon.classList.add("hidden"); 
+            if(spin) spin.classList.remove("hidden");
+            document.getElementById("btn-update-text").innerText = "クラウド同期中...";
 
             const timeStr = getNowTimeStr(); const now = new Date();
             const idx = volcanoData.findIndex(v => String(v.id) === tid); if(idx === -1) return;
@@ -877,18 +808,33 @@
             
             volcanoData[idx].history.unshift(`${now.getFullYear()}/${timeStr}: 【レベル${level}】に更新。状況: ${comment}`);
 
-            if(db && auth && auth.currentUser) {
-                try { 
-                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(tid)).set(volcanoData[idx]); 
-                    sendBackgroundPushNotification(`🚨【状況更新】${volcanoData[idx].name}`, `警戒レベル ${level}: ${volcanoData[idx].comment}`);
+            try {
+                if (!db && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
+                    await connectFirebase(JSON.stringify(firebaseConfig));
                 }
-                catch(e){}
-            } else { saveLocalVolcanos(); renderUI(); }
 
-            setTimeout(() => {
-                document.getElementById("btn-update-text").innerText = "情報を書き換えて警報発令"; icon.classList.remove("hidden"); spin.classList.add("hidden");
-                document.getElementById("update-visual-base64").value=""; playSiren();
-            }, 800);
+                if(db && auth && auth.currentUser) {
+                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(tid)).set(volcanoData[idx]); 
+                    // 🔔 更新時に全iPadへPush通知を発射！
+                    await sendBackgroundPushNotification(`🚨【状況更新】${volcanoData[idx].name}`, `警戒レベル ${level}: ${volcanoData[idx].comment}`);
+                } else { 
+                    saveLocalVolcanos(); renderUI(); 
+                }
+
+                document.getElementById("update-visual-base64").value=""; 
+                playSiren();
+                showToast("更新成功", "火山情報を更新しました");
+
+            } catch(e) {
+                console.error(e);
+                showToast("通信エラー", "クラウドの更新に失敗しました: " + e.message, true);
+            } finally {
+                setTimeout(() => {
+                    document.getElementById("btn-update-text").innerText = "情報を更新＆Push通知"; 
+                    if(icon) icon.classList.remove("hidden"); 
+                    if(spin) spin.classList.add("hidden");
+                }, 800);
+            }
         }
 
         function checkAdminPassword() {
@@ -911,8 +857,10 @@
 
         function switchAdminSubTab(t) {
             ['update','create','earthquake'].forEach(x => {
-                document.getElementById(`subtab-${x}`).className = x===t ? "flex-1 py-2 text-[10px] font-black rounded-m3-full bg-white dark:bg-gray-700 text-gray-950 dark:text-white shadow-sm" : "flex-1 py-2 text-[10px] font-black rounded-m3-full text-gray-500 hover:bg-gray-100/50";
-                document.getElementById(`admin-form-${x}`).classList.toggle("hidden", x!==t);
+                const subtab = document.getElementById(`subtab-${x}`);
+                const adminform = document.getElementById(`admin-form-${x}`);
+                if (subtab) subtab.className = x===t ? "flex-1 py-2 text-[10px] font-black rounded-m3-full bg-white dark:bg-gray-700 text-gray-950 dark:text-white shadow-sm" : "flex-1 py-2 text-[10px] font-black rounded-m3-full text-gray-500 hover:bg-gray-100/50";
+                if (adminform) adminform.classList.toggle("hidden", x!==t);
             });
         }
 
@@ -922,6 +870,12 @@
                 try { for(const v of volcanoData) await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(v.id)).delete(); } catch(e){}
             } else { volcanoData=[]; saveLocalVolcanos(); renderUI(); }
             showToast("全件消去", "リセットしました", true);
+        }
+
+        function triggerEarthquakeTicker(show) {
+            const tk = document.getElementById("emergency-ticker"); const t = document.getElementById("eq-text-input").value;
+            if(show && t) { document.getElementById("ticker-text").innerText=t; tk.classList.remove("hidden"); playSiren(); showToast("配信中","速報オーバーレイ表示中",true); }
+            else tk.classList.add("hidden");
         }
 
         // =============================================================
@@ -1102,10 +1056,89 @@
             }
         }
 
-        function triggerEarthquakeTicker(show) {
-            const tk = document.getElementById("emergency-ticker"); const t = document.getElementById("eq-text-input").value;
-            if(show && t) { document.getElementById("ticker-text").innerText=t; tk.classList.remove("hidden"); playSiren(); showToast("配信中","速報オーバーレイ表示中",true); }
-            else tk.classList.add("hidden");
+        // =============================================================
+        // 📋 共有 ＆ 避難マップ ＆ コピー ＆ 読み上げ
+        // =============================================================
+        function copyVolcanoReport(name, level, comment, time) {
+            const reportText = `【火山防災情報レポート】\n火山名: ${name}\n警戒レベル: ${level}\n発表日時: ${time}\n状況: ${comment}`;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(reportText).then(() => {
+                    showToast("コピー完了", "状況レポートをクリップボードにコピーしました。");
+                }).catch(err => { fallbackCopyTextToClipboard(reportText); });
+            } else {
+                fallbackCopyTextToClipboard(reportText);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text; textArea.style.position = "fixed";
+            document.body.appendChild(textArea); textArea.focus(); textArea.select();
+            try { document.execCommand('copy'); showToast("コピー完了", "状況レポートをクリップボードにコピーしました。"); } catch (err) { showToast("エラー", "コピーに失敗しました。", true); }
+            document.body.removeChild(textArea);
+        }
+
+        function shareVolcano(name, level) {
+            const text = `【火山防災情報発表】${name}は警戒レベル「レベル${level}」に指定されています。`;
+            if (navigator.share) { navigator.share({ title: '火山防災速報', text: text, url: window.location.href }).catch(()=>{}); }
+            else { showToast("共有", "URLをコピーしてご家族へ送信してください。"); }
+        }
+
+        function openMap(name) {
+            showToast("避難所検索", `${name}周辺の最寄りの避難所情報を検索中...`);
+            setTimeout(() => { window.open(`https://www.google.com/maps/search/避難所+${name}`, '_blank'); }, 800);
+        }
+
+        function playChimeNotes(notes, cb) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)(); let time = ctx.currentTime;
+                notes.forEach(n => {
+                    const o = ctx.createOscillator(); const g = ctx.createGain();
+                    o.type = 'sine'; o.frequency.value = n.f;
+                    g.gain.setValueAtTime(0, time); g.gain.linearRampToValueAtTime(0.12, time+0.05); g.gain.setValueAtTime(0.12, time+n.d-0.1); g.gain.exponentialRampToValueAtTime(0.01, time+n.d);
+                    o.connect(g); g.connect(ctx.destination); o.start(time); o.stop(time+n.d); time += n.d-0.05;
+                });
+                if(cb) setTimeout(cb, (time - ctx.currentTime)*1000);
+            } catch(e) { if(cb) cb(); }
+        }
+
+        function playSiren() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(320, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(640, ctx.currentTime+0.3); osc.frequency.linearRampToValueAtTime(320, ctx.currentTime+0.6);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime+1.2);
+                osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime+1.2);
+            } catch(e){}
+        }
+
+        function playEmergencyBroadcastById(id) {
+            const v = volcanoData.find(x => x.id === id); if(!v) return;
+            if('speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); }
+            playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]);
+            setTimeout(() => {
+                if('speechSynthesis' in window) {
+                    const u = new SpeechSynthesisUtterance(`、、、、、、火山防災情報。${v.name}の警戒レベルは、レベル${v.level}です。状況をお伝えします。${v.comment}`);
+                    u.lang="ja-JP"; u.rate=speechRate; u.pitch=speechPitch; window.speechSynthesis.speak(u);
+                }
+            }, 300);
+        }
+
+        function readAllHighLevelAlerts() {
+            const highLevelVols = volcanoData.filter(v => v.level >= 3);
+            if (highLevelVols.length === 0) return showToast("情報", "現在、重大警報火山はありません。");
+            if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); }
+            playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]);
+            setTimeout(() => {
+                let fullText = "、、、、、、緊急避難警報。一括読み上げを開始します。";
+                highLevelVols.forEach(v => { fullText += `、${v.name}、警戒レベル${v.level}。${v.comment}`; });
+                fullText += "、以上です。命を守る行動を心がけてください。";
+                if ('speechSynthesis' in window) {
+                    const u = new SpeechSynthesisUtterance(fullText);
+                    u.lang = "ja-JP"; u.rate = speechRate; u.pitch = speechPitch; window.speechSynthesis.speak(u);
+                }
+            }, 300);
         }
 
         // PWA
