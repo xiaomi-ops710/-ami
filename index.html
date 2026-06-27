@@ -325,7 +325,6 @@
                             <svg id="update-google-spinner" class="google-spinner absolute right-4 hidden" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none"/></svg>
                         </button>
                     </div>
-
                     <!-- 新規登録フォーム -->
                     <div id="admin-form-create" class="space-y-4 hidden">
                         <input type="text" id="create-name" placeholder="新規火山名" class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3 text-xs font-bold dark:text-white focus:outline-none">
@@ -605,7 +604,7 @@
   messagingSenderId: "342829309449",
   appId: "1:342829309449:web:9937c81eaa8f48436262d8"
 };
-
+        
 
         // =============================================================
         // 変数定義
@@ -961,7 +960,7 @@
             const cu = document.getElementById("btn-update-volcano"); if(cu) cu.style.backgroundColor = hex;
             const cc = document.getElementById("btn-create-volcano"); if(cc) cc.style.backgroundColor = hex;
         }
-
+        
         // =============================================================
         // ✍️ 管理者・データCRUD
         // =============================================================
@@ -1241,7 +1240,7 @@
                     showToast("通知許可", "ブラウザのプッシュ通知を許可しました。");
 
                     // 💡 コードに埋め込んだ VAPID_KEY を使用してトークンを取得
-                    if (messaging && MY_VAPID_KEY && MY_VAPID_KEY !== "ここにFirebaseの短いVAPIDキーを貼り付けます") {
+                    if (messaging && MY_VAPID_KEY && MY_VAPID_KEY !== "gLRd2fkyQkSq5QJ7WaN36k4q1znic4uP6RoNgyOJwi4") {
                         messaging.getToken({ vapidKey: MY_VAPID_KEY }).then((currentToken) => {
                             if (currentToken) {
                                 db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({
@@ -1268,8 +1267,8 @@
         }
 
         async function sendBackgroundPushNotification(title, bodyText) {
-            // 💡 コードに埋め込んだ GAS_URL を使用して送信
-            if (!MY_GAS_URL || MY_GAS_URL === "ここにGASのURLを貼り付けます" || !db) return;
+             // 💡 コードに埋め込んだ GAS_URL を使用して送信
+            if (!MY_GAS_URL || MY_GAS_URL === "https://script.google.com/macros/s/AKfycbwh_6uOJP7LTT4iaYxNtFS02tr23Z54ZQwSar2XrxBB9Js1wVL8AJokLqueD6KpPhTD/exec" || !db) return;
 
             try {
                 const snapshot = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').get();
