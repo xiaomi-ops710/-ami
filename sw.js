@@ -1,12 +1,5 @@
-```javascript
-const CACHE_NAME = 'volcano-monitor-v1.5-pro';
-const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
-];
+const CACHE_NAME = 'volcano-monitor-v1.6-pro';
+const urlsToCache = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
@@ -18,55 +11,43 @@ self.addEventListener('fetch', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => Promise.all(cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))))
-  );
+  event.waitUntil(caches.keys().then(cacheNames => Promise.all(cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name)))));
   self.clients.claim();
 });
 
-// 🔔 PWAの「バックグラウンド・プッシュ通知」を受信・表示する
-self.addEventListener('push', event => {
-  let title = '🚨 火山警報';
-  let body = '火山警戒レベルが更新されました。最新情報をご確認ください。';
+// Firebase Cloud Messaging (FCM) の統合
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
-  if (event.data) {
-    try {
-      const data = event.data.json();
-      title = data.title || title;
-      body = data.body || body;
-    } catch (e) {
-      body = event.data.text() || body;
-    }
-  }
+const firebaseConfig = {
+    apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOFUpc",
+    authDomain: "ohamigo-425a8.firebaseapp.com",
+    projectId: "ohamigo-425a8",
+    storageBucket: "ohamigo-425a8.firebasestorage.app",
+    messagingSenderId: "342829309449",
+    appId: "1:342829309449:web:9937c81eaa8f48436262d8"
+};
 
-  const options = {
-    body: body,
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(function(payload) {
+  const notificationTitle = payload.notification?.title || '🚨 火山防災情報局';
+  const notificationOptions = {
+    body: payload.notification?.body || '最新の警戒情報が更新されました。',
     icon: './icon-192.png',
     badge: './icon-192.png',
     vibrate: [300, 100, 300, 100, 400],
     data: { url: './index.html' },
-    requireInteraction: true // iPadの画面にユーザーが消すまで残り続ける設定
+    requireInteraction: true
   };
-
-  event.waitUntil(self.registration.showNotification(title, options));
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// 通知がタップされたらアプリを開く
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
-      if (clientList.length > 0) {
-        let client = clientList[0];
-        for (let i = 0; i < clientList.length; i++) {
-          if (clientList[i].focused) client = clientList[i];
-        }
-        return client.focus();
-      }
-      return clients.openWindow('./index.html');
-    })
-  );
+  event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+    if (clientList.length > 0) return clientList[0].focus();
+    return clients.openWindow('./index.html');
+  }));
 });
-
-
-```
