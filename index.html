@@ -390,13 +390,13 @@
         // 🌟 必須の定数・変数定義
         // =============================================================
         const firebaseConfig = {
-  apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOFUpc",
-  authDomain: "ohamigo-425a8.firebaseapp.com",
-  projectId: "ohamigo-425a8",
-  storageBucket: "ohamigo-425a8.firebasestorage.app",
-  messagingSenderId: "342829309449",
-  appId: "1:342829309449:web:9937c81eaa8f48436262d8"
-};
+            apiKey: "AIzaSyDgMQ8XAA4y717qE8c1sWL5C-XKDzOFUpc",
+            authDomain: "ohamigo-425a8.firebaseapp.com",
+            projectId: "ohamigo-425a8",
+            storageBucket: "ohamigo-425a8.firebasestorage.app",
+            messagingSenderId: "342829309449",
+            appId: "1:342829309449:web:9937c81eaa8f48436262d8"
+        };
         const MY_VAPID_KEY = "gLRd2fkyQkSq5QJ7WaN36k4q1znic4uP6RoNgyOJwi4";
         const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbwUYhNMvF1e-_-vUn-CQz8MlvDofw09wmI6aWyi4evrrKkpmaP3aDTcj_qSM8h1CoBl/exec";
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
@@ -473,7 +473,6 @@
         // 🚀 起動処理 (絶対クラッシュしない堅牢設計)
         // =============================================================
         window.onload = function() {
-            // スプラッシュ画面を必ず非表示にする（1.2秒後）
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if (splash) splash.classList.add('hide');
@@ -529,7 +528,6 @@
                 }
             } catch(e){}
 
-            // 起動時の自動同期は行わず、裏側で1.5秒後にこっそり同期を開始する
             setTimeout(() => { tryAutoConnectFirebase(); }, 1500);
         };
 
@@ -711,51 +709,60 @@
         function saveLocalVolcanos() { safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(volcanoData)); }
 
         // =============================================================
-        // 🔔 バックグラウンド Push 通信
+        // 🔔 バックグラウンド Push 通信 (完全可視化＆エラー表示対応)
         // =============================================================
-        function requestNotificationPermission() {
-            if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です");
+        async function requestNotificationPermission() {
+            if(!("Notification" in window)) return showToast("非対応", "端末がプッシュ通知に非対応です", true);
             
-            Notification.requestPermission().then(p => {
+            try {
+                const p = await Notification.requestPermission();
                 const s = document.getElementById("notification-status-text");
                 const b = document.getElementById("notification-btn");
+
                 if(p === "granted") {
                     if (s) s.innerText = "プッシュ通知：許可済み";
                     if (b) b.className = "w-full py-3 bg-[#D2E4FF] text-[#001D36] rounded-m3-full text-xs font-black flex justify-center gap-2";
-                    showToast("通知許可", "ブラウザのプッシュ通知を許可しました。");
+                    showToast("通知許可", "ブラウザの通知を許可しました。トークン取得中...");
 
                     if (messaging && typeof MY_VAPID_KEY !== 'undefined') {
-                        let tokenPromise;
-                        if (swRegistration) {
-                            tokenPromise = messaging.getToken({ vapidKey: MY_VAPID_KEY, serviceWorkerRegistration: swRegistration });
-                        } else {
-                            tokenPromise = messaging.getToken({ vapidKey: MY_VAPID_KEY });
-                        }
+                        // ⭐️ ワーカーの準備が完了するまで確実に待機する
+                        const registration = await navigator.serviceWorker.ready;
+                        
+                        try {
+                            const currentToken = await messaging.getToken({ 
+                                vapidKey: MY_VAPID_KEY,
+                                serviceWorkerRegistration: registration
+                            });
 
-                        tokenPromise.then((currentToken) => {
                             if (currentToken && db && auth && auth.currentUser) {
-                                db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({
+                                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({
                                     token: currentToken,
                                     updatedAt: new Date()
-                                }).then(() => {
-                                    if (s) s.innerText = "バックグラウンドPush：有効！";
-                                    showToast("Push有効化完了", "バックグラウンド通知の準備が完了しました！");
                                 });
+                                if (s) s.innerText = "バックグラウンドPush：有効！";
+                                showToast("Push有効化完了", "バックグラウンド通知の準備が完了しました！");
                             } else if(currentToken) {
                                 showToast("通知準備完了", "トークン取得成功。DB接続後に保存されます。");
+                            } else {
+                                showToast("エラー", "トークンが空でした。", true);
                             }
-                        }).catch((err) => {
-                            console.error('トークン取得エラー:', err);
-                            showToast("エラー", "FCMトークン取得に失敗しました。ホーム画面に追加して起動してください。", true);
-                        });
-                    } else if (!swRegistration) {
-                        showToast("エラー", "通知の受け皿（Service Worker）が準備できていません。", true);
+                        } catch (err) {
+                            console.error('トークン取得詳細エラー:', err);
+                            // エラーの「本当の理由」を赤いトーストで表示する
+                            showToast("FCMエラー", err.message || "トークン取得に失敗しました", true);
+                        }
+                    } else {
+                        showToast("エラー", "FCMモジュールがありません", true);
                     }
                 } else {
                     if (s) s.innerText = "プッシュ通知：ブロック中";
                     if (b) b.className = "w-full py-3 bg-red-100 text-red-800 rounded-m3-full text-xs font-bold flex justify-center gap-2";
+                    showToast("ブロック", "端末の設定から通知を許可してください", true);
                 }
-            });
+            } catch (error) {
+                console.error("通知許可要求でエラー:", error);
+                showToast("エラー", "通知の許可要求に失敗しました", true);
+            }
         }
 
         async function sendBackgroundPushNotification(title, bodyText) {
@@ -769,18 +776,26 @@
                 snapshot.forEach(doc => { if (doc.data().token) tokens.push(doc.data().token); });
                 
                 if (tokens.length === 0) {
-                    console.log("No tokens found to push to.");
+                    showToast("送信スキップ", "通知先（トークン）が1件も登録されていません", true);
                     return;
                 }
 
-                // 🚨 GASへの通信がブロックされないよう、必ず安全なテキスト形式で送信する
+                showToast("送信中...", "GASへプッシュリクエストを送信しています");
+
                 fetch(MY_GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors', 
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ title: title, body: bodyText, tokens: tokens })
+                }).then(() => {
+                    showToast("送信完了", "プッシュ通知リクエストを送信しました！");
+                }).catch(err => {
+                    showToast("送信エラー", "GASへの通信に失敗: " + err.message, true);
                 });
-            } catch(e) { console.error("バックグラウンド通知送信失敗", e); }
+            } catch(e) { 
+                console.error("バックグラウンド通知送信失敗", e); 
+                showToast("エラー", "トークンDBの読み込み失敗: " + e.message, true);
+            }
         }
 
         async function testPushNotification() {
@@ -1102,9 +1117,6 @@
             }
         }
 
-        // =============================================================
-        // 📋 共有 ＆ 避難マップ ＆ コピー ＆ 読み上げ
-        // =============================================================
         function copyVolcanoReport(name, level, comment, time) {
             const reportText = `【火山防災情報レポート】\n火山名: ${name}\n警戒レベル: ${level}\n発表日時: ${time}\n状況: ${comment}`;
             if (navigator.clipboard && window.isSecureContext) {
@@ -1210,9 +1222,19 @@
         async function runDynamicServiceWorker() { 
             if('serviceWorker' in navigator) {
                 try {
-                    // Preview環境等の相対パスエラーを回避
+                    // 古い sw.js を自動的に抹消する安全処理
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for(let registration of registrations) {
+                        if(registration.active && registration.active.scriptURL.includes('sw.js')) {
+                            await registration.unregister();
+                            console.log("古い sw.js を強制消去しました");
+                        }
+                    }
+
+                    // HTTP環境でのみ新しい FCM 専用ワーカーを登録する
                     if(window.location.protocol.startsWith('http')) {
-                        swRegistration = await navigator.serviceWorker.register('./sw.js');
+                        swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                        console.log('通知用ワーカーの登録完了');
                     }
                 } catch(e) { console.warn('SW registration skipped', e); }
             }
