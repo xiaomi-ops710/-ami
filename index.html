@@ -67,7 +67,6 @@
 </head>
 <body id="app-body" class="bg-[#F3F4F9] dark:bg-[#111318] text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen pb-16 antialiased m3-expressive">
 
-    <!-- スプラッシュスクリーン -->
     <div id="splash-screen" class="fixed inset-0 z-[100] bg-[#1D1B20] flex flex-col items-center justify-center text-white">
         <div class="w-24 h-24 bg-[#6750A4] rounded-3xl flex items-center justify-center animate-pulse shadow-[0_0_40px_rgba(103,80,164,0.4)] mb-6">
             <span class="material-symbols-rounded text-6xl">volcano</span>
@@ -161,6 +160,7 @@
         </div>
 
         <div class="flex flex-col lg:flex-row items-start gap-8 w-full">
+            
             <section id="admin-panel" class="hidden w-full lg:w-[380px] shrink-0 bg-white dark:bg-[#1E1F22] border border-[#E1E2EC] dark:border-gray-800 p-6 rounded-m3-large shadow-m3-elevation-1 lg:sticky lg:top-6 z-30">
                 <div class="flex items-center justify-between border-b pb-4 mb-5 dark:border-gray-800">
                     <h3 class="text-md font-bold text-[#1C1B1F] dark:text-white flex items-center gap-2"><span class="material-symbols-rounded text-red-500">terminal</span>コントロールパネル</h3>
@@ -415,6 +415,7 @@
         let db = null, auth = null, messaging = null; 
         let currentSyncUnsubscribe = null, currentSortOrder = 'id_asc', connectionTimeout = null;
         let isFirstLoad = true, isAdmin = false, isConnecting = false;
+        let swRegistration = null; // 🔔 ServiceWorkerを確実に保持する
 
         // =======================
         // 🕒 ユーティリティ
@@ -455,12 +456,10 @@
         }
         function triggerSystemNotification(n, l, c) {
             const t = `🚨 【防災速報】${n}`; const b = `レベル${l}: ${c}`;
-            if(Notification.permission === "granted") {
-                if(navigator.serviceWorker) {
-                    navigator.serviceWorker.ready.then(reg => {
-                        reg.showNotification(t, { body: b, icon: './icon-192.png', vibrate: [300,100,300,100,400], requireInteraction: true });
-                    }).catch(()=> new Notification(t, {body:b}));
-                } else new Notification(t, {body:b});
+            if(Notification.permission === "granted" && swRegistration) {
+                swRegistration.showNotification(t, { body: b, icon: './icon-192.png', vibrate: [300,100,300,100,400], requireInteraction: true }).catch(()=> new Notification(t, {body:b}));
+            } else if (Notification.permission === "granted") {
+                new Notification(t, {body:b});
             }
             showToast(t, b, l>=4);
         }
@@ -705,7 +704,7 @@
         function saveLocalVolcanos() { safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(volcanoData)); }
 
         // =============================================================
-        // 🔔 バックグラウンド Push 通信
+        // 🔔 バックグラウンド Push 通信 (FCM + PWA 統合機能)
         // =============================================================
         function requestNotificationPermission() {
             if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です");
@@ -718,8 +717,12 @@
                     if (b) b.className = "w-full py-3 bg-[#D2E4FF] text-[#001D36] rounded-m3-full text-xs font-black flex justify-center gap-2";
                     showToast("通知許可", "ブラウザのプッシュ通知を許可しました。");
 
-                    if (messaging && MY_VAPID_KEY) {
-                        messaging.getToken({ vapidKey: MY_VAPID_KEY }).then((currentToken) => {
+                    // 💡 通知を受け取るためには、Service Workerが確実に動いている必要があります。
+                    if (messaging && MY_VAPID_KEY && swRegistration) {
+                        messaging.getToken({ 
+                            vapidKey: MY_VAPID_KEY,
+                            serviceWorkerRegistration: swRegistration // iPadのSafariエラーを回避するための必須措置
+                        }).then((currentToken) => {
                             if (currentToken && db && auth && auth.currentUser) {
                                 db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({
                                     token: currentToken,
@@ -733,8 +736,10 @@
                             }
                         }).catch((err) => {
                             console.error('トークン取得エラー:', err);
-                            showToast("エラー", "VAPIDキーエラーか通信エラーが発生しました。", true);
+                            showToast("エラー", "FCMトークン取得に失敗しました。ホーム画面に追加して起動してください。", true);
                         });
+                    } else if (!swRegistration) {
+                        showToast("エラー", "通知の受け皿（Service Worker）が準備できていません。", true);
                     }
                 } else {
                     if (s) s.innerText = "プッシュ通知：ブロック中";
@@ -754,10 +759,11 @@
                 snapshot.forEach(doc => { if (doc.data().token) tokens.push(doc.data().token); });
                 if (tokens.length === 0) return;
 
+                // 🚨 GASへの通信がブロックされないよう、必ず安全なテキスト形式で送信する
                 fetch(MY_GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors', 
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ title: title, body: bodyText, tokens: tokens })
                 });
             } catch(e) { console.error("バックグラウンド通知送信失敗", e); }
@@ -1181,21 +1187,21 @@
             safeStorage.setItem("volcano_speech_pitch", speechPitch);
         }
 
-        // PWA
+        // =======================
+        // PWA・Service Worker
+        // =======================
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById("install-banner").classList.remove("hidden"); });
         function triggerInstall() { if(deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById("install-banner").classList.add("hidden"); }); } }
         function dismissInstallBanner() { document.getElementById("install-banner").classList.add("hidden"); }
-        function runDynamicServiceWorker() { 
+        
+        async function runDynamicServiceWorker() { 
             if('serviceWorker' in navigator) {
                 try {
-                    // Blob環境等の相対パスエラーを回避
                     if(window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-                        navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW registration skipped', e)); 
+                        swRegistration = await navigator.serviceWorker.register('./sw.js');
                     }
-                } catch(e) {
-                    console.warn('SW registration skipped', e);
-                }
+                } catch(e) { console.warn('SW registration skipped', e); }
             }
         }
     </script>
