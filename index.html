@@ -458,6 +458,22 @@
         let isAdmin = false;
         let isConnecting = false;
 
+        // =======================
+        // 🕒 ユーティリティ
+        // =======================
+        function getNowTimeStr() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const i = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            return `${h}:${i}:${s}`;
+        }
+
+        function tickClock() {
+            const c = document.getElementById("live-clock"); if(!c) return; const n = new Date();
+            c.innerText = `${n.getFullYear()}/${String(n.getMonth()+1).padStart(2,'0')}/${String(n.getDate()).padStart(2,'0')} ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+        }
+
         // =============================================================
         // 🚀 起動処理 (絶対クラッシュしない堅牢設計)
         // =============================================================
@@ -523,22 +539,6 @@
                 tryAutoConnectFirebase(); 
             }, 1500);
         };
-
-        // =======================
-        // 🕒 ユーティリティ
-        // =======================
-        function getNowTimeStr() {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const i = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            return `${h}:${i}:${s}`;
-        }
-
-        function tickClock() {
-            const c = document.getElementById("live-clock"); if(!c) return; const n = new Date();
-            c.innerText = `${n.getFullYear()}/${String(n.getMonth()+1).padStart(2,'0')}/${String(n.getDate()).padStart(2,'0')} ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
-        }
 
         function toggleSettingsModal(s) {
             const m = document.getElementById("settings-modal"); const sh = document.getElementById("settings-sheet");
@@ -621,6 +621,14 @@
         }
 
         function tryAutoConnectFirebase() {
+            if (connectionTimeout) clearTimeout(connectionTimeout);
+            connectionTimeout = setTimeout(() => {
+                const textEl = document.getElementById("sync-text");
+                if (textEl && textEl.innerText.includes("同期中")) {
+                    updateSyncStatus('offline', '⚠️ 同期タイムアウト');
+                }
+            }, 5000);
+
             if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
                 connectFirebase(JSON.stringify(firebaseConfig)).catch(e => console.error("Auto connect failed", e));
             } else {
@@ -675,6 +683,7 @@
                     renderUI();
                     
                     isFirstLoad = false;
+                    if (connectionTimeout) clearTimeout(connectionTimeout);
                     updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
                 }, (error) => {
                     handleFirebaseError(error, "Firestore Database");
@@ -1247,7 +1256,10 @@
         function runDynamicServiceWorker() { 
             if('serviceWorker' in navigator) {
                 try {
-                    navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW registration skipped', e)); 
+                    // Blob環境等の相対パスエラーを回避
+                    if(window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                        navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW registration skipped', e)); 
+                    }
                 } catch(e) {
                     console.warn('SW registration skipped', e);
                 }
