@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>仮想火山防災情報局 - REAL-TIME MONITOR</title>
     
+    <!-- キャッシュ対策のバージョン変更（v3.6） -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#1D1B20">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -72,7 +73,7 @@
             <span class="material-symbols-rounded text-6xl">volcano</span>
         </div>
         <h1 class="text-2xl font-black tracking-widest mb-2">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">v3.5 Ultimate Pro</p>
+        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">v3.6 Ultimate Pro</p>
     </div>
 
     <div id="emergency-ticker" class="hidden bg-red-600 dark:bg-red-700 text-white py-2.5 overflow-hidden relative z-50 shadow-md">
@@ -358,11 +359,14 @@
                         <button onclick="testPushNotification()" class="w-full mt-2 py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors">
                             <span class="material-symbols-rounded text-sm">send</span> デモ通知を配信テスト
                         </button>
+                        <button onclick="clearLocalCache()" class="w-full mt-2 py-3 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors">
+                            <span class="material-symbols-rounded text-sm">delete</span> 古いキャッシュを強制削除
+                        </button>
                     </div>
                 </div>
             </div>
             <div class="border-t dark:border-gray-800 pt-4 text-center">
-                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v3.5 (Ultimate Pro)</span>
+                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v3.6 (Cache Fixed Pro)</span>
             </div>
         </div>
     </div>
@@ -383,7 +387,8 @@
         const safeStorage = {
             memoryStore: {},
             getItem(key) { try { return localStorage.getItem(key); } catch (e) { return this.memoryStore[key] || null; } },
-            setItem(key, value) { try { localStorage.setItem(key, value); } catch (e) { this.memoryStore[key] = value; } }
+            setItem(key, value) { try { localStorage.setItem(key, value); } catch (e) { this.memoryStore[key] = value; } },
+            removeItem(key) { try { localStorage.removeItem(key); } catch (e) { delete this.memoryStore[key]; } }
         };
 
         // =============================================================
@@ -589,6 +594,14 @@
         }
 
         function tryAutoConnectFirebase() {
+            if (connectionTimeout) clearTimeout(connectionTimeout);
+            connectionTimeout = setTimeout(() => {
+                const textEl = document.getElementById("sync-text");
+                if (textEl && textEl.innerText.includes("同期中")) {
+                    updateSyncStatus('offline', '⚠️ 同期タイムアウト');
+                }
+            }, 5000);
+
             if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
                 connectFirebase(JSON.stringify(firebaseConfig)).catch(e => console.error("Auto connect failed", e));
             } else {
@@ -599,11 +612,13 @@
         async function connectFirebase(configJson) {
             if (db && auth && auth.currentUser) return true;
             if (isConnecting) {
-                while(isConnecting) await new Promise(r => setTimeout(r, 100));
-                return true;
+                let waitCount = 0;
+                while(isConnecting && waitCount < 50) { await new Promise(r => setTimeout(r, 100)); waitCount++; }
+                return !!(db && auth && auth.currentUser);
             }
             
             isConnecting = true;
+            updateSyncStatus('connecting', 'サーバー接続中...');
             const errLog = document.getElementById("firebase-error-log");
             if (errLog) errLog.innerText = "";
 
@@ -645,16 +660,14 @@
                     renderUI();
                     
                     isFirstLoad = false;
-                    document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-[#E6F4EA] dark:bg-[#1B3624] border border-[#A3E2B6] dark:border-[#3C5A42] rounded-m3-full p-1 pl-4 shadow-sm transition-all";
-                    document.getElementById("sync-dot").className = "w-2.5 h-2.5 bg-[#137333] dark:bg-[#81C995] rounded-full inline-block animate-pulse";
-                    document.getElementById("sync-text").innerText = `データベース接続済み`;
-                    document.getElementById("sync-text").className = "text-[11px] font-black text-[#137333] dark:text-[#81C995]";
+                    if (connectionTimeout) clearTimeout(connectionTimeout);
+                    updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
                 }, (error) => {
-                    console.error("Firestore error:", error);
+                    handleFirebaseError(error, "Firestore Database");
                 });
                 return true;
             } catch (err) { 
-                console.error("Connection error:", err);
+                handleFirebaseError(err, "初期接続"); 
                 throw err;
             } finally {
                 isConnecting = false;
@@ -666,7 +679,6 @@
             const spinner = document.getElementById("sync-google-spinner");
             if(btnIcon) btnIcon.classList.add("hidden"); 
             if(spinner) spinner.classList.remove("hidden");
-            
             showToast("手動同期", "Firebaseに接続してデータを同期しています...", false);
             
             try {
@@ -683,36 +695,37 @@
                     snap.forEach(doc => { list.push({ docId: doc.id, ...doc.data() }); });
                     volcanoData = list.sort((a, b) => Number(a.id) - Number(b.id));
                     
-                    saveLocalVolcanos(); 
-                    renderUI();
-                    try {
-                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                        const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                        osc.type = 'sine'; osc.frequency.setValueAtTime(880, ctx.currentTime);
-                        osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.08);
-                        gain.gain.setValueAtTime(0.08, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-                        osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.25);
-                    } catch(e) {}
-                    
-                    const badge = document.getElementById("sync-status-badge");
-                    const dot = document.getElementById("sync-dot");
-                    const textEl = document.getElementById("sync-text");
-                    if(badge) badge.className = "cursor-pointer hover:opacity-80 flex items-center gap-2";
-                    document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-[#E6F4EA] dark:bg-[#1B3624] border border-[#A3E2B6] dark:border-[#3C5A42] rounded-m3-full p-1 pl-4 shadow-sm transition-all";
-                    if(dot) dot.className = "w-2.5 h-2.5 bg-[#137333] dark:bg-[#81C995] rounded-full inline-block animate-pulse";
-                    if(textEl) { textEl.innerText = `データベース接続済み`; textEl.className = "text-[11px] font-black text-[#137333] dark:text-[#81C995]"; }
+                    saveLocalVolcanos(); renderUI();
+                    playPingSound();
+                    updateSyncStatus('connected', `データベース接続済み (${getNowTimeStr()})`);
                 } else {
                     switchToLocalMode();
                 }
             } catch (e) { 
                 console.error(e);
                 showToast("同期エラー", "同期に失敗しました: " + e.message, true);
+                handleFirebaseError(e, "手動同期"); 
             } finally {
                 setTimeout(() => { 
                     if(btnIcon) btnIcon.classList.remove("hidden"); 
                     if(spinner) spinner.classList.add("hidden"); 
                 }, 800);
             }
+        }
+
+        function handleFirebaseError(error, phase) {
+            if (connectionTimeout) clearTimeout(connectionTimeout);
+            const errLog = document.getElementById("firebase-error-log");
+            if (errLog) errLog.innerText = `[${phase}] ${error.message || error}`;
+            updateSyncStatus('offline', '⚠️ 同期障害・エラー');
+            let advice = "通信障害です。Wi-Fiを確認するか、ローカルモードに切り替えてください。";
+            const msg = (error.message || "").toLowerCase();
+            if (msg.includes("api-key-not-valid") || msg.includes("api key")) advice = "APIキーが間違っています。設定コードを確認してください。";
+            else if (msg.includes("permission-denied") || msg.includes("missing or insufficient permissions")) advice = "Firebaseコンソールで「匿名ログイン」を有効にし、ルールをテストモードに設定してください。";
+            else if (msg.includes("タイムアウト")) advice = "サーバーからの応答がありません。電波状況を確認してください。";
+            
+            const adviceBox = document.getElementById("diagnostics-advice");
+            if (adviceBox) adviceBox.innerHTML = advice;
         }
 
         function loadLocalVolcanos() {
@@ -726,6 +739,10 @@
         // 🔔 バックグラウンド Push 通信
         // =============================================================
         async function requestNotificationPermission() {
+            // 🚫 プレビュー環境でのエラーを防止する保護
+            if(!window.location.protocol.startsWith('http')) {
+                return showToast("制限あり", "プレビュー画面では通知は動作しません。GitHub Pagesで開いてください。", true);
+            }
             if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です", true);
             
             try {
@@ -735,16 +752,16 @@
                 if(p === "granted") {
                     if (s) s.innerText = "プッシュ通知：許可済み";
                     if (b) b.className = "w-full py-3 bg-[#D2E4FF] text-[#001D36] rounded-m3-full text-xs font-black flex justify-center gap-2";
-                    showToast("通信中", "通知許可を保存しています...");
+                    showToast("通信中", "通知許可をサーバーに保存しています...");
 
                     if (typeof MY_VAPID_KEY !== 'undefined') {
-                        // ⭐️ まず確実にFirebase接続を完了させる
+                        // ⭐️ 必ずDB接続を完了させてからトークンを取得する
                         if (!db || !auth || !auth.currentUser) {
                             await connectFirebase(JSON.stringify(firebaseConfig));
                         }
                         
                         if (!messaging) {
-                            showToast("エラー", "FCMモジュールがありません", true);
+                            showToast("エラー", "FCMモジュールが読み込めませんでした", true);
                             return;
                         }
 
@@ -761,7 +778,6 @@
                             return;
                         }
 
-                        // ⭐️ 確実にDBにトークンを書き込む！
                         if (currentToken && db && auth && auth.currentUser) {
                             await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({
                                 token: currentToken,
@@ -782,7 +798,7 @@
                 }
             } catch (error) {
                 console.error("通知許可要求でエラー:", error);
-                showToast("エラー", "トークン処理中にエラーが発生しました", true);
+                showToast("エラー", "通知処理中にエラーが発生しました", true);
             }
         }
 
@@ -794,7 +810,7 @@
                 }
                 if (!db) return;
 
-                // タイムアウトを15秒に延長し、読み込み失敗を防止
+                // Firestoreからトークンを取り出す
                 const fetchPromise = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').get();
                 const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('トークン取得タイムアウト')), 15000));
                 const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
@@ -804,12 +820,13 @@
                 
                 if (tokens.length === 0) {
                     console.warn("送信スキップ 通知先（トークン）が1件も登録されていません");
-                    showToast("送信スキップ", "通知先（トークン）が1件も登録されていません", true);
+                    showToast("送信スキップ", "通知先が1件も登録されていません。設定から通知を許可してください。", true);
                     return;
                 }
 
                 showToast("送信中...", "プッシュ通知を送信しています");
 
+                // GASに通知を送る
                 fetch(MY_GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors', 
@@ -821,8 +838,8 @@
                     console.warn("GAS送信エラー", err);
                 });
             } catch(e) { 
-                console.error("バックグラウンド通知送信失敗", e); 
-                showToast("エラー", "トークンDBの読み込み失敗: " + e.message, true);
+                console.error("通知送信失敗", e); 
+                showToast("エラー", "トークンDB読取失敗: " + e.message, true);
             }
         }
 
@@ -832,7 +849,7 @@
         }
 
         // =============================================================
-        // ✍️ 管理者・データCRUD
+        // ✍️ 管理者・データCRUD (送信時にPush連動 ＆ ぐるぐる完全保護)
         // =============================================================
         async function submitCreateVolcano() {
             if(!isAdmin) return;
@@ -1241,6 +1258,22 @@
             safeStorage.setItem("volcano_speech_pitch", speechPitch);
         }
 
+        function clearLocalCache() {
+            // PWAキャッシュを強制破壊する必殺ボタン
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) { registration.unregister(); }
+                });
+            }
+            if(window.caches) {
+                caches.keys().then(function(names) {
+                    for (let name of names) caches.delete(name);
+                });
+            }
+            showToast("キャッシュ消去", "古いキャッシュを消去しました。ページを再読み込みします。");
+            setTimeout(() => { window.location.reload(true); }, 1500);
+        }
+
         // PWA
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById("install-banner").classList.remove("hidden"); });
@@ -1250,7 +1283,7 @@
         async function runDynamicServiceWorker() { 
             if('serviceWorker' in navigator) {
                 try {
-                    // Preview環境等の相対パスエラーを回避
+                    // 🚨 プレビュー環境でのエラーを回避
                     if(window.location.protocol.startsWith('http')) {
                         swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
                         console.log('通知用ワーカーの登録完了');
