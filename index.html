@@ -376,15 +376,15 @@
                         <!-- M3ボタンスタイル修正 -->
                         <button onclick="readAllHighLevelAlerts()" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-red-200 dark:border-red-900/60 cursor-pointer active:scale-95">
                             <span class="material-symbols-rounded text-[16px]">campaign</span>
-                            <span class="hidden sm:inline">重大警報を一括読上</span>
+                            <span class="hidden sm:inline">一括読上</span>
                         </button>
                         <button onclick="stopAllSpeechAndAlarms()" id="mute-panel-btn" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-950/60 text-red-800 dark:text-red-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-red-300 dark:border-red-900/60 cursor-pointer active:scale-95" title="全ての読み上げ・アラームを強制停止">
                             <span class="material-symbols-rounded text-[16px]">volume_off</span>
-                            <span class="hidden sm:inline">緊急停止</span>
+                            <span class="hidden sm:inline">停止</span>
                         </button>
                         <button onclick="toggleFullScreen()" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#2A2B2E] dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer active:scale-95">
                             <span class="material-symbols-rounded text-[16px]" id="fullscreen-icon">fullscreen</span>
-                            <span id="fullscreen-text" class="hidden sm:inline">全画面モード</span>
+                            <span id="fullscreen-text" class="hidden sm:inline">全画面</span>
                         </button>
                     </div>
                 </div>
@@ -458,7 +458,7 @@
                             </label>
                         </div>
                         <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 shadow-sm">
-                            <span class="text-xs font-bold dark:text-white">コンパクト表示</span>
+                            <span class="text-xs font-bold dark:text-white">画像コンパクト表示</span>
                             <label class="m3-switch">
                                 <input type="checkbox" id="compact-toggle" onchange="toggleCompactMode(this.checked)">
                                 <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
@@ -911,7 +911,7 @@ Ver1.0(2026/06/24)
             const spinner = document.getElementById("sync-google-spinner");
             if(btnIcon) btnIcon.classList.add("hidden"); 
             if(spinner) spinner.classList.remove("hidden");
-            showToast("手動同期", "Firebaseに接続してデータを同期しています...", false);
+            showToast("手動同期", "Firebaseに接続して火山データを同期しています...", false);
             
             try {
                 if (!db && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
@@ -935,7 +935,7 @@ Ver1.0(2026/06/24)
                 }
             } catch (e) { 
                 console.error(e);
-                showToast("同期エラー", "同期に失敗しました: " + e.message, true);
+                showToast("同期エラー", "同期に失敗しました。アプリを再起動しもう一度お試しください。: " + e.message, true);
                 handleFirebaseError(e, "手動同期"); 
             } finally {
                 setTimeout(() => { 
@@ -1129,19 +1129,19 @@ Ver1.0(2026/06/24)
                     showToast("送信スキップ", "通知先（トークン）が1件も登録されていません", true);
                     return;
                 }
-                showToast("送信中...", "GASへプッシュリクエストを送信しています");
+                showToast("送信中...", "GASへプッシュリクエストを送信しています…完了まで残り3秒");
 
                 fetch(MY_GAS_URL, {
                     method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ title: title, body: bodyText, tokens: tokens })
                 }).then(() => {
-                    showToast("送信完了", "プッシュ通知リクエストを送信しました！");
+                    showToast("送信完了", "プッシュ通知リクエストを送信しました。まもなく全デバイスでプッシュ通知が配信されます。");
                 }).catch(err => {
                     showToast("送信エラー", "GASへの通信に失敗: " + err.message, true);
                 });
             } catch(e) { 
-                console.error("バックグラウンド通知送信失敗", e); 
-                showToast("エラー", "トークンDBの読み込み失敗: " + e.message, true);
+                console.error("バックグラウンド通知送信失敗。アプリを再起動するかもう一度お試しください。", e); 
+                showToast("エラー", "トークンDBの読み込み失敗。コード内のエラーが発生しています。: " + e.message, true);
             }
         }
 
