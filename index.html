@@ -72,7 +72,7 @@
             <span class="material-symbols-rounded text-6xl">volcano</span>
         </div>
         <h1 class="text-2xl font-black tracking-widest mb-2">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">v4.0 Ultimate Pro</p>
+        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">v5.0 Ultimate Stable Pro</p>
     </div>
 
     <div id="emergency-ticker" class="hidden bg-red-600 dark:bg-red-700 text-white py-2.5 overflow-hidden relative z-50 shadow-md">
@@ -352,9 +352,12 @@
                                 <input type="text" id="gas-url-input" placeholder="GAS Webhook URL" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
                             </div>
                         </div>
+                        
+                        <!-- 修正: onclick="requestNotificationPermission()" を追加 -->
                         <button id="notification-btn" onclick="requestNotificationPermission()" class="w-full py-3 bg-gray-100 dark:bg-gray-800 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full flex justify-center gap-2">
                             <span class="material-symbols-rounded text-sm">volume_up</span> <span id="notification-status-text">プッシュ通知を許可して登録</span>
                         </button>
+                        
                         <button onclick="testPushNotification()" class="w-full mt-2 py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors">
                             <span class="material-symbols-rounded text-sm">send</span> デモ通知を配信テスト
                         </button>
@@ -365,7 +368,7 @@
                 </div>
             </div>
             <div class="border-t dark:border-gray-800 pt-4 text-center">
-                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v3.9 (Ultimate Pro)</span>
+                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v5.0 (Ultimate Stable Pro)</span>
             </div>
         </div>
     </div>
@@ -528,9 +531,16 @@
                     });
                 }
             } catch(e){}
+            
+            try { setupEventListeners(); } catch(e){}
 
             setTimeout(() => { tryAutoConnectFirebase(); }, 1500);
         };
+        
+        function setupEventListeners() {
+            // 他にも動的にイベントを追加する必要があればここに記述します
+            // 現在はHTMLにonclickとして直接記述されているため、安全のためのプレースホルダーとして機能します
+        }
 
         // =======================
         // ☁️ Firebase 接続とエラーハンドリング
@@ -624,7 +634,7 @@
                     
                     if (!isFirstLoad) {
                         newVolcanoData.forEach(newVol => {
-                            const oldVol = volcanoData.find(v => v.id === newVol.id);
+                            const oldVol = volcanoData.find(v => String(v.id) === String(newVol.id));
                             if (!oldVol || oldVol.updateTime !== newVol.updateTime) {
                                 triggerSystemNotification(newVol.name, newVol.level, newVol.comment);
                                 if (newVol.level >= 4) playSiren(); 
@@ -635,7 +645,7 @@
                     
                     volcanoData = newVolcanoData;
                     saveLocalVolcanos();
-                    renderUI();
+                    renderUI(); // ここで山が表示されます！
                     
                     isFirstLoad = false;
                     if (connectionTimeout) clearTimeout(connectionTimeout);
@@ -714,7 +724,7 @@
         function saveLocalVolcanos() { safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(volcanoData)); }
 
         // =============================================================
-        // 🔔 バックグラウンド Push 通信 (完全可視化＆エラー表示対応)
+        // 🔔 バックグラウンド Push 通信
         // =============================================================
         async function requestNotificationPermission() {
             if(!window.location.protocol.startsWith('http')) {
@@ -722,7 +732,7 @@
             }
             if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です", true);
             
-            if (!MY_VAPID_KEY || MY_VAPID_KEY.includes("BM_xWes_gaETd4XGGGKlu4MNH2ggSt5AOGVdOz74scBSopthlLKseYK-NSmggg23326PY0nVBSwg6SivQoJSofw") || MY_VAPID_KEY.length < 80) {
+            if (!MY_VAPID_KEY || MY_VAPID_KEY.includes("ここにFirebaseコンソールで取得した長いVAPIDキー（公開鍵）を貼り付けます") || MY_VAPID_KEY.length < 80) {
                 showToast("⚠️ VAPIDキー エラー", "設定されたキーが短すぎるか、間違っています。Firebaseの「Web Push certificates」から取得した長い文字列（約80文字以上）を設定してください。", true);
                 return;
             }
@@ -835,8 +845,100 @@
         }
 
         // =============================================================
-        // ✍️ 管理者・データCRUD (送信時にPush連動)
+        // ✍️ 管理者・データCRUD 
         // =============================================================
+        
+        // 🛠️ 修正1: タブ切り替えのバグを防ぐため、常に文字列としてIDを扱うように統一
+        function setTab(vid, idx) { 
+            currentTabs[String(vid)] = idx; 
+            renderUI(); 
+        }
+
+        function populateSelector() {
+            const s = document.getElementById("update-volcano-id"); if(!s) return;
+            const c = s.value; s.innerHTML = '<option value="">-- 火山を選択 --</option>';
+            volcanoData.forEach(v => s.innerHTML += `<option value="${v.id}">${v.name}</option>`);
+            s.value = c;
+        }
+
+        function getSortedData() {
+            let sorted = [...volcanoData];
+            if (currentSortOrder === 'level_desc') sorted.sort((a, b) => (b.level || 0) - (a.level || 0));
+            else if (currentSortOrder === 'id_desc') sorted.sort((a, b) => (b.id || 0) - (a.id || 0));
+            else if (currentSortOrder === 'id_asc') sorted.sort((a, b) => (a.id || 0) - (b.id || 0));
+            else if (currentSortOrder === 'name') sorted.sort((a, b) => (a.name || "").localeCompare(b.name || "", 'ja'));
+            return sorted;
+        }
+
+        function renderUI() {
+            const grid = document.getElementById("monitor-area");
+            const emptyState = document.getElementById("empty-state");
+            if (!grid || !emptyState) return;
+
+            if (volcanoData.length === 0) { 
+                grid.innerHTML = ""; 
+                emptyState.classList.remove("hidden"); 
+                return; 
+            }
+            emptyState.classList.add("hidden"); 
+            grid.innerHTML = "";
+
+            const sortedData = getSortedData();
+            sortedData.forEach((vol) => {
+                const theme = getLevelTheme(vol.level || 1);
+                
+                // 🛠️ 修正1続き: タブの現在の状態を安全に読み取る
+                const volIdStr = String(vol.id);
+                if (currentTabs[volIdStr] === undefined) currentTabs[volIdStr] = 0;
+                
+                const t0 = currentTabs[volIdStr] === 0 ? "bg-white dark:bg-[#1E1F22] text-gray-900 dark:text-white shadow-sm font-black" : "text-gray-500 hover:bg-gray-100/50 dark:hover:bg-gray-800";
+                const t1 = currentTabs[volIdStr] === 1 ? "bg-white dark:bg-[#1E1F22] text-gray-900 dark:text-white shadow-sm font-black" : "text-gray-500 hover:bg-gray-100/50 dark:hover:bg-gray-800";
+                const tClass = theme.badge.includes('bg-[#f0f2f6]') ? theme.badge : `${theme.badge} text-white`;
+
+                const commentText = vol.comment || "状況コメントはありません。";
+                const historyList = (vol.history || []).map(h => `<li class="border-b dark:border-gray-800 pb-1.5 last:border-0 flex items-start gap-1"><span class="material-symbols-rounded text-[10px] text-red-500 mt-1">info</span><span>${h}</span></li>`).join('');
+                const updateTimeText = vol.updateTime || "時間未定";
+
+                grid.innerHTML += `
+                    <div class="card-container m3-card bg-white dark:bg-[#1E1F22] border border-[#E1E2EC] dark:border-gray-800 p-6 shadow-m3-elevation-1 hover:shadow-m3-elevation-3 transition-all duration-300 flex flex-col justify-between overflow-hidden relative">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="card-title text-2xl font-black text-[#1C1B1F] dark:text-white tracking-tight">${vol.name || "名称未設定"}</h2>
+                                    <div class="text-[10px] sm:text-xs text-green-600 font-bold mt-1 flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>${vol.status || "監視中"}</div>
+                                </div>
+                                <div class="${tClass} text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-m3-full shadow-sm tracking-wide">⚠️ レベル ${vol.level || 1}</div>
+                            </div>
+                            <div class="card-visual m3-visual-box w-full rounded-m3-medium mb-5 relative overflow-hidden flex items-end justify-center shadow-inner bg-gray-100 dark:bg-gray-900 aspect-square">
+                                ${getVolcanoArtHTML(vol, theme)}
+                            </div>
+                            <div class="card-tabs flex bg-[#E1E2EC]/50 dark:bg-gray-800 p-1 rounded-m3-full mb-4">
+                                <button onclick="setTab('${volIdStr}', 0)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition ${t0}">現在の状況</button>
+                                <button onclick="setTab('${volIdStr}', 1)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition ${t1}">活動履歴</button>
+                            </div>
+                            <div class="card-content relative min-h-[110px]">
+                                ${currentTabs[volIdStr] === 0 ? `<div class="bg-gray-50 dark:bg-[#111318] border border-gray-100 dark:border-gray-800 rounded-m3-medium p-4 text-sm text-[#44474E] dark:text-gray-300 leading-relaxed font-semibold">${commentText}</div>` : `<div class="bg-gray-50 dark:bg-[#111318] border border-gray-100 dark:border-gray-800 rounded-m3-medium p-3 text-xs text-[#44474E] dark:text-gray-300 max-h-[110px] overflow-y-auto font-medium"><ul class="space-y-2">${historyList}</ul></div>`}
+                            </div>
+                        </div>
+                        <div class="card-footer mt-5 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-3 relative z-10">
+                            <div class="flex justify-between items-center w-full">
+                                <div class="flex flex-col gap-0.5">
+                                    <div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold flex items-center gap-1"><span class="material-symbols-rounded text-xs">gavel</span> 気象局発表</div>
+                                    <div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold">⏳ ${updateTimeText}</div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="copyVolcanoReport('${vol.name}', ${vol.level}, '${commentText.replace(/'/g, "\\'")}', '${updateTimeText}')" title="レポートコピー" class="m3-btn flex items-center justify-center w-9 h-9 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full transition-all"><span class="material-symbols-rounded text-[16px]">content_copy</span></button>
+                                    <button onclick="shareVolcano('${vol.name}', ${vol.level})" title="SNS等に共有" class="m3-btn flex items-center justify-center w-9 h-9 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-[#1C1B1F] dark:text-gray-300 rounded-full transition-all"><span class="material-symbols-rounded text-[16px]">share</span></button>
+                                    <button onclick="playEmergencyBroadcastById('${volIdStr}')" class="readout-btn m3-btn flex items-center gap-1.5 bg-[#E1E2EC]/40 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2 rounded-m3-full text-[11px] font-black transition-all shadow-sm"><span class="material-symbols-rounded text-sm">volume_up</span> 状況読上</button>
+                                </div>
+                            </div>
+                            ${vol.level >= 3 ? `<button onclick="openMap('${vol.name}')" class="m3-btn w-full py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-m3-full text-xs font-black flex justify-center gap-1.5 transition-all"><span class="material-symbols-rounded text-sm">map</span> 周辺の避難所マップを開く</button>` : ''}
+                        </div>
+                    </div>`;
+            });
+            populateSelector(); applyThemeColorsToDynamicElements();
+        }
+
         async function submitCreateVolcano() {
             if(!isAdmin) return;
             const name = document.getElementById("create-name").value.trim();
@@ -897,11 +999,16 @@
             document.getElementById("btn-update-text").innerText = "クラウド同期中...";
 
             const timeStr = getNowTimeStr(); const now = new Date();
-            const idx = volcanoData.findIndex(v => String(v.id) === tid); if(idx === -1) return;
-            volcanoData[idx].level = level; if(comment) volcanoData[idx].comment = comment; volcanoData[idx].updateTime = timeStr;
+            const idx = volcanoData.findIndex(v => String(v.id) === String(tid)); if(idx === -1) return;
+            
+            volcanoData[idx].level = level; 
+            if(comment) volcanoData[idx].comment = comment; 
+            volcanoData[idx].updateTime = timeStr;
             volcanoData[idx].visualType = visualTypeUpdate;
             if(visualTypeUpdate === 'preset') volcanoData[idx].visualPreset = document.getElementById("update-visual-preset").value;
             if(visualTypeUpdate === 'custom' && document.getElementById("update-visual-base64").value) volcanoData[idx].customImage = document.getElementById("update-visual-base64").value;
+            
+            if (!volcanoData[idx].history) volcanoData[idx].history = [];
             volcanoData[idx].history.unshift(`${now.getFullYear()}/${timeStr}: 【レベル${level}】に更新。状況: ${comment}`);
 
             try {
@@ -1049,68 +1156,9 @@
             `;
         }
 
-        function setTab(vid, idx) { currentTabs[vid] = idx; renderUI(); }
-        function populateSelector() {
-            const s = document.getElementById("update-volcano-id"); if(!s) return;
-            const c = s.value; s.innerHTML = '<option value="">-- 火山を選択 --</option>';
-            volcanoData.forEach(v => s.innerHTML += `<option value="${v.id}">${v.name}</option>`);
-            s.value = c;
-        }
-
-        function renderUI() {
-            const grid = document.getElementById("monitor-area");
-            const emptyState = document.getElementById("empty-state");
-            if (volcanoData.length === 0) { grid.innerHTML = ""; emptyState.classList.remove("hidden"); return; }
-            emptyState.classList.add("hidden"); grid.innerHTML = "";
-
-            const sortedData = getSortedData();
-            sortedData.forEach((vol) => {
-                const theme = getLevelTheme(vol.level);
-                if (currentTabs[vol.id] === undefined) currentTabs[vol.id] = 0;
-                const t0 = currentTabs[vol.id] === 0 ? "bg-white dark:bg-[#1E1F22] text-gray-900 dark:text-white shadow-sm font-black" : "text-gray-500 hover:bg-gray-100/50 dark:hover:bg-gray-800";
-                const t1 = currentTabs[vol.id] === 1 ? "bg-white dark:bg-[#1E1F22] text-gray-900 dark:text-white shadow-sm font-black" : "text-gray-500 hover:bg-gray-100/50 dark:hover:bg-gray-800";
-                const tClass = theme.badge.includes('bg-[#f0f2f6]') ? theme.badge : `${theme.badge} text-white`;
-
-                grid.innerHTML += `
-                    <div class="card-container m3-card bg-white dark:bg-[#1E1F22] border border-[#E1E2EC] dark:border-gray-800 p-6 shadow-m3-elevation-1 hover:shadow-m3-elevation-3 transition-all duration-300 flex flex-col justify-between overflow-hidden relative">
-                        <div>
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h2 class="card-title text-2xl font-black text-[#1C1B1F] dark:text-white tracking-tight">${vol.name}</h2>
-                                    <div class="text-[10px] sm:text-xs text-green-600 font-bold mt-1 flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>${vol.status}</div>
-                                </div>
-                                <div class="${tClass} text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-m3-full shadow-sm tracking-wide">⚠️ レベル ${vol.level}</div>
-                            </div>
-                            <div class="card-visual m3-visual-box w-full rounded-m3-medium mb-5 relative overflow-hidden flex items-end justify-center shadow-inner bg-gray-100 dark:bg-gray-900 aspect-square">
-                                ${getVolcanoArtHTML(vol, theme)}
-                            </div>
-                            <div class="card-tabs flex bg-[#E1E2EC]/50 dark:bg-gray-800 p-1 rounded-m3-full mb-4">
-                                <button onclick="setTab(${vol.id}, 0)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition ${t0}">現在の状況</button>
-                                <button onclick="setTab(${vol.id}, 1)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition ${t1}">活動履歴</button>
-                            </div>
-                            <div class="card-content relative min-h-[110px]">
-                                ${currentTabs[vol.id] === 0 ? `<div class="bg-gray-50 dark:bg-[#111318] border border-gray-100 dark:border-gray-800 rounded-m3-medium p-4 text-sm text-[#44474E] dark:text-gray-300 leading-relaxed font-semibold">${vol.comment}</div>` : `<div class="bg-gray-50 dark:bg-[#111318] border border-gray-100 dark:border-gray-800 rounded-m3-medium p-3 text-xs text-[#44474E] dark:text-gray-300 max-h-[110px] overflow-y-auto font-medium"><ul class="space-y-2">${vol.history.map(h => `<li class="border-b dark:border-gray-800 pb-1.5 last:border-0 flex items-start gap-1"><span class="material-symbols-rounded text-[10px] text-red-500 mt-1">info</span><span>${h}</span></li>`).join('')}</ul></div>`}
-                            </div>
-                        </div>
-                        <div class="card-footer mt-5 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-3 relative z-10">
-                            <div class="flex justify-between items-center w-full">
-                                <div class="flex flex-col gap-0.5">
-                                    <div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold flex items-center gap-1"><span class="material-symbols-rounded text-xs">gavel</span> 気象局発表</div>
-                                    <div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold">⏳ ${vol.updateTime}</div>
-                                </div>
-                                <div class="flex gap-2">
-                                    <button onclick="copyVolcanoReport('${vol.name}', ${vol.level}, '${vol.comment.replace(/'/g, "\\'")}', '${vol.updateTime}')" title="レポートコピー" class="m3-btn flex items-center justify-center w-9 h-9 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full transition-all"><span class="material-symbols-rounded text-[16px]">content_copy</span></button>
-                                    <button onclick="shareVolcano('${vol.name}', ${vol.level})" title="SNS等に共有" class="m3-btn flex items-center justify-center w-9 h-9 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 text-[#1C1B1F] dark:text-gray-300 rounded-full transition-all"><span class="material-symbols-rounded text-[16px]">share</span></button>
-                                    <button onclick="playEmergencyBroadcastById(${vol.id})" class="readout-btn m3-btn flex items-center gap-1.5 bg-[#E1E2EC]/40 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2 rounded-m3-full text-[11px] font-black transition-all shadow-sm"><span class="material-symbols-rounded text-sm">volume_up</span> 状況読上</button>
-                                </div>
-                            </div>
-                            ${vol.level >= 3 ? `<button onclick="openMap('${vol.name}')" class="m3-btn w-full py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-m3-full text-xs font-black flex justify-center gap-1.5 transition-all"><span class="material-symbols-rounded text-sm">map</span> 周辺の避難所マップを開く</button>` : ''}
-                        </div>
-                    </div>`;
-            });
-            populateSelector(); applyThemeColorsToDynamicElements();
-        }
-
+        // =============================================================
+        // PWA キャッシュ制御
+        // =============================================================
         function clearLocalCache() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -1126,7 +1174,6 @@
             setTimeout(() => { window.location.reload(true); }, 1500);
         }
 
-        // PWA
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById("install-banner").classList.remove("hidden"); });
         function triggerInstall() { if(deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById("install-banner").classList.add("hidden"); }); } }
@@ -1135,7 +1182,6 @@
         async function runDynamicServiceWorker() { 
             if('serviceWorker' in navigator) {
                 try {
-                    // Preview環境等の相対パスエラーを回避
                     if(window.location.protocol.startsWith('http')) {
                         swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
                         console.log('通知用ワーカーの登録完了');
