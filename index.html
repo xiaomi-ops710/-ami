@@ -40,14 +40,27 @@
     </script>
 
     <style>
+        :root {
+            --primary: #6750A4;
+            --on-primary: #FFFFFF;
+            --primary-container: #EADDFF;
+            --on-primary-container: #21005D;
+            --primary-alpha: rgba(103, 80, 164, 0.2);
+            --primary-container-alpha: rgba(234, 221, 255, 0.2);
+        }
+        
         .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
         body { transition: color 0.4s ease; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        
         @keyframes lava-pulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.15); opacity: 1; fill: #ff1100; } }
         .pulse-lava { animation: lava-pulse 2s infinite ease-in-out; }
+        
         @keyframes smoke-drift { 0% { transform: translateY(0) translateX(0) scale(0.9); opacity: 0.3; } 50% { transform: translateY(-18px) translateX(10px) scale(1.3); opacity: 0.7; } 100% { transform: translateY(-35px) translateX(-6px) scale(1.6); opacity: 0; } }
         .drift-smoke { animation: smoke-drift 4s infinite linear; }
+        
         @keyframes ticker-scroll { 0% { transform: translate3d(100%, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
         .animate-ticker { display: inline-block; white-space: nowrap; animation: ticker-scroll 22s linear infinite; }
+        
         .google-spinner { animation: rotate 2s linear infinite; z-index: 2; width: 24px; height: 24px; }
         .google-spinner circle { stroke: currentColor; stroke-width: 3.5; stroke-dasharray: 1, 200; stroke-dashoffset: 0; animation: dash 1.5s ease-in-out infinite; stroke-linecap: round; }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
@@ -58,13 +71,12 @@
         #splash-screen { transition: opacity 0.5s ease, transform 0.5s ease; }
         #splash-screen.hide { opacity: 0; transform: scale(1.08); pointer-events: none; }
         
+        /* M3E Design Always On */
         body.m3-expressive .m3-card { backdrop-filter: blur(16px); background-color: rgba(255, 255, 255, 0.85); border-radius: 28px !important; box-shadow: 0px 4px 8px 3px rgba(0,0,0,0.08); transform: scale(1); transition: transform 0.2s, box-shadow 0.2s; }
         .dark body.m3-expressive .m3-card { background-color: rgba(30, 31, 34, 0.85); }
         body.m3-expressive .m3-card:hover { transform: translateY(-2px); box-shadow: 0px 6px 12px 4px rgba(0,0,0,0.12); }
         body.m3-expressive .m3-btn { border-radius: 100px !important; }
         body.m3-expressive .m3-visual-box { border-radius: 20px !important; }
-        body:not(.m3-expressive) .m3-card { border-radius: 8px !important; box-shadow: none !important; border: 1px solid #ddd; background-color: #fff; }
-        .dark body:not(.m3-expressive) .m3-card { background-color: #1E1F22; border-color: #333; }
         
         body.compact-mode .card-container { padding: 16px !important; }
         body.compact-mode .card-visual { aspect-ratio: 16 / 9 !important; margin-bottom: 12px !important; }
@@ -78,16 +90,34 @@
         .dark .m3-switch-track { background-color: #49454F; border-color: #938F99; }
         .m3-switch-thumb { position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; background-color: #79747E; border-radius: 50%; transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; }
         .dark .m3-switch-thumb { background-color: #938F99; }
-        .m3-switch input:checked + .m3-switch-track { background-color: #6750A4; border-color: #6750A4; }
-        .dark .m3-switch input:checked + .m3-switch-track { background-color: #D0BCFF; border-color: #D0BCFF; }
-        .m3-switch input:checked + .m3-switch-track .m3-switch-thumb { background-color: #FFFFFF; transform: translateX(20px); width: 24px; height: 24px; top: 2px; }
-        .dark .m3-switch input:checked + .m3-switch-track .m3-switch-thumb { background-color: #381E72; }
-        .m3-switch-icon { font-size: 14px; font-weight: bold; color: #E1E2EC; transition: color 0.2s; }
-        .dark .m3-switch-icon { color: #49454F; }
-        .m3-switch input:checked + .m3-switch-track .m3-switch-thumb .m3-switch-icon { color: #6750A4; }
-        .dark .m3-switch input:checked + .m3-switch-track .m3-switch-thumb .m3-switch-icon { color: #381E72; }
+        .m3-switch input:checked + .m3-switch-track { background-color: var(--primary); border-color: var(--primary); }
+        .dark .m3-switch input:checked + .m3-switch-track { background-color: var(--primary-container); border-color: var(--primary-container); }
+        .m3-switch input:checked + .m3-switch-track .m3-switch-thumb { background-color: var(--on-primary); transform: translateX(20px); width: 24px; height: 24px; top: 2px; }
+        .dark .m3-switch input:checked + .m3-switch-track .m3-switch-thumb { background-color: var(--on-primary-container); }
+        
+        /* Fix switch icons in dark mode */
+        .m3-switch-icon { font-size: 14px; font-weight: bold; color: #79747E; transition: color 0.2s; }
+        .dark .m3-switch-icon { color: #938F99; }
+        .m3-switch input:checked + .m3-switch-track .m3-switch-thumb .m3-switch-icon { color: var(--primary); }
+        .dark .m3-switch input:checked + .m3-switch-track .m3-switch-thumb .m3-switch-icon { color: var(--primary-container); }
         .m3-switch input:checked + .m3-switch-track .m3-switch-thumb .m3-switch-icon::before { content: 'check'; font-family: 'Material Symbols Rounded'; }
         .m3-switch input:not(:checked) + .m3-switch-track .m3-switch-thumb .m3-switch-icon::before { content: 'close'; font-family: 'Material Symbols Rounded'; }
+
+        /* M3 Slider Styles */
+        input[type=range] { -webkit-appearance: none; background: transparent; height: 32px; border-radius: 16px; cursor: pointer; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; background: #E1E2EC; border-radius: 4px; transition: background 0.2s; }
+        .dark input[type=range]::-webkit-slider-runnable-track { background: #49454F; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: var(--primary); margin-top: -6px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: transform 0.1s, box-shadow 0.1s; }
+        .dark input[type=range]::-webkit-slider-thumb { background: var(--primary-container); }
+        input[type=range]:active::-webkit-slider-thumb { transform: scale(1.2); box-shadow: 0 0 0 8px var(--primary-container-alpha); }
+        .dark input[type=range]:active::-webkit-slider-thumb { box-shadow: 0 0 0 8px var(--primary-alpha); }
+
+        /* Emergency Border Pulse */
+        @keyframes emergency-border-pulse {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 0 15px rgba(239, 68, 68, 0.2); }
+            50% { border-color: rgba(239, 68, 68, 0.9); box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+        }
+        .emergency-card { animation: emergency-border-pulse 2s infinite ease-in-out; border-width: 2px !important; }
     </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen pb-16 antialiased m3-expressive">
@@ -96,11 +126,11 @@
     <div id="app-background" class="fixed inset-0 z-[-1] bg-[#F3F4F9] dark:bg-[#111318] transition-all duration-500 bg-cover bg-center"></div>
 
     <div id="splash-screen" class="fixed inset-0 z-[100] bg-[#1D1B20] flex flex-col items-center justify-center text-white">
-        <div class="w-24 h-24 bg-[#6750A4] rounded-3xl flex items-center justify-center animate-pulse shadow-[0_0_40px_rgba(103,80,164,0.4)] mb-6">
+        <div class="w-24 h-24 bg-[#6750A4] rounded-3xl flex items-center justify-center animate-pulse shadow-[0_0_40px_rgba(103,80,164,0.4)] mb-6" style="background-color: var(--primary);">
             <span class="material-symbols-rounded text-6xl">volcano</span>
         </div>
         <h1 class="text-2xl font-black tracking-widest mb-2">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">v6.0 Ultimate Custom Pro</p>
+        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">v7.0 Ultimate Custom Pro</p>
     </div>
 
     <!-- 🚨 速報テロップ -->
@@ -111,6 +141,39 @@
             </span>
             <div class="w-full overflow-hidden">
                 <span id="ticker-text" class="animate-ticker text-sm font-black pl-4"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌋 全画面詳細モーダル -->
+    <div id="detail-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300">
+        <div id="detail-card" class="bg-[#F3F4F9] dark:bg-[#111318] w-11/12 h-5/6 max-w-5xl rounded-m3-large shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="relative h-64 sm:h-80 shrink-0 bg-gray-200 dark:bg-gray-800 w-full overflow-hidden" id="detail-visual">
+                <!-- Visual will be injected here -->
+            </div>
+            
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+                <div class="flex-1 p-6 sm:p-8 overflow-y-auto border-r border-gray-200 dark:border-gray-800">
+                    <h3 class="text-sm font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2"><span class="material-symbols-rounded text-lg">description</span> 状況・アドバイス</h3>
+                    <div id="detail-comment" class="text-base sm:text-lg text-gray-800 dark:text-gray-200 font-medium leading-relaxed whitespace-pre-wrap"></div>
+                </div>
+                <div class="w-full md:w-80 lg:w-96 p-6 sm:p-8 bg-gray-50 dark:bg-[#1A1C20] overflow-y-auto flex flex-col gap-6 shrink-0">
+                    <div>
+                        <h3 class="text-sm font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2"><span class="material-symbols-rounded text-lg">history</span> 活動履歴</h3>
+                        <ul id="detail-history" class="space-y-3"></ul>
+                    </div>
+                    
+                    <div class="mt-auto pt-6 border-t border-gray-200 dark:border-gray-800">
+                        <div class="text-xs text-gray-500 font-bold mb-3 flex items-center justify-between">
+                            <span>最終更新</span>
+                            <span id="detail-time"></span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="btn-detail-read" class="readout-btn m3-btn w-full py-3 bg-[var(--primary-container)] hover:opacity-90 dark:bg-gray-800 dark:hover:bg-gray-700 text-[var(--on-primary-container)] dark:text-white rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">volume_up</span>読上</button>
+                            <button id="btn-detail-map" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-red-200 dark:border-red-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 hidden"><span class="material-symbols-rounded text-xl">map</span>避難所</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -134,10 +197,10 @@
     <main class="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 relative z-10">
         <header id="main-header" class="bg-[#1D1B20]/95 backdrop-blur-md dark:bg-[#121115]/95 text-white p-6 sm:p-8 rounded-m3-large mb-4 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 shadow-m3-elevation-2 relative overflow-hidden border border-white/10 transition-all duration-500">
             <div class="absolute -right-6 -top-6 w-48 h-48 bg-red-600 rounded-full opacity-10 blur-2xl pointer-events-none"></div>
-            <div id="header-accent-glow" class="absolute -left-6 -bottom-6 w-48 h-48 bg-purple-600 rounded-full opacity-10 blur-2xl transition-all duration-500 pointer-events-none"></div>
+            <div id="header-accent-glow" class="absolute -left-6 -bottom-6 w-48 h-48 rounded-full opacity-10 blur-2xl transition-all duration-500 pointer-events-none" style="background-color: var(--primary);"></div>
             
             <div class="relative z-10 flex items-center gap-5">
-                <div id="header-icon-box" class="bg-[#6750A4] text-white w-14 h-14 rounded-2xl flex items-center justify-center animate-pulse shadow-lg transition-all duration-500">
+                <div id="header-icon-box" class="text-white w-14 h-14 rounded-2xl flex items-center justify-center animate-pulse shadow-lg transition-all duration-500" style="background-color: var(--primary);">
                     <span class="material-symbols-rounded text-3xl">volcano</span>
                 </div>
                 <div>
@@ -152,10 +215,6 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3 relative z-10 w-full lg:w-auto justify-start lg:justify-end">
-                <button onclick="stopAllSpeechAndAlarms()" id="mute-panel-btn" class="bg-red-950/40 hover:bg-red-950/60 text-red-400 w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-md border border-red-500/20 active:scale-95 cursor-pointer">
-                    <span class="material-symbols-rounded text-2xl">volume_off</span>
-                </button>
-
                 <div class="flex items-center gap-2 bg-[#F1ECEB]/90 dark:bg-[#201A19]/90 backdrop-blur-sm border border-gray-200 dark:border-gray-800 rounded-m3-full p-1.5 pl-4 shadow-sm transition-all" id="sync-status-container">
                     <div id="sync-status-badge" class="cursor-pointer flex items-center gap-2">
                         <span id="sync-dot" class="w-2.5 h-2.5 bg-gray-500 dark:bg-gray-400 rounded-full inline-block"></span>
@@ -165,10 +224,10 @@
                 </div>
                 
                 <!-- 🚀 巨大化・M3化された同期ボタン -->
-                <button onclick="forceSyncFromFirebase()" id="force-sync-btn" class="bg-[#EADDFF] hover:bg-[#D0BCFF] text-[#21005D] dark:bg-[#4F378B] dark:hover:bg-[#633B48] dark:text-[#EADDFF] px-5 py-3 rounded-full flex items-center justify-center transition-all shadow-lg border border-white/10 relative group cursor-pointer active:scale-95">
+                <button onclick="forceSyncFromFirebase()" id="force-sync-btn" class="bg-[var(--primary-container)] text-[var(--on-primary-container)] dark:brightness-90 px-5 py-3 rounded-full flex items-center justify-center transition-all shadow-lg border border-white/10 relative group cursor-pointer active:scale-95">
                     <span id="sync-button-icon" class="material-symbols-rounded text-2xl group-hover:rotate-180 transition-transform duration-500">sync</span>
                     <span class="text-sm font-black ml-1.5 mr-1 tracking-wide">同期</span>
-                    <svg id="sync-google-spinner" class="google-spinner absolute inset-0 m-auto hidden text-[#21005D] dark:text-[#EADDFF]" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none" /></svg>
+                    <svg id="sync-google-spinner" class="google-spinner absolute inset-0 m-auto hidden text-[var(--on-primary-container)] dark:text-[var(--primary-container)]" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none" /></svg>
                 </button>
 
                 <div class="bg-white/10 px-4 py-3 rounded-m3-medium text-xs font-bold font-mono flex items-center gap-2 border border-white/10 shadow-sm backdrop-blur-sm">
@@ -221,12 +280,21 @@
                         <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
                             <label class="block text-[10px] font-black text-gray-400 uppercase">山のスタイル変更</label>
                             <div class="grid grid-cols-3 gap-2">
-                                <button onclick="setVisualType('update', 'animation')" id="vtype-update-animation" class="py-2 text-[10px] font-bold rounded-lg border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white">SVG</button>
-                                <button onclick="setVisualType('update', 'preset')" id="vtype-update-preset" class="py-2 text-[10px] font-bold rounded-lg border text-gray-500 dark:border-gray-800">イラスト</button>
-                                <button onclick="setVisualType('update', 'custom')" id="vtype-update-custom" class="py-2 text-[10px] font-bold rounded-lg border text-gray-500 dark:border-gray-800">写真</button>
+                                <button onclick="setVisualType('update', 'animation')" id="vtype-update-animation" class="py-2 text-[10px] font-bold rounded-lg border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white border-gray-400">SVGアニメ</button>
+                                <button onclick="setVisualType('update', 'preset')" id="vtype-update-preset" class="py-2 text-[10px] font-bold rounded-lg border text-gray-500 border-gray-200 dark:border-gray-800">イラスト</button>
+                                <button onclick="setVisualType('update', 'custom')" id="vtype-update-custom" class="py-2 text-[10px] font-bold rounded-lg border text-gray-500 border-gray-200 dark:border-gray-800">写真アップ</button>
                             </div>
-                            <div id="vstyle-update-preset-box" class="hidden"><select id="update-visual-preset" class="w-full bg-white dark:bg-gray-800 border rounded-lg p-2 text-xs font-bold dark:text-white"><option value="fuji">富士山風</option><option value="island">火山島</option><option value="sci-fi">未来SF</option></select></div>
-                            <div id="vstyle-update-custom-box" class="hidden"><input type="file" id="update-visual-file" accept="image/*" onchange="processCustomImage('update', this)" class="w-full text-xs file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:bg-[#6750A4] file:text-white"><input type="hidden" id="update-visual-base64"></div>
+                            <div id="vstyle-update-preset-box" class="hidden">
+                                <select id="update-visual-preset" class="w-full bg-white dark:bg-gray-800 border rounded-lg p-2 text-xs font-bold dark:text-white dark:border-gray-800">
+                                    <option value="fuji">富士山風 (雪化粧)</option>
+                                    <option value="island">海に浮かぶ火山島</option>
+                                    <option value="sci-fi">未来SFドーム火山</option>
+                                </select>
+                            </div>
+                            <div id="vstyle-update-custom-box" class="hidden">
+                                <input type="file" id="update-visual-file" accept="image/*" onchange="processCustomImage('update', this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[var(--primary)] file:text-white">
+                                <input type="hidden" id="update-visual-base64">
+                            </div>
                         </div>
                         <textarea id="update-comment" rows="3" placeholder="状況・アドバイス文..." class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3.5 text-xs font-semibold focus:outline-none resize-none dark:text-white"></textarea>
                         
@@ -235,7 +303,7 @@
                             <button onclick="deleteVolcano()" type="button" title="この火山を完全に削除" class="py-3.5 px-4 bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-400 text-xs font-black rounded-m3-full flex items-center justify-center transition-colors shadow-sm">
                                 <span class="material-symbols-rounded text-[18px]">delete</span>
                             </button>
-                            <button onclick="submitUpdateVolcano()" class="flex-1 py-3.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-m3-full flex items-center justify-center gap-2 shadow-md relative">
+                            <button id="btn-update-volcano" onclick="submitUpdateVolcano()" class="flex-1 py-3.5 bg-[var(--primary)] hover:opacity-90 text-white text-xs font-black rounded-m3-full flex items-center justify-center gap-2 shadow-md relative">
                                 <span class="material-symbols-rounded text-sm" id="btn-update-icon">campaign</span>
                                 <span id="btn-update-text">情報を更新＆通知</span>
                                 <svg id="update-google-spinner" class="google-spinner absolute right-4 hidden" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none"/></svg>
@@ -246,19 +314,39 @@
                     <!-- 🌋 新規登録タブ -->
                     <div id="admin-form-create" class="space-y-4 hidden">
                         <input type="text" id="create-name" placeholder="新規火山名" class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3 text-xs font-bold dark:text-white focus:outline-none">
-                        <select id="create-level" class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3 text-xs font-bold dark:text-white focus:outline-none"><option value="1">レベル1</option><option value="2">レベル2</option><option value="3">レベル3</option><option value="4">レベル4</option><option value="5">レベル5</option></select>
+                        <select id="create-level" class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3 text-xs font-bold dark:text-white focus:outline-none">
+                            <option value="1">レベル1 [活火山留意]</option>
+                            <option value="2">レベル2 [火口周辺規制]</option>
+                            <option value="3">レベル3 [入山規制]</option>
+                            <option value="4">レベル4 [高齢者等避難]</option>
+                            <option value="5">レベル5 [避難]</option>
+                        </select>
                         <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
-                            <label class="block text-[10px] font-black text-gray-400">山のスタイル</label>
+                            <label class="block text-[10px] font-black text-gray-400 uppercase">山のスタイル</label>
                             <div class="grid grid-cols-3 gap-2">
-                                <button onclick="setVisualType('create', 'animation')" id="vtype-create-animation" class="py-2 text-[10px] font-bold rounded-lg border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white">SVG</button>
-                                <button onclick="setVisualType('create', 'preset')" id="vtype-create-preset" class="py-2 text-[10px] font-bold rounded-lg border text-gray-500 dark:border-gray-800">イラスト</button>
-                                <button onclick="setVisualType('create', 'custom')" id="vtype-create-custom" class="py-2 text-[10px] font-bold rounded-lg border text-gray-500 dark:border-gray-800">写真</button>
+                                <button type="button" onclick="setVisualType('create', 'animation')" id="vtype-create-animation" class="py-2 text-[10px] font-bold rounded-lg border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white border-gray-400">SVGアニメ</button>
+                                <button type="button" onclick="setVisualType('create', 'preset')" id="vtype-create-preset" class="py-2 text-[10px] font-bold rounded-lg border text-gray-500 border-gray-200 dark:border-gray-800">イラスト</button>
+                                <button type="button" onclick="setVisualType('create', 'custom')" id="vtype-create-custom" class="py-2 text-[10px] font-bold rounded-lg border text-gray-500 border-gray-200 dark:border-gray-800">写真アップ</button>
                             </div>
-                            <div id="vstyle-create-preset-box" class="hidden"><select id="create-visual-preset" class="w-full bg-white dark:bg-gray-800 border rounded-lg p-2 text-xs font-bold dark:text-white"><option value="fuji">富士山風</option><option value="island">火山島</option><option value="sci-fi">未来SF</option></select></div>
-                            <div id="vstyle-create-custom-box" class="hidden"><input type="file" accept="image/*" onchange="processCustomImage('create', this)" class="w-full text-xs file:bg-[#6750A4] file:text-white"><input type="hidden" id="create-visual-base64"></div>
+                            <div id="vstyle-create-preset-box" class="hidden">
+                                <select id="create-visual-preset" class="w-full bg-white dark:bg-gray-800 border rounded-lg p-2 text-xs font-bold dark:text-white dark:border-gray-800">
+                                    <option value="fuji">富士山風 (雪化粧)</option>
+                                    <option value="island">海に浮かぶ火山島</option>
+                                    <option value="sci-fi">未来SFドーム火山</option>
+                                </select>
+                            </div>
+                            <div id="vstyle-create-custom-box" class="hidden">
+                                <input type="file" id="create-visual-file" accept="image/*" onchange="processCustomImage('create', this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[var(--primary)] file:text-white">
+                                <input type="hidden" id="create-visual-base64">
+                            </div>
                         </div>
                         <textarea id="create-comment" rows="3" placeholder="状況の説明..." class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-medium p-3.5 text-xs font-semibold dark:text-white focus:outline-none resize-none"></textarea>
-                        <button onclick="submitCreateVolcano()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-m3-full flex items-center justify-center gap-2 shadow-md relative"><span class="material-symbols-rounded text-sm" id="btn-create-icon">add_circle</span><span id="btn-create-text">データベースに新規登録</span><svg id="create-google-spinner" class="google-spinner absolute right-4 hidden" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none"/></svg></button>
+                        
+                        <button id="btn-create-volcano" onclick="submitCreateVolcano()" class="relative w-full py-3.5 bg-[var(--primary)] hover:opacity-90 text-white text-xs font-black rounded-m3-full transition shadow-md flex items-center justify-center gap-2">
+                            <span class="material-symbols-rounded text-sm" id="btn-create-icon">add_circle</span>
+                            <span id="btn-create-text">データベースに新規登録</span>
+                            <svg id="create-google-spinner" class="google-spinner absolute right-4 hidden" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none"/></svg>
+                        </button>
                     </div>
 
                     <!-- 🚨 速報テロップタブ -->
@@ -290,6 +378,10 @@
                             <span class="material-symbols-rounded text-[16px]">campaign</span>
                             <span class="hidden sm:inline">重大警報を一括読上</span>
                         </button>
+                        <button onclick="stopAllSpeechAndAlarms()" id="mute-panel-btn" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-950/60 text-red-800 dark:text-red-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-red-300 dark:border-red-900/60 cursor-pointer active:scale-95" title="全ての読み上げ・アラームを強制停止">
+                            <span class="material-symbols-rounded text-[16px]">volume_off</span>
+                            <span class="hidden sm:inline">緊急停止</span>
+                        </button>
                         <button onclick="toggleFullScreen()" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#2A2B2E] dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer active:scale-95">
                             <span class="material-symbols-rounded text-[16px]" id="fullscreen-icon">fullscreen</span>
                             <span id="fullscreen-text" class="hidden sm:inline">全画面モード</span>
@@ -314,7 +406,7 @@
             <div>
                 <div class="flex items-center justify-between border-b pb-4 mb-5 dark:border-gray-800">
                     <h3 class="text-lg font-black text-[#1C1B1F] dark:text-white flex items-center gap-2">
-                        <span id="modal-title-icon" class="material-symbols-rounded text-[#6750A4]">settings</span> アプリ設定と認証
+                        <span id="modal-title-icon" class="material-symbols-rounded" style="color: var(--primary);">settings</span> アプリ設定と認証
                     </h3>
                     <button id="settings-close-btn" onclick="toggleSettingsModal(false)" class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center text-gray-800 dark:text-gray-200 cursor-pointer">
                         <span class="material-symbols-rounded">close</span>
@@ -323,10 +415,10 @@
 
                 <div class="space-y-6 overflow-y-auto max-h-[75vh] pr-1 pb-10">
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800">
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex items-center gap-1.5"><span class="material-symbols-rounded text-sm text-[#6750A4]">shield</span> 管理者モード</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex items-center gap-1.5"><span class="material-symbols-rounded text-sm" style="color: var(--primary);">shield</span> 管理者モード</h4>
                         <div id="settings-admin-login" class="flex gap-2">
                             <input type="password" id="modal-admin-pass" placeholder="パスワード" class="flex-1 bg-white dark:bg-[#1E1F22] border rounded-m3-small px-3.5 py-2 text-xs font-bold dark:text-white dark:border-gray-800">
-                            <button onclick="checkAdminPassword()" class="bg-[#6750A4] hover:bg-[#523d85] text-white text-xs font-black px-5 py-2 rounded-m3-full shadow-sm transition">認証</button>
+                            <button onclick="checkAdminPassword()" class="bg-[var(--primary)] hover:opacity-90 text-white text-xs font-black px-5 py-2 rounded-m3-full shadow-sm transition">認証</button>
                         </div>
                         <div id="settings-admin-status" class="hidden flex justify-between items-center">
                             <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-full flex items-center gap-1"><span class="material-symbols-rounded text-[14px]">check_circle</span>認証済み</span>
@@ -334,9 +426,9 @@
                         </div>
                     </div>
 
-                    <!-- 🎨 背景設定機能を追加 -->
+                    <!-- 🎨 背景設定機能 -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800">
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded text-sm text-[#6750A4]">wallpaper</span> 背景設定</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bg-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">wallpaper</span> 背景設定</h4>
                         <div class="flex gap-2 mb-3">
                             <button onclick="setBackgroundMode('color')" id="bg-mode-color" class="flex-1 py-2 text-[10px] font-bold rounded-m3-small border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white transition">単色</button>
                             <button onclick="setBackgroundMode('image')" id="bg-mode-image" class="flex-1 py-2 text-[10px] font-bold rounded-m3-small border text-gray-500 dark:border-gray-800 hover:bg-gray-100/50 transition">画像</button>
@@ -349,22 +441,15 @@
                         
                         <div id="bg-image-settings" class="hidden">
                             <label class="block text-[10px] font-bold text-gray-500 mb-1">画像アップロード</label>
-                            <input type="file" id="bg-image-file" accept="image/*" onchange="processBackgroundImage(this)" class="w-full text-[10px] text-gray-500 file:cursor-pointer file:mr-2 file:py-1.5 file:px-4 file:rounded-full file:bg-[#6750A4] file:text-white file:border-0 file:font-bold mb-3 shadow-sm hover:file:opacity-90">
+                            <input type="file" id="bg-image-file" accept="image/*" onchange="processBackgroundImage(this)" class="w-full text-[10px] text-gray-500 file:cursor-pointer file:mr-2 file:py-1.5 file:px-4 file:rounded-full file:bg-[var(--primary)] file:text-white file:border-0 file:font-bold mb-3 shadow-sm hover:file:opacity-90">
                             
                             <div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>画像の不透明度</span><span id="bg-opacity-val">100%</span></div>
-                            <input type="range" id="bg-opacity" min="0.1" max="1" step="0.05" value="1" onchange="updateBackground()" class="w-full accent-[#6750A4]">
+                            <input type="range" id="bg-opacity" min="0.1" max="1" step="0.05" value="1" onchange="updateBackground()" class="w-full">
                             <input type="hidden" id="bg-image-base64">
                         </div>
                     </div>
 
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 shadow-sm">
-                            <span class="text-xs font-bold dark:text-white">M3 Expressive デザイン</span>
-                            <label class="m3-switch">
-                                <input type="checkbox" id="m3-expressive-toggle" onchange="toggleM3Expressive(this.checked)" checked>
-                                <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
-                            </label>
-                        </div>
                         <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 shadow-sm">
                             <span class="text-xs font-bold dark:text-white">ダークテーマ</span>
                             <label class="m3-switch">
@@ -382,15 +467,15 @@
                     </div>
 
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded text-sm text-[#6750A4]">record_voice_over</span> 読み上げ音声の設定</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded text-sm" style="color: var(--primary);">record_voice_over</span> 読み上げ音声の設定</h4>
                         <div class="space-y-4 bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800 shadow-sm">
-                            <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>読み上げ速度</span><span id="rate-val">1.0x</span></div><input type="range" id="speech-rate" min="0.5" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full accent-[#6750A4]"></div>
-                            <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>声の高さ（ピッチ）</span><span id="pitch-val">1.0</span></div><input type="range" id="speech-pitch" min="0.1" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full accent-[#6750A4]"></div>
+                            <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>読み上げ速度</span><span id="rate-val">1.0x</span></div><input type="range" id="speech-rate" min="0.5" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full"></div>
+                            <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>声の高さ（ピッチ）</span><span id="pitch-val">1.0</span></div><input type="range" id="speech-pitch" min="0.1" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full"></div>
                         </div>
                     </div>
 
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800 shadow-sm">
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex gap-1.5"><span class="material-symbols-rounded text-sm text-[#6750A4]">cloud_sync</span> 接続・診断</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex gap-1.5"><span id="theme-card-sync-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">cloud_sync</span> 接続・診断</h4>
                         <div class="text-[10px] text-gray-500 font-mono space-y-1"><div>• Project ID: ohamigo-425a8</div></div>
                         <div id="diagnostics-box" class="hidden border-t pt-3 mt-3 dark:border-gray-800">
                             <div class="text-xs font-bold text-red-500 mb-1">⚠️ 接続障害</div>
@@ -403,7 +488,7 @@
                     </div>
 
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded text-sm text-[#6750A4]">palette</span> アクセントカラー</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-palette-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">palette</span> アクセントカラー</h4>
                         <div class="grid grid-cols-4 gap-2">
                             <button id="theme-btn-purple" onclick="setThemeColor('purple')" class="border-2 p-2 rounded-m3-medium bg-[#F1ECFB] dark:bg-purple-900/20 text-[#21005D] dark:text-purple-200 text-xs font-black flex flex-col items-center gap-1 transition shadow-sm"><span class="w-6 h-6 rounded-full bg-[#6750A4] shadow-inner"></span>紫</button>
                             <button id="theme-btn-blue" onclick="setThemeColor('blue')" class="border-2 p-2 rounded-m3-medium bg-[#E8F0FE] dark:bg-blue-900/20 text-[#001D36] dark:text-blue-200 text-xs font-black flex flex-col items-center gap-1 transition shadow-sm"><span class="w-6 h-6 rounded-full bg-[#1A73E8] shadow-inner"></span>青</button>
@@ -414,7 +499,7 @@
 
                     <!-- 🔔 バックグラウンド Push 通信の設定パネル -->
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm text-[#6750A4]">notifications</span> プッシュ通知</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">notifications</span> プッシュ通知</h4>
                         <div class="p-3 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 mb-3 hidden">
                             <div class="space-y-2">
                                 <input type="text" id="vapid-key-input" placeholder="Firebase VAPID Key" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
@@ -431,10 +516,87 @@
                             <span class="material-symbols-rounded text-[16px]">delete</span> 古いキャッシュを強制削除
                         </button>
                     </div>
+                    
+                    <!-- 📜 更新履歴 -->
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-medium border border-gray-100 dark:border-gray-800 shadow-sm">
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex items-center justify-between gap-1.5 cursor-pointer" onclick="document.getElementById('update-history-content').classList.toggle('hidden')">
+                            <div class="flex items-center gap-1.5"><span id="theme-card-history-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">history</span> アップデート履歴</div>
+                            <span class="material-symbols-rounded text-sm">expand_more</span>
+                        </h4>
+                        <div id="update-history-content" class="hidden text-xs text-[#44474E] dark:text-gray-300 font-medium whitespace-pre-wrap leading-relaxed space-y-3 border-t border-gray-200 dark:border-gray-700 pt-3 max-h-48 overflow-y-auto">
+<!-- 👇👇👇 ここにアップデート履歴を書いてください 👇👇👇 -->
+〜〜〜全ての更新内容〜〜〜
+（このアプリはGithub Pages側で更新が行われているため、自動で更新されています。しかし、一部機能が動作しない場合はそのアプリを一旦ホーム画面から削除し、もう一度追加してみてください。）
+
+✨Ver7.0 (2026/06/29)（このバージョン）
+・緊急時のカード赤枠点滅アニメーションを追加
+・カードタップで詳細情報を全画面表示する機能を追加
+・カード並び替えの動作を修正
+・スライダーデザインをMaterial 3仕様に刷新
+・緊急停止ボタンを使いやすい位置へ移動
+・M3Eデザインの常時適用化とアイコン不具合の修正
+・アクセントカラーの全体同期を完全対応
+・設定内に「更新履歴」パネルを追加
+
+Ver6.0 (2026/06/28)←前日にGeminiの使用量上限に達したためGemini使用できず、翌日リリース
+・背景のカスタム変更機能を実装
+・オフラインでも履歴を閲覧可能に
+・背景変更機能実装
+・速報テロップ同期可能に
+・一部ボタンが反応しないバグを修正
+
+Ver5.0 (2026/06/27)
+・プッシュ通知システムの同期問題を完全修正・本格実装（GASに送信→Firebase Cloud message機能を使用） 
+・アプリを閉じている場合でもプッシュ通知受信可能に
+・Firebase同期問題の修正
+・山が表示されない不具合を修正
+
+Ver4.1(2026/06/27)
+・プッシュ通知システム修正→まだ直らず
+・山の同期エラー問題発生
+・起動画面から進まないバグを修正
+・ダークモード対応
+
+Ver4.0(2026/06/27)
+・プッシュ通知コード追加→エラーの為動作せず
+・避難所検索機能・共有機能・上部テロップ機能実装
+・アプリ起動時に自動同期機能追加→後にそのせいでアプリが起動しなくなっていたと判明しVer4.1で削除
+
+Ver3.2(2026/06/27)
+・山の画像を設定可能に
+・山が同期されないバグの修正
+・アプリUIをMaterial 3 Expressiveデザインに移行
+
+Ver3.1(2026/06/26)
+・起動アニメーション追加
+・カードの色変更機能追加→次のバージョンにて削除（見た目統一の為）
+・全画面機能追加
+
+Ver3.0(2026/06/26)
+・エラー原因表示機能追加
+・効果音追加
+・全ての情報読み上げ機能追加
+・アクセントカラー機能追加
+
+Ver2.0(2026/06/25)
+・山の情報自動Firebase同期機能追加✨
+・カードの音声読み上げ機能実装
+・管理者機能追加
+・活動履歴表示機能実装
+・Github Pagesにて初の公開
+
+Ver1.0(2026/06/24)
+・麟汰が作ってた噴火情報アプリを見て、HTMLで作れないかと考えアプリを作成
+・思ったより上手くいって本格的にアプリの作成開始
+
+作成協力：Google Gemini 3.1 PRO ・鈴木麟汰様
+<!-- 👆👆👆 ここまで 👆👆👆 -->
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="border-t dark:border-gray-800 pt-4 text-center">
-                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v6.0 (Ultimate Custom Pro)</span>
+                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v7.0 (Ultimate Custom Pro)</span>
             </div>
         </div>
     </div>
@@ -471,8 +633,8 @@
             appId: "1:342829309449:web:9937c81eaa8f48436262d8"
         };
         
-        // 🚨 ここを書き換えてください 🚨
-        const MY_VAPID_KEY = "BM_xWes_gaETd4XGGGKlu4MNH2ggSt5AOGVdOz74scBSopthlLKseYK-NSmggg23326PY0nVBSwg6SivQoJSofw"; 
+        // 🚨ここを書き換えてください🚨
+        const MY_VAPID_KEY = "BM_xWes_gaETd4XGGGKlu4MNH2ggSt5AOGVdOz74scBSopthlLKseYK-NSmggg23326PY0nVBSwg6SivQoJSofw"; // 🚨ここを書き換えてください
 
         const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbwUYhNMvF1e-_-vUn-CQz8MlvDofw09wmI6aWyi4evrrKkpmaP3aDTcj_qSM8h1CoBl/exec";
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
@@ -489,7 +651,7 @@
         
         let db = null, auth = null, messaging = null; 
         let currentSyncUnsubscribe = null;
-        let currentTickerUnsubscribe = null; // テロップ用の監視
+        let currentTickerUnsubscribe = null;
         let currentSortOrder = 'id_asc', connectionTimeout = null;
         let isFirstLoad = true, isAdmin = false;
         
@@ -564,8 +726,11 @@
             }, 1200);
 
             try { tickClock(); setInterval(tickClock, 1000); } catch(e){}
+
+            const sortSelect = document.getElementById("sort-order-select");
+            if (sortSelect) currentSortOrder = sortSelect.value;
             try { loadLocalVolcanos(); } catch(e){ console.error("Local Load Error", e); }
-            try { loadBackgroundSettings(); } catch(e){} // 🎨 背景の読み込み
+            try { loadBackgroundSettings(); } catch(e){}
             try { runDynamicServiceWorker(); } catch(e){}
 
             try {
@@ -577,9 +742,6 @@
                 const savedCompact = safeStorage.getItem("volcano_compact_mode") === "true";
                 document.getElementById("compact-toggle").checked = savedCompact;
                 toggleCompactMode(savedCompact);
-                const savedM3 = safeStorage.getItem("volcano_m3_expressive") !== "false";
-                document.getElementById("m3-expressive-toggle").checked = savedM3;
-                toggleM3Expressive(savedM3);
                 
                 document.getElementById("speech-rate").value = safeStorage.getItem("volcano_speech_rate") || "1.0";
                 document.getElementById("speech-pitch").value = safeStorage.getItem("volcano_speech_pitch") || "1.0";
@@ -597,7 +759,6 @@
                     updateVolcanoId.addEventListener("change", function() {
                         const vol = volcanoData.find(v => String(v.id) === this.value);
                         if (vol) {
-                            // 名前の変更もサポート
                             document.getElementById("update-name").value = vol.name || "";
                             document.getElementById("update-level").value = vol.level;
                             document.getElementById("update-comment").value = vol.comment;
@@ -698,7 +859,6 @@
                 if (currentSyncUnsubscribe) currentSyncUnsubscribe();
                 if (currentTickerUnsubscribe) currentTickerUnsubscribe();
 
-                // 山データの監視
                 const colRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos');
                 currentSyncUnsubscribe = colRef.onSnapshot((snapshot) => {
                     const list = [];
@@ -728,7 +888,6 @@
                     handleFirebaseError(error, "Firestore Database");
                 });
 
-                // 速報テロップの監視
                 currentTickerUnsubscribe = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('ticker').onSnapshot((doc) => {
                     if (doc.exists) {
                         const data = doc.data();
@@ -827,8 +986,8 @@
             bgMode = mode;
             if (save) safeStorage.setItem("volcano_bg_mode", mode);
             
-            document.getElementById("bg-mode-color").className = mode === 'color' ? "flex-1 py-2 text-[10px] font-bold rounded-m3-small border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white transition shadow-sm" : "flex-1 py-2 text-[10px] font-bold rounded-m3-small border text-gray-500 dark:border-gray-800 hover:bg-gray-100/50 transition";
-            document.getElementById("bg-mode-image").className = mode === 'image' ? "flex-1 py-2 text-[10px] font-bold rounded-m3-small border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white transition shadow-sm" : "flex-1 py-2 text-[10px] font-bold rounded-m3-small border text-gray-500 dark:border-gray-800 hover:bg-gray-100/50 transition";
+            document.getElementById("bg-mode-color").className = mode === 'color' ? "flex-1 py-2 text-[10px] font-bold rounded-m3-small border bg-[var(--primary-container)] text-[var(--on-primary-container)] transition shadow-sm" : "flex-1 py-2 text-[10px] font-bold rounded-m3-small border text-gray-500 dark:border-gray-800 hover:bg-gray-100/50 transition";
+            document.getElementById("bg-mode-image").className = mode === 'image' ? "flex-1 py-2 text-[10px] font-bold rounded-m3-small border bg-[var(--primary-container)] text-[var(--on-primary-container)] transition shadow-sm" : "flex-1 py-2 text-[10px] font-bold rounded-m3-small border text-gray-500 dark:border-gray-800 hover:bg-gray-100/50 transition";
             
             document.getElementById("bg-color-settings").classList.toggle("hidden", mode !== 'color');
             document.getElementById("bg-image-settings").classList.toggle("hidden", mode !== 'image');
@@ -1040,19 +1199,17 @@
                 const tClass = theme.badge.includes('bg-[#f0f2f6]') ? theme.badge : `${theme.badge} text-white`;
 
                 const commentText = vol.comment || "状況コメントはありません。";
-                // 🚨 ボタンが反応しないバグの修正：改行などを完全にエスケープしてHTMLを破壊しないように保護
                 const safeComment = commentText.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '\\n').replace(/\r/g, '');
                 const safeName = (vol.name || "名称未設定").replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 const safeTime = (vol.updateTime || "時間未定").replace(/'/g, "\\'");
                 
                 const historyList = (vol.history || []).map(h => `<li class="border-b dark:border-gray-800 pb-1.5 last:border-0 flex items-start gap-1"><span class="material-symbols-rounded text-[10px] text-red-500 mt-1">info</span><span>${h}</span></li>`).join('');
 
-                grid.innerHTML += `
-                    <div class="card-container m3-card border border-[#E1E2EC] dark:border-gray-800/60 p-6 shadow-m3-elevation-1 hover:shadow-m3-elevation-3 transition-all duration-300 flex flex-col justify-between overflow-hidden relative">
+                grid.innerHTML += `<div onclick="openDetailModal('${volIdStr}')" class="card-container m3-card border ${vol.level >= 4 ? 'emergency-card' : 'border-[#E1E2EC] dark:border-gray-800/60'} p-6 shadow-m3-elevation-1 hover:shadow-m3-elevation-3 transition-all duration-300 flex flex-col justify-between overflow-hidden relative cursor-pointer group">
                         <div>
                             <div class="flex justify-between items-start mb-4">
                                 <div>
-                                    <h2 class="card-title text-2xl font-black text-[#1C1B1F] dark:text-white tracking-tight drop-shadow-sm">${safeName}</h2>
+                                    <h2 class="card-title text-2xl font-black text-[#1C1B1F] dark:text-white tracking-tight drop-shadow-sm group-hover:text-[var(--primary)] transition-colors">${safeName}</h2>
                                     <div class="text-[10px] sm:text-xs text-green-600 dark:text-green-400 font-bold mt-1 flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>${vol.status || "監視中"}</div>
                                 </div>
                                 <div class="${tClass} text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-m3-full shadow-sm tracking-wide border border-black/5">⚠️ レベル ${vol.level || 1}</div>
@@ -1060,15 +1217,15 @@
                             <div class="card-visual m3-visual-box w-full rounded-m3-medium mb-5 relative overflow-hidden flex items-end justify-center shadow-inner bg-gray-100 dark:bg-gray-900 aspect-square">
                                 ${getVolcanoArtHTML(vol, theme)}
                             </div>
-                            <div class="card-tabs flex bg-[#E1E2EC]/60 dark:bg-gray-800/80 p-1.5 rounded-m3-full mb-4 backdrop-blur-sm">
+                            <div class="card-tabs flex bg-[#E1E2EC]/60 dark:bg-gray-800/80 p-1.5 rounded-m3-full mb-4 backdrop-blur-sm" onclick="event.stopPropagation()">
                                 <button onclick="setTab('${volIdStr}', 0)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t0}">現在の状況</button>
                                 <button onclick="setTab('${volIdStr}', 1)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t1}">活動履歴</button>
                             </div>
-                            <div class="card-content relative min-h-[110px]">
+                            <div class="card-content relative min-h-[110px]" onclick="event.stopPropagation()">
                                 ${currentTabs[volIdStr] === 0 ? `<div class="bg-gray-50/80 dark:bg-[#111318]/80 border border-gray-100 dark:border-gray-800 rounded-m3-medium p-4 text-sm text-[#44474E] dark:text-gray-300 leading-relaxed font-semibold backdrop-blur-sm whitespace-pre-wrap">${commentText}</div>` : `<div class="bg-gray-50/80 dark:bg-[#111318]/80 border border-gray-100 dark:border-gray-800 rounded-m3-medium p-3 text-xs text-[#44474E] dark:text-gray-300 max-h-[110px] overflow-y-auto font-medium backdrop-blur-sm"><ul class="space-y-2">${historyList}</ul></div>`}
                             </div>
                         </div>
-                        <div class="card-footer mt-5 pt-3 border-t border-gray-100 dark:border-gray-800/60 flex flex-col gap-3 relative z-10">
+                        <div class="card-footer mt-5 pt-3 border-t border-gray-100 dark:border-gray-800/60 flex flex-col gap-3 relative z-10" onclick="event.stopPropagation()">
                             <div class="flex justify-between items-center w-full">
                                 <div class="flex flex-col gap-0.5">
                                     <div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold flex items-center gap-1"><span class="material-symbols-rounded text-xs">gavel</span> 気象局発表</div>
@@ -1148,7 +1305,6 @@
             const timeStr = getNowTimeStr(); const now = new Date();
             const idx = volcanoData.findIndex(v => String(v.id) === String(tid)); if(idx === -1) return;
             
-            // 🔥 名前変更機能の実装
             if (newName) volcanoData[idx].name = newName;
             
             volcanoData[idx].level = level; 
@@ -1184,7 +1340,6 @@
             }
         }
 
-        // 🔥 個別の火山データを削除する機能
         async function deleteVolcano() {
             if(!isAdmin || !confirm("本当にこの火山をデータベースから削除しますか？")) return;
             const tid = document.getElementById("update-volcano-id").value;
@@ -1235,7 +1390,6 @@
             });
         }
 
-        // 🚨 速報テロップの表示（ローカル処理）
         function triggerEarthquakeTickerLocal(show, text) {
             const tk = document.getElementById("emergency-ticker"); 
             const tEl = document.getElementById("ticker-text");
@@ -1247,7 +1401,6 @@
             }
         }
 
-        // 🚨 速報テロップの配信（クラウドに同期する処理）
         async function updateTicker(show) {
             if(!isAdmin) return;
             const text = document.getElementById("eq-text-input").value.trim();
@@ -1278,17 +1431,37 @@
 
         function setThemeColor(theme) {
             activeTheme = theme; safeStorage.setItem("volcano_accent_theme", theme);
-            let hex = "#6750A4"; if (theme === 'purple') hex = "#6750A4"; else if (theme === 'blue') hex = "#1A73E8"; else if (theme === 'terracotta') hex = "#BF360C"; else if (theme === 'emerald') hex = "#00897B";
-            ["header-accent-glow", "header-icon-box"].forEach(id => { const el = document.getElementById(id); if(el) el.style.backgroundColor = hex; });
-            ["modal-title-icon", "theme-card-sync-icon", "theme-card-palette-icon", "theme-card-bell-icon"].forEach(id => { const el = document.getElementById(id); if(el) el.style.color = hex; });
-            applyThemeColorsToDynamicElements(hex);
+            let p = "#6750A4", op = "#FFFFFF", pc = "#EADDFF", opc = "#21005D", pa = "rgba(103, 80, 164, 0.2)", pca = "rgba(234, 221, 255, 0.2)"; 
+            if (theme === 'blue') { p = "#1A73E8"; pc = "#D2E3FC"; opc = "#001D36"; pa = "rgba(26, 115, 232, 0.2)"; pca = "rgba(210, 227, 252, 0.2)"; }
+            else if (theme === 'terracotta') { p = "#BF360C"; pc = "#FBECEB"; opc = "#310000"; pa = "rgba(191, 54, 12, 0.2)"; pca = "rgba(251, 236, 235, 0.2)"; }
+            else if (theme === 'emerald') { p = "#00897B"; pc = "#EBFBF0"; opc = "#002107"; pa = "rgba(0, 137, 123, 0.2)"; pca = "rgba(235, 251, 240, 0.2)"; }
+            
+            document.documentElement.style.setProperty('--primary', p);
+            document.documentElement.style.setProperty('--on-primary', op);
+            document.documentElement.style.setProperty('--primary-container', pc);
+            document.documentElement.style.setProperty('--on-primary-container', opc);
+            document.documentElement.style.setProperty('--primary-alpha', pa);
+            document.documentElement.style.setProperty('--primary-container-alpha', pca);
+
+            ["header-accent-glow", "header-icon-box"].forEach(id => { const el = document.getElementById(id); if(el) el.style.backgroundColor = p; });
+            ["modal-title-icon", "theme-card-sync-icon", "theme-card-palette-icon", "theme-card-bell-icon", "theme-card-history-icon", "theme-card-bg-icon"].forEach(id => { const el = document.getElementById(id); if(el) el.style.color = p; });
+            
+            ['purple', 'blue', 'terracotta', 'emerald'].forEach(t => {
+                const btn = document.getElementById(`theme-btn-${t}`);
+                if (btn) btn.style.borderColor = 'transparent';
+            });
+            const tb = document.getElementById(`theme-btn-${theme}`); if (tb) tb.style.borderColor = p;
+            
+            applyThemeColorsToDynamicElements();
         }
 
-        function applyThemeColorsToDynamicElements(hex) {
-            if(!hex) hex = "#6750A4";
-            document.querySelectorAll('.readout-btn').forEach(btn => btn.style.color = hex);
-            const cu = document.getElementById("btn-update-volcano"); if(cu) cu.style.backgroundColor = hex;
-            const cc = document.getElementById("btn-create-volcano"); if(cc) cc.style.backgroundColor = hex;
+        function applyThemeColorsToDynamicElements() {
+            const bgEl = document.getElementById("force-sync-btn");
+            if (bgEl) { bgEl.style.backgroundColor = 'var(--primary-container)'; bgEl.style.color = 'var(--on-primary-container)'; }
+            
+            document.querySelectorAll('.readout-btn').forEach(btn => btn.style.color = 'var(--primary)');
+            const cu = document.getElementById("btn-update-volcano"); if(cu) cu.style.backgroundColor = 'var(--primary)';
+            const cc = document.getElementById("btn-create-volcano"); if(cc) cc.style.backgroundColor = 'var(--primary)';
         }
 
         function setVisualType(mode, type) {
@@ -1349,8 +1522,59 @@
         }
 
         // =============================================================
-        // 🔄 共有・コピー・読み上げ機能
+        // 🔄 共有・コピー・読み上げ機能・モーダル機能
         // =============================================================
+        function openDetailModal(vid) {
+            const vol = volcanoData.find(v => String(v.id) === String(vid));
+            if (!vol) return;
+            
+            const modal = document.getElementById("detail-modal");
+            const card = document.getElementById("detail-card");
+            const theme = getLevelTheme(vol.level || 1);
+            
+            document.getElementById("detail-visual").innerHTML = `
+                ${getVolcanoArtHTML(vol, theme)}
+                <button onclick="closeDetailModal()" class="absolute top-4 right-4 z-20 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-lg active:scale-95 cursor-pointer">
+                    <span class="material-symbols-rounded text-2xl">close</span>
+                </button>
+                <div class="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-black/90 to-transparent z-10 pointer-events-none"></div>
+                <div class="absolute bottom-6 left-6 sm:left-8 z-20 w-11/12">
+                    <div id="detail-badge" class="inline-block px-4 py-1.5 rounded-m3-full text-xs font-black mb-3 shadow-sm border border-white/20 ${theme.badge} ${theme.badge.includes('bg-[#f0f2f6]') ? '' : 'text-white'}">⚠️ レベル ${vol.level || 1}</div>
+                    <h2 id="detail-name" class="text-3xl sm:text-5xl font-black text-white drop-shadow-lg tracking-tight">${(vol.name || "名称未設定").replace(/'/g, "\\'").replace(/"/g, "&quot;")}</h2>
+                    <div id="detail-status" class="text-sm sm:text-base text-green-400 font-bold mt-2.5 flex items-center gap-2 drop-shadow-md"><span class="w-2.5 h-2.5 bg-green-400 rounded-full animate-ping shadow-[0_0_8px_rgba(74,222,128,0.8)]"></span>${vol.status || "監視中"}</div>
+                </div>
+            `;
+            
+            document.getElementById("detail-comment").innerText = vol.comment || "状況コメントはありません。";
+            
+            const historyList = (vol.history || []).map(h => `<li class="bg-white dark:bg-[#222428] p-3.5 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"><div class="flex items-start gap-2"><span class="material-symbols-rounded text-base text-red-500 shrink-0">info</span><span class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 leading-snug">${h}</span></div></li>`).join('');
+            document.getElementById("detail-history").innerHTML = historyList || "<li class='text-xs text-gray-500 font-bold'>履歴はありません</li>";
+            
+            document.getElementById("detail-time").innerText = vol.updateTime || "時間未定";
+            
+            document.getElementById("btn-detail-read").onclick = () => playEmergencyBroadcastById(vid);
+            
+            const mapBtn = document.getElementById("btn-detail-map");
+            if (vol.level >= 3) {
+                mapBtn.classList.remove("hidden");
+                mapBtn.onclick = () => openMap(vol.name);
+            } else {
+                mapBtn.classList.add("hidden");
+            }
+
+            modal.classList.remove("opacity-0", "pointer-events-none");
+            card.classList.remove("scale-95");
+            card.classList.add("scale-100");
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById("detail-modal");
+            const card = document.getElementById("detail-card");
+            card.classList.remove("scale-100");
+            card.classList.add("scale-95");
+            modal.classList.add("opacity-0", "pointer-events-none");
+        }
+
         function copyVolcanoReport(name, level, comment, time) {
             const reportText = `【火山防災情報レポート】\n火山名: ${name}\n警戒レベル: ${level}\n発表日時: ${time}\n状況: ${comment}`;
             if (navigator.clipboard && window.isSecureContext) {
@@ -1441,40 +1665,6 @@
             document.getElementById("pitch-val").innerText = speechPitch.toFixed(1);
             safeStorage.setItem("volcano_speech_rate", speechRate);
             safeStorage.setItem("volcano_speech_pitch", speechPitch);
-        }
-
-        // =============================================================
-        // PWA キャッシュ制御
-        // =============================================================
-        function clearLocalCache() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for(let registration of registrations) { registration.unregister(); }
-                });
-            }
-            if(window.caches) {
-                caches.keys().then(function(names) {
-                    for (let name of names) caches.delete(name);
-                });
-            }
-            showToast("キャッシュ消去", "古いキャッシュを消去しました。ページを再読み込みします。");
-            setTimeout(() => { window.location.reload(true); }, 1500);
-        }
-
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById("install-banner").classList.remove("hidden"); });
-        function triggerInstall() { if(deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById("install-banner").classList.add("hidden"); }); } }
-        function dismissInstallBanner() { document.getElementById("install-banner").classList.add("hidden"); }
-        
-        async function runDynamicServiceWorker() { 
-            if('serviceWorker' in navigator) {
-                try {
-                    if(window.location.protocol.startsWith('http')) {
-                        swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-                        console.log('通知用ワーカーの登録完了');
-                    }
-                } catch(e) { console.warn('SW registration skipped', e); }
-            }
         }
     </script>
 </body>
