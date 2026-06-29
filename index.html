@@ -975,7 +975,7 @@
                 document.getElementById("create-name").value=""; document.getElementById("create-comment").value=""; document.getElementById("create-visual-base64").value="";
                 showToast("登録成功", `${name} を追加しました`);
             } catch (e) {
-                console.error(e); showToast("通信エラー", "クラウドへの登録に失敗しました: " + e.message, true);
+                console.error(e); showToast("クラウドへの登録に失敗しました", "もう一度情報更新ボタンを押すか、アプリを再起動してください: " + e.message, true);
             } finally {
                 setTimeout(() => {
                     document.getElementById("btn-create-text").innerText = "データベースに新規登録"; 
