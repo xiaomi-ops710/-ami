@@ -72,7 +72,7 @@
             <span class="material-symbols-rounded text-6xl">volcano</span>
         </div>
         <h1 class="text-2xl font-black tracking-widest mb-2">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">v5.0 Ultimate Stable Pro</p>
+        <p class="text-[10px] text-gray-500 font-mono tracking-widest mb-8">Ver5.0 Pro </p>
     </div>
 
     <div id="emergency-ticker" class="hidden bg-red-600 dark:bg-red-700 text-white py-2.5 overflow-hidden relative z-50 shadow-md">
@@ -577,8 +577,8 @@
             if (currentSyncUnsubscribe) currentSyncUnsubscribe();
             if (connectionTimeout) clearTimeout(connectionTimeout);
             loadLocalVolcanos();
-            updateSyncStatus('local', 'ローカル専用モード稼働中');
-            showToast("モード切替", "クラウド通信を切断し、端末内のデータで起動しました。");
+            updateSyncStatus('local', 'ローカルデータモードで稼働中');
+            showToast("モード切替", "端末内のデータで起動しました。クラウドには同期されません。");
         }
 
         function tryAutoConnectFirebase() {
@@ -667,7 +667,7 @@
             const spinner = document.getElementById("sync-google-spinner");
             if(btnIcon) btnIcon.classList.add("hidden"); 
             if(spinner) spinner.classList.remove("hidden");
-            showToast("手動同期", "Firebaseに接続してデータを同期しています...", false);
+            showToast("手動同期", "Firebaseに接続して火山データを同期しています...", false);
             
             try {
                 if (!db && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) {
@@ -706,11 +706,11 @@
             const errLog = document.getElementById("firebase-error-log");
             if (errLog) errLog.innerText = `[${phase}] ${error.message || error}`;
             updateSyncStatus('offline', '⚠️ 同期障害・エラー');
-            let advice = "通信障害です。Wi-Fiを確認するか、ローカルモードに切り替えてください。";
+            let advice = "通信障害です。インターネットを確認するか、ローカルモードに切り替えてください。";
             const msg = (error.message || "").toLowerCase();
             if (msg.includes("api-key-not-valid") || msg.includes("api key")) advice = "APIキーが間違っています。設定コードを確認してください。";
             else if (msg.includes("permission-denied") || msg.includes("missing or insufficient permissions")) advice = "Firebaseコンソールで「匿名ログイン」を有効にし、ルールをテストモードに設定してください。";
-            else if (msg.includes("タイムアウト")) advice = "サーバーからの応答がありません。電波状況を確認してください。";
+            else if (msg.includes("タイムアウト")) advice = "サーバーからの応答がありません。インターネット状況を確認してください。またはアプリを再起動してください。";
             
             const adviceBox = document.getElementById("diagnostics-advice");
             if (adviceBox) adviceBox.innerHTML = advice;
@@ -728,9 +728,9 @@
         // =============================================================
         async function requestNotificationPermission() {
             if(!window.location.protocol.startsWith('http')) {
-                return showToast("制限あり", "プレビュー画面では通知は動作しません。GitHub Pagesで開いてください。", true);
+                return showToast("制限あり", "プレビュー画面では通知は動作しません。 PWAで開いてください。", true);
             }
-            if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です", true);
+            if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です。ホーム画面にこのアプリを追加してください。", true);
             
             if (!MY_VAPID_KEY || MY_VAPID_KEY.includes("ここにFirebaseコンソールで取得した長いVAPIDキー（公開鍵）を貼り付けます") || MY_VAPID_KEY.length < 80) {
                 showToast("⚠️ VAPIDキー エラー", "設定されたキーが短すぎるか、間違っています。Firebaseの「Web Push certificates」から取得した長い文字列（約80文字以上）を設定してください。", true);
@@ -782,7 +782,7 @@
                                 updatedAt: new Date()
                             });
                             if (s) s.innerText = "バックグラウンドPush：有効！";
-                            showToast("登録完了", "トークンをDBに保存しました！通知を受信できます。");
+                            showToast("登録完了", "トークンをデータベースに保存しました！通知を受信できます。");
                         } else {
                             showToast("エラー", "トークンの保存に失敗しました。", true);
                         }
@@ -821,7 +821,7 @@
                     return;
                 }
 
-                showToast("送信中...", "GASへプッシュリクエストを送信しています");
+                showToast("送信中...", "GASへプッシュ通知リクエストを送信しています");
 
                 fetch(MY_GAS_URL, {
                     method: 'POST',
@@ -829,7 +829,7 @@
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ title: title, body: bodyText, tokens: tokens })
                 }).then(() => {
-                    showToast("送信完了", "プッシュ通知リクエストを送信しました！");
+                    showToast("送信完了", "プッシュ通知リクエストを送信しました。まもなく通知が配信されます。");
                 }).catch(err => {
                     showToast("送信エラー", "GASへの通信に失敗: " + err.message, true);
                 });
@@ -841,7 +841,7 @@
 
         async function testPushNotification() {
             showToast("テスト送信", "デモ通知を送信しています...");
-            await sendBackgroundPushNotification("🌋 テスト通知", "これはバックグラウンドPushのテストです。");
+            await sendBackgroundPushNotification("🌋 テスト通知", "これはバックグラウンプッシ通知のテストです。");
         }
 
         // =============================================================
