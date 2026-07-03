@@ -211,7 +211,10 @@
     <!-- 🌋 全画面詳細モーダル -->
     <div id="detail-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300">
         <div id="detail-card" class="bg-[#F3F4F9] dark:bg-[#111318] w-11/12 h-5/6 max-w-5xl rounded-m3-large shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 border border-gray-200 dark:border-gray-800">
-            <div class="relative h-64 sm:h-80 shrink-0 bg-gray-200 dark:bg-gray-800 w-full overflow-hidden" id="detail-visual"></div>
+            <div class="relative h-64 sm:h-80 shrink-0 bg-gray-200 dark:bg-gray-800 w-full overflow-hidden" id="detail-visual">
+                <!-- Visual will be injected here via JavaScript -->
+            </div>
+            
             <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
                 <div class="flex-1 p-6 sm:p-8 overflow-y-auto border-r border-gray-200 dark:border-gray-800"><h3 class="text-sm font-black text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2"><span class="material-symbols-rounded text-lg">description</span> 状況・アドバイス</h3><div id="detail-comment" class="text-base sm:text-lg text-gray-800 dark:text-gray-200 font-medium leading-relaxed whitespace-pre-wrap"></div></div>
                 <div class="w-full md:w-80 lg:w-96 p-6 sm:p-8 bg-gray-50 dark:bg-[#1A1C20] overflow-y-auto flex flex-col gap-6 shrink-0">
@@ -249,7 +252,7 @@
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
                 <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v8.2 (究極進化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】噴火音の録音をアップロードして再生できる音声機能の実装</li><li>【新機能】カスタムアラート音のアップロード・全体同期機能の追加</li><li>【機密設定】特殊コードによる高度な設定管理機能を解放</li><li>設定モーダル等が開けなくなるスクリプト切断バグを完全に根絶・復元</li><li>時計表示が「ーーー」になって動作停止していたエラーを完全に解決</li><li>同期のタイミングで山が一時的に消える・通知が重複するバグを徹底修正</li><li>スマートフォン（縦長画面）におけるタイトル非表示などのダッシュボードコンパクト化</li><li>スマートフォン用の下部タブバーに正しく「ホーム」「通知履歴」「設定」の文字ラベルを完全復活</li></ul></div>
-                <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v8.0 〜 v8.1</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>過去のプッシュ通知閲覧・保持機能を実装（設定の隣およびボトムナビに配置）</li><li>アプリ名の下のサブメッセージ文字を削除し、ヘッダーを劇的にクリーン化</li><li>スプラッシュ（起動画面）にCSS3によるおしゃれな「山体噴火アニメーション」を搭載</li><li>GIFアニメーションや各種音声拡張子（.m4a等）のアップロードに完全対応</li><li>全体的な画面・カードへの滑らかなM3Eアニメーションを追加</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v8.0 〜 v8.1</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>過去のプッシュ通知閲覧・保持機能を実装（設定の隣およびボトムナビに配置）</li><li>アプリ名の下のサブメッセージ文字を削除し、ヘッダーを劇的にクリーン化</li><li>スプラッシュ（起動画面）にCSS3によるおしゃれな「山体噴火アニメーション」を搭載</li><li>GIFアニメーション（動く画像）のカスタム画像アップロードに対応（キャンバス圧縮を自動バイパス）</li><li>全体的な画面・カードへの滑らかなM3Eアニメーションを追加</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-90"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v7.3 (2026/06/29)</h4><ul class="list-disc pl-4 space-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>途切れていた全コードを完全復活させ、動作の安定性を向上</li><li>アップデート履歴を専用ページ（全画面表示）に変更</li><li>画像拡大時のアスペクト比を保持（画像全体が正確に見えるように修正）</li><li>複数回通知が届くバグの修正（1回の更新につき1回のみ確実に配信）</li><li>並び替え機能の不具合修正と最適化（降順・昇順の安定化）</li><li>スライダーデザインを最新 of M3E仕様に完全変更</li><li>詳細画面から気象庁の火山マップへ直接飛べる機能を追加</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-80"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v7.0 (2026/06/29)</h4><ul class="list-disc pl-4 space-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>緊急時のカード赤枠点滅アニメーションを追加</li><li>カードタップで詳細情報を全画面表示する機能を追加</li><li>カード並び替えの動作を修正</li><li>緊急停止ボタンを使いやすい位置へ移動</li><li>M3Eデザインの常時適用化とアイコン不具合の修正</li><li>アクセントカラーの全体同期を完全対応</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-70"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v5.0 〜 v6.0</h4><ul class="list-disc pl-4 space-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>背景のカスタム変更機能を実装</li><li>オフラインでも履歴を閲覧可能に</li><li>速報テロップ同期可能に</li><li>プッシュ通知システムの同期問題を完全修正・本格実装（GAS→FCM）</li><li>アプリを閉じている場合でもプッシュ通知受信可能に</li></ul></div>
@@ -389,7 +392,6 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         <!-- 🎤 噴火音声アップロード機能 -->
                         <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
                             <label class="block text-[10px] font-black text-gray-400 uppercase flex items-center gap-1"><span class="material-symbols-rounded text-sm">mic</span> 噴火音・録音データ (オプション)</label>
-                            <!-- audio/* 以外の拡張子も明示してiOSでのグレーアウト問題を回避 -->
                             <input type="file" id="update-audio-file" accept="audio/*, video/*, .m4a, .mp4, .wav, .mp3, .aac, .ogg, .caf" onchange="processCustomAudio('update', this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
                             <input type="hidden" id="update-audio-base64">
                         </div>
@@ -678,23 +680,28 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                     <!-- 🔔 バックグラウンド Push 通信の設定パネル -->
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">notifications</span> プッシュ通知</h4>
-                        <div class="p-3 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 mb-3 hidden">
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">notifications</span> プッシュ通知 ＆ GChat Webhook</h4>
+                        <div class="p-3 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 mb-3">
                             <div class="space-y-2">
-                                <input type="text" id="vapid-key-input" placeholder="Firebase VAPID Key" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
-                                <input type="text" id="gas-url-input" placeholder="GAS Webhook URL" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
+                                <label class="block text-[10px] font-bold text-gray-500">Google Chat Webhook URL (Ver8.2統合)</label>
+                                <input type="text" id="gchat-url-input" placeholder="https://chat.googleapis.com/v1/spaces/..." class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
+                                
+                                <div class="hidden">
+                                    <input type="text" id="vapid-key-input" placeholder="Firebase VAPID Key" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
+                                    <input type="text" id="gas-url-input" placeholder="GAS Webhook URL" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
+                                </div>
                             </div>
                         </div>
                         <button id="notification-btn" onclick="requestNotificationPermission()" class="w-full py-3.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-[#1C1B1F] dark:text-white text-xs font-black rounded-m3-full flex justify-center gap-2 transition shadow-sm cursor-pointer active:scale-95">
-                            <span class="material-symbols-rounded text-[18px]">volume_up</span> <span id="notification-status-text">プッシュ通知を許可して登録</span>
+                            <span class="material-symbols-rounded text-[18px]">volume_up</span> <span id="notification-status-text">ブラウザ通知を許可して登録</span>
                         </button>
                         <button onclick="testPushNotification()" class="w-full mt-2.5 py-3.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors shadow-sm cursor-pointer active:scale-95">
-                            <span class="material-symbols-rounded text-[18px]">send</span> デモ通知を配信テスト
+                            <span class="material-symbols-rounded text-[18px]">send</span> 配信テスト (デバイス & GChat)
                         </button>
                         <button onclick="window.location.reload(true)" class="w-full mt-2.5 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors cursor-pointer active:scale-95 shadow-sm">
                             <span class="material-symbols-rounded text-[16px]">refresh</span> アプリを再起動 (同期をリセット)
                         </button>
-                        <button onclick="clearLocalCache()" class="w-full mt-2.5 py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors border border-red-200 dark:border-red-900/50 cursor-pointer">
+                        <button onclick="clearLocalCache()" class="w-full mt-2.5 py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors border border-red-200 dark:border-red-900/50 cursor-pointer active:scale-95">
                             <span class="material-symbols-rounded text-[16px]">delete</span> 古いキャッシュを強制削除
                         </button>
                     </div>
@@ -753,6 +760,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         let speechRate = 1.0;
         let speechPitch = 1.0;
         
+        // 🌟 v8.1 追加の詳細設定オプション変数
         let alarmSoundType = 'chime'; // chime, siren, jalert, mute
         let autoTTSOnUpdate = true;
         let minLevelFilter = 1; // 1: すべて, 2, 3, 4
@@ -802,6 +810,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             c.innerText = `${n.getFullYear()}/${String(n.getMonth()+1).padStart(2,'0')}/${String(n.getDate()).padStart(2,'0')} ${getNowTimeStr()}`;
         }
 
+        // ⚙️ 設定モーダルの開閉機能
         function toggleSettingsModal(s) {
             const m = document.getElementById("settings-modal"); const sh = document.getElementById("settings-sheet");
             if(!m || !sh) return;
@@ -809,6 +818,89 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             else { m.classList.remove("opacity-100", "pointer-events-auto"); m.classList.add("invisible", "pointer-events-none", "opacity-0"); sh.classList.add("translate-x-full"); sh.classList.remove("translate-x-0"); }
         }
 
+        // 🔔 通知ログ管理用
+        function loadNotificationHistory() {
+            const raw = safeStorage.getItem("volcano_notification_history");
+            if (raw) { try { notificationHistory = JSON.parse(raw); } catch(e) { notificationHistory = []; } }
+        }
+        
+        function saveNotificationHistory() {
+            safeStorage.setItem("volcano_notification_history", JSON.stringify(notificationHistory));
+        }
+
+        function addNotificationToHistory(title, body) {
+            notificationHistory.unshift({ title, body, time: getNowTimeStr(), date: new Date().toLocaleDateString() });
+            if (notificationHistory.length > 50) notificationHistory.pop();
+            saveNotificationHistory();
+            updateNotificationBadge();
+        }
+        
+        function updateNotificationBadge() {
+            const badge1 = document.getElementById("nav-notif-badge");
+            const badge2 = document.getElementById("header-notif-badge");
+            if(badge1) badge1.classList.remove("hidden");
+            if(badge2) badge2.classList.remove("hidden");
+        }
+        
+        function clearNotificationBadge() {
+            const badge1 = document.getElementById("nav-notif-badge");
+            const badge2 = document.getElementById("header-notif-badge");
+            if(badge1) badge1.classList.add("hidden");
+            if(badge2) badge2.classList.add("hidden");
+        }
+
+        function openNotificationModal() {
+            const modal = document.getElementById("notification-modal");
+            const card = document.getElementById("notification-card");
+            
+            const listEl = document.getElementById("notification-history-list");
+            if (notificationHistory.length === 0) {
+                listEl.innerHTML = "<li class='text-center text-gray-500 py-12 font-bold'>通知履歴はありません</li>";
+            } else {
+                listEl.innerHTML = notificationHistory.map(n => `
+                    <li class="bg-gray-50 dark:bg-[#222428] p-4 rounded-2xl border border-gray-100 dark:border-gray-800 flex flex-col gap-1 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <span class="font-black text-[var(--primary)] text-sm">${n.title}</span>
+                            <span class="text-[10px] text-gray-400 font-bold">${n.date} ${n.time}</span>
+                        </div>
+                        <span class="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">${n.body}</span>
+                    </li>
+                `).join('');
+            }
+            
+            modal.classList.remove("opacity-0", "pointer-events-none");
+            card.classList.remove("scale-95");
+            card.classList.add("scale-100");
+            clearNotificationBadge();
+        }
+
+        function closeNotificationModal() {
+            const modal = document.getElementById("notification-modal");
+            const card = document.getElementById("notification-card");
+            card.classList.remove("scale-100");
+            card.classList.add("scale-95");
+            modal.classList.add("opacity-0", "pointer-events-none");
+        }
+        
+        function clearNotificationHistory() {
+            if(!confirm("通知履歴をすべて消去しますか？")) return;
+            notificationHistory = [];
+            saveNotificationHistory();
+            openNotificationModal();
+            showToast("通知履歴", "すべて消去しました");
+        }
+
+        function triggerSystemNotification(n, l, c) {
+            const t = `🚨 【防災速報】${n}`; const b = `レベル${l}: ${c}`;
+            if(Notification.permission === "granted" && swRegistration) {
+                swRegistration.showNotification(t, { body: b, icon: './icon-192.png', vibrate: [300,100,300,100,400], requireInteraction: true }).catch(()=> new Notification(t, {body:b}));
+            } else if (Notification.permission === "granted") { new Notification(t, {body:b}); }
+            showToast(t, b, l>=4); addNotificationToHistory(t, b);
+        }
+
+        // =======================
+        // 🕒 音声・アラートユーティリティ
+        // =======================
         function playPingSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -818,62 +910,6 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 gain.gain.setValueAtTime(0.08, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
                 osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.25);
             } catch(e) {}
-        }
-
-        // =======================
-        // 🔔 通知履歴
-        // =======================
-        function loadNotificationHistory() {
-            const raw = safeStorage.getItem("volcano_notification_history");
-            if (raw) { try { notificationHistory = JSON.parse(raw); } catch(e) { notificationHistory = []; } }
-        }
-        function saveNotificationHistory() { safeStorage.setItem("volcano_notification_history", JSON.stringify(notificationHistory)); }
-
-        function addNotificationToHistory(title, body) {
-            notificationHistory.unshift({ title, body, time: getNowTimeStr(), date: new Date().toLocaleDateString() });
-            if (notificationHistory.length > 50) notificationHistory.pop();
-            saveNotificationHistory(); updateNotificationBadge();
-        }
-        
-        function updateNotificationBadge() {
-            const badge1 = document.getElementById("nav-notif-badge"); const badge2 = document.getElementById("header-notif-badge");
-            if(badge1) badge1.classList.remove("hidden"); if(badge2) badge2.classList.remove("hidden");
-        }
-        function clearNotificationBadge() {
-            const badge1 = document.getElementById("nav-notif-badge"); const badge2 = document.getElementById("header-notif-badge");
-            if(badge1) badge1.classList.add("hidden"); if(badge2) badge2.classList.add("hidden");
-        }
-
-        function openNotificationModal() {
-            const modal = document.getElementById("notification-modal"); const card = document.getElementById("notification-card");
-            const listEl = document.getElementById("notification-history-list");
-            if (notificationHistory.length === 0) {
-                listEl.innerHTML = "<li class='text-center text-gray-500 py-12 font-bold'>通知履歴はありません</li>";
-            } else {
-                listEl.innerHTML = notificationHistory.map(n => `
-                    <li class="bg-gray-50 dark:bg-[#222428] p-4 rounded-2xl border border-gray-100 dark:border-gray-800 flex flex-col gap-1 shadow-sm">
-                        <div class="flex justify-between items-start"><span class="font-black text-[var(--primary)] text-sm">${n.title}</span><span class="text-[10px] text-gray-400 font-bold">${n.date} ${n.time}</span></div>
-                        <span class="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">${n.body}</span>
-                    </li>`).join('');
-            }
-            modal.classList.remove("opacity-0", "pointer-events-none"); card.classList.remove("scale-95"); card.classList.add("scale-100");
-            clearNotificationBadge();
-        }
-        function closeNotificationModal() {
-            const modal = document.getElementById("notification-modal"); const card = document.getElementById("notification-card");
-            card.classList.remove("scale-100"); card.classList.add("scale-95"); modal.classList.add("opacity-0", "pointer-events-none");
-        }
-        function clearNotificationHistory() {
-            if(!confirm("通知履歴をすべて消去しますか？")) return;
-            notificationHistory = []; saveNotificationHistory(); openNotificationModal(); showToast("通知履歴", "すべて消去しました");
-        }
-
-        function triggerSystemNotification(n, l, c) {
-            const t = `🚨 【防災速報】${n}`; const b = `レベル${l}: ${c}`;
-            if(Notification.permission === "granted" && swRegistration) {
-                swRegistration.showNotification(t, { body: b, icon: './icon-192.png', vibrate: [300,100,300,100,400], requireInteraction: true }).catch(()=> new Notification(t, {body:b}));
-            } else if (Notification.permission === "granted") { new Notification(t, {body:b}); }
-            showToast(t, b, l>=4); addNotificationToHistory(t, b);
         }
 
         // =============================================================
@@ -929,19 +965,40 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         };
 
         // =============================================================
-        // 🎚️ 詳細設定＆カスタムアラートアップロード
+        // 🎚️ v8.1 追加の詳細設定読み込み・操作
         // =============================================================
         function loadExtraSettings() {
             alarmSoundType = safeStorage.getItem("volcano_alarm_sound") || 'chime';
             document.getElementById("alarm-sound-select").value = alarmSoundType;
+
             autoTTSOnUpdate = safeStorage.getItem("volcano_auto_tts") !== "false";
             document.getElementById("auto-tts-toggle").checked = autoTTSOnUpdate;
+
             minLevelFilter = Number(safeStorage.getItem("volcano_level_filter") || 1);
             document.getElementById("level-filter-select").value = minLevelFilter;
         }
-        function updateAlarmSound(value) { alarmSoundType = value; safeStorage.setItem("volcano_alarm_sound", value); showToast("警報設定", "通知アラームを設定しました。"); if (value !== 'mute') { playWarningAlert(4); } }
-        function toggleAutoTTS(checked) { autoTTSOnUpdate = checked; safeStorage.setItem("volcano_auto_tts", checked ? "true" : "false"); showToast("設定", `自動音声読み上げを ${checked ? 'ON' : 'OFF'} にしました。`); }
-        function updateLevelFilter(value) { minLevelFilter = Number(value); safeStorage.setItem("volcano_level_filter", value); renderUI(); showToast("フィルター", `レベル${value}以上の火山を表示します。`); }
+
+        function updateAlarmSound(value) {
+            alarmSoundType = value;
+            safeStorage.setItem("volcano_alarm_sound", value);
+            showToast("警報設定", "通知アラーム警告音を設定しました。");
+            if (value !== 'mute') {
+                playWarningAlert(4); // テスト音を鳴らす
+            }
+        }
+
+        function toggleAutoTTS(checked) {
+            autoTTSOnUpdate = checked;
+            safeStorage.setItem("volcano_auto_tts", checked ? "true" : "false");
+            showToast("読み上げ設定", `自動音声読み上げを ${checked ? '有効' : '無効'} にしました。`);
+        }
+
+        function updateLevelFilter(value) {
+            minLevelFilter = Number(value);
+            safeStorage.setItem("volcano_level_filter", value);
+            renderUI();
+            showToast("フィルター適用", `警戒レベル${value}以上の火山に絞り込みました。`);
+        }
 
         // 🌟 カスタムアラート音声のアップロード（全同期）
         async function uploadGlobalAlertAudio(input) {
@@ -960,6 +1017,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             }
         }
 
+        // 🚨 選択されたアラーム警告音を適切に鳴らし分ける
         function playWarningAlert(level) {
             if (alarmSoundType === 'mute') return;
             // 🌟 グローバル同期のカスタムアラート音が優先
@@ -971,11 +1029,14 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             else if (alarmSoundType === 'jalert') { playJalertSound(); } 
             else { playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]); }
         }
+
+        // 🚨 J-ALERT風の不協和音を再現するサイン波ジェネレータ
         function playJalertSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime;
                 const osc1 = ctx.createOscillator(); const osc2 = ctx.createOscillator(); const gain = ctx.createGain();
-                osc1.type = 'sine'; osc1.frequency.setValueAtTime(494, now); osc2.type = 'sine'; osc2.frequency.setValueAtTime(523, now);
+                osc1.type = 'sine'; osc1.frequency.setValueAtTime(494, now); // シ (B4)
+                osc2.type = 'sine'; osc2.frequency.setValueAtTime(523, now); // ド (C5)
                 gain.gain.setValueAtTime(0.12, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
                 osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
                 osc1.start(now); osc2.start(now); osc1.stop(now + 1.5); osc2.stop(now + 1.5);
@@ -983,11 +1044,12 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         }
 
         // =======================
-        // ☁️ Firebase 接続とバグ修正
+        // ☁️ Firebase 接続とエラーハンドリング
         // =======================
         function updateSyncStatus(status, text) {
             const badge = document.getElementById("sync-status-badge"); const dot = document.getElementById("sync-dot"); const textEl = document.getElementById("sync-text");
             const localBtn = document.getElementById("switch-local-btn"); const diagBox = document.getElementById("diagnostics-box"); const fabIcon = document.getElementById("fab-sync-icon");
+
             if (status === 'connected') {
                 if (badge) badge.className = "cursor-pointer hover:opacity-80 flex items-center gap-2";
                 document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-[#E6F4EA]/90 dark:bg-[#1B3624]/90 backdrop-blur-sm border border-[#A3E2B6] dark:border-[#3C5A42] rounded-m3-full p-1.5 pl-4 shadow-sm transition-all";
@@ -1075,6 +1137,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     if (!snapshot.metadata.fromCache) { isFirstLoad = false; }
                     if (connectionTimeout) clearTimeout(connectionTimeout);
                     
+                    // 🌟 本当の接続ステータスをfromCache判定をもとにリアルタイムに表示
                     const statusText = snapshot.metadata.fromCache ? "オフライン読込中" : `データベース同期完了 (${getNowTimeStr()})`;
                     const statusType = snapshot.metadata.fromCache ? "offline" : "connected";
                     updateSyncStatus(statusType, statusText);
@@ -1083,6 +1146,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 currentTickerUnsubscribe = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('ticker').onSnapshot((doc) => {
                     if (doc.exists) { const data = doc.data(); triggerEarthquakeTickerLocal(data.show, data.text); } else { triggerEarthquakeTickerLocal(false, ""); }
                 });
+
                 return true;
             } catch (err) { handleFirebaseError(err, "初期接続"); throw err; } finally { isConnecting = false; }
         }
@@ -1158,12 +1222,12 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         }
 
         // =============================================================
-        // 🔔 バックグラウンド Push 通信
+        // 🔔 バックグラウンド Push 通信 (FCM + GAS)
         // =============================================================
         async function requestNotificationPermission() {
             if(!window.location.protocol.startsWith('http')) { return showToast("制限あり", "プレビュー画面では通知は動作しません。正式なURL(https://~)で開いてください。", true); }
             if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です", true);
-            if (!MY_VAPID_KEY || MY_VAPID_KEY.includes("ここにFirebaseコンソールで取得した長いVAPIDキー（公開鍵）を貼り付けます") || MY_VAPID_KEY.length < 80) { showToast("⚠️ VAPIDキー エラー", "設定されたキーが短すぎるか、間違っています。Firebaseの「Web Push certificates」から取得した長い文字列（約80文字以上）を設定してください。", true); return; }
+            if (!MY_VAPID_KEY || MY_VAPID_KEY.includes("ここにFirebaseコンソールで取得した長いVAPIDキー（公開鍵）を貼り付けます") || MY_VAPID_KEY.length < 80) { showToast("⚠️ VAPIDキー エラー", "設定されたキーが短すぎるか、間違っています。Firebaseの設定を確認してください。", true); return; }
 
             try {
                 const p = await Notification.requestPermission();
@@ -1175,7 +1239,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         if (!messaging) { showToast("エラー", "FCMモジュールが読み込めませんでした", true); return; }
                         let currentToken;
                         try { const registration = await navigator.serviceWorker.ready; if (swRegistration) { currentToken = await messaging.getToken({ vapidKey: MY_VAPID_KEY, serviceWorkerRegistration: registration }); } else { currentToken = await messaging.getToken({ vapidKey: MY_VAPID_KEY }); } } 
-                        catch (err) { console.error('トークン取得詳細エラー:', err); const msg = err.message || ""; if (msg.includes("P-256 public key")) showToast("鍵エラー", "VAPIDキーの形式が間違っています。Firebaseから公開鍵を取得し直してください！", true); else showToast("FCMエラー", err.message || "トークン取得に失敗しました", true); return; }
+                        catch (err) { console.error('トークン取得詳細エラー:', err); const msg = err.message || ""; if (msg.includes("P-256 public key")) showToast("鍵エラー", "VAPIDキーの形式が間違っています。公開鍵を取得し直してください！", true); else showToast("FCMエラー", err.message || "トークン取得に失敗しました", true); return; }
 
                         if (currentToken && db && auth && auth.currentUser) { await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({ token: currentToken, updatedAt: new Date() }); if (s) s.innerText = "バックグラウンドPush：有効！"; showToast("登録完了", "トークンをDBに保存しました！通知を受信できます。"); } 
                         else { showToast("エラー", "トークンの保存に失敗しました。", true); }
@@ -1191,19 +1255,121 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 const fetchPromise = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').get(); const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('トークン取得タイムアウト')), 15000));
                 const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
                 const tokens = []; snapshot.forEach(doc => { if (doc.data().token) tokens.push(doc.data().token); });
-                if (tokens.length === 0) { console.warn("送信スキップ 通知先（トークン）が1件も登録されていません"); showToast("送信スキップ", "通知先（トークン）が1件も登録されていません", true); return; }
-                showToast("送信中...", "GASへプッシュリクエストを送信しています");
-                fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: tokens }) }).then(() => { showToast("送信完了", "プッシュ通知リクエストを送信しました！"); }).catch(err => { showToast("送信エラー", "GASへの通信に失敗: " + err.message, true); });
-            } catch(e) { console.error("バックグラウンド通知送信失敗", e); showToast("エラー", "トークンDB的読み込み失敗: " + e.message, true); }
+                
+                // GC Webhook が登録されていればGASにURLも送信して連携させる
+                const gchatUrl = document.getElementById("gchat-url-input") ? document.getElementById("gchat-url-input").value : "";
+                
+                if (tokens.length === 0 && !gchatUrl) { console.warn("送信スキップ 通知先が登録されていません"); return; }
+                showToast("送信中...", "プッシュリクエストを送信しています");
+
+                fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: tokens, gchatUrl: gchatUrl }) }).then(() => { showToast("送信完了", "プッシュ通知リクエストを送信しました！"); }).catch(err => { showToast("送信エラー", "GASへの通信に失敗: " + err.message, true); });
+            } catch(e) { console.error("バックグラウンド通知送信失敗", e); }
         }
 
-        async function testPushNotification() {
-            showToast("テスト送信", "デモ通知を送信しています...");
-            await sendBackgroundPushNotification("🌋 テスト通知", "これはバックグラウンドPushのテストです。");
+        async function testPushNotification() { showToast("テスト送信", "デモ通知を送信しています..."); await sendBackgroundPushNotification("🌋 テスト通知", "これはバックグラウンドPushのテストです。"); }
+
+        // =============================================================
+        // 🔄 共有・UI・音声・モーダル制御
+        // =============================================================
+        function openHistoryModal() { const modal = document.getElementById("history-modal"); const card = document.getElementById("history-card"); modal.classList.remove("opacity-0", "pointer-events-none"); card.classList.remove("scale-95"); card.classList.add("scale-100"); toggleSettingsModal(false); }
+        function closeHistoryModal() { const modal = document.getElementById("history-modal"); const card = document.getElementById("history-card"); card.classList.remove("scale-100"); card.classList.add("scale-95"); modal.classList.add("opacity-0", "pointer-events-none"); }
+
+        function openDetailModal(vid) {
+            const vol = volcanoData.find(v => String(v.id) === String(vid)); if (!vol) return;
+            const modal = document.getElementById("detail-modal"); const card = document.getElementById("detail-card"); const theme = getLevelTheme(vol.level || 1);
+            
+            const statusBadge = vol.level >= 100 ? `<span class="text-sm sm:text-base text-red-500 font-black mt-2.5 flex items-center gap-2 drop-shadow-md animate-pulse"><span class="material-symbols-rounded text-xl">warning</span>超噴火危険警報 (地球滅亡クラス)</span>` : vol.level >= 6 ? `<span class="text-sm sm:text-base text-red-500 font-black mt-2.5 flex items-center gap-2 drop-shadow-md"><span class="material-symbols-rounded text-xl">warning</span>破局噴火危険状態</span>` : `<div id="detail-status" class="text-sm sm:text-base text-green-400 font-bold mt-2.5 flex items-center gap-2 drop-shadow-md"><span class="w-2.5 h-2.5 bg-green-400 rounded-full animate-ping shadow-[0_0_8px_rgba(74,222,128,0.8)]"></span>${vol.status || "監視中"}</div>`;
+
+            document.getElementById("detail-visual").innerHTML = `${getVolcanoArtHTML(vol, theme, true)}<button onclick="closeDetailModal()" class="absolute top-4 right-4 z-20 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-lg active:scale-95 cursor-pointer"><span class="material-symbols-rounded text-2xl">close</span></button><div class="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-black/90 to-transparent z-10 pointer-events-none"></div><div class="absolute bottom-6 left-6 sm:left-8 z-20 w-11/12"><div id="detail-badge" class="inline-block px-4 py-1.5 rounded-m3-full text-xs font-black mb-3 shadow-sm border border-white/20 ${theme.badge} ${theme.badge.includes('bg-[#f0f2f6]') ? '' : 'text-white'}">⚠️ レベル ${vol.level || 1}</div><h2 id="detail-name" class="text-3xl sm:text-5xl font-black ${vol.level >= 100 ? 'text-red-500 animate-pulse' : 'text-white'} drop-shadow-lg tracking-tight">${(vol.name || "名称未設定").replace(/'/g, "\\'").replace(/"/g, "&quot;")}</h2>${statusBadge}</div>`;
+            document.getElementById("detail-comment").innerText = vol.comment || "状況コメントはありません。";
+            
+            const historyList = (vol.history || []).map(h => `<li class="bg-white dark:bg-[#222428] p-3.5 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"><div class="flex items-start gap-2"><span class="material-symbols-rounded text-base text-red-500 shrink-0">info</span><span class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 leading-snug">${h}</span></div></li>`).join('');
+            document.getElementById("detail-history").innerHTML = historyList || "<li class='text-xs text-gray-500 font-bold'>履歴はありません</li>";
+            document.getElementById("detail-time").innerText = vol.updateTime || "時間未定";
+            
+            const actionContainer = document.getElementById("detail-action-buttons");
+            let actionHtml = `<button onclick="playEmergencyBroadcastById('${vol.id}')" class="readout-btn m3-btn w-full py-3 bg-[var(--primary-container)] hover:opacity-90 dark:bg-gray-800 dark:hover:bg-gray-700 text-[var(--on-primary-container)] dark:text-white rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">volume_up</span>読上</button>`;
+            if (vol.level >= 3) { actionHtml += `<button onclick="openMap('${(vol.name || "名称未設定").replace(/'/g, "\\'")}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-red-200 dark:border-red-800/50 flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">map</span>避難所</button>`; }
+            if (vol.customAudio) { actionHtml += `<button onclick="playCustomAudio('${vol.id}')" class="m3-btn w-full py-3 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-emerald-200 dark:border-emerald-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 col-span-2 mt-2"><span class="material-symbols-rounded text-xl">play_circle</span>噴火音声を再生</button>`; } 
+            else { actionHtml += `<button onclick="window.open('https://www.jma.go.jp/bosai/map.html#contents=volcano', '_blank')" class="m3-btn w-full py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-blue-200 dark:border-blue-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 col-span-2 mt-2"><span class="material-symbols-rounded text-xl">public</span>気象庁 火山マップを開く</button>`; }
+            actionContainer.innerHTML = actionHtml;
+
+            modal.classList.remove("opacity-0", "pointer-events-none"); card.classList.remove("scale-95"); card.classList.add("scale-100");
+        }
+
+        function closeDetailModal() { const modal = document.getElementById("detail-modal"); const card = document.getElementById("detail-card"); card.classList.remove("scale-100"); card.classList.add("scale-95"); modal.classList.add("opacity-0", "pointer-events-none"); }
+
+        function copyVolcanoReport(name, level, comment, time) {
+            const reportText = `【火山防災情報レポート】\n火山名: ${name}\n警戒レベル: ${level}\n発表日時: ${time}\n状況: ${comment}`;
+            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(reportText).then(() => { showToast("コピー完了", "状況レポートをクリップボードにコピーしました。"); }).catch(err => { fallbackCopyTextToClipboard(reportText); });
+            } else { fallbackCopyTextToClipboard(reportText); }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; document.body.appendChild(textArea); textArea.focus(); textArea.select();
+            try { document.execCommand('copy'); showToast("コピー完了", "状況レポートをクリップボードにコピーしました。"); } catch (err) { showToast("エラー", "コピーに失敗しました。", true); } document.body.removeChild(textArea);
+        }
+
+        function shareVolcano(name, level) {
+            const text = `【火山防災情報発表】${name}は警戒レベル「レベル${level}」に指定されています。`;
+            if (navigator.share) { navigator.share({ title: '火山防災速報', text: text, url: window.location.href }).catch(()=>{}); } else { showToast("共有", "URLをコピーしてご家族へ送信してください。"); }
+        }
+
+        function openMap(name) { showToast("避難所検索", `${name}周辺の最寄りの避難所情報を検索中...`); setTimeout(() => { window.open(`https://www.google.com/maps/search/避難所+${name}`, '_blank'); }, 800); }
+
+        function playChimeNotes(notes, cb) {
+            try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); let time = ctx.currentTime;
+                notes.forEach(n => { const o = ctx.createOscillator(); const g = ctx.createGain(); o.type = 'sine'; o.frequency.value = n.f; g.gain.setValueAtTime(0, time); g.gain.linearRampToValueAtTime(0.12, time+0.05); g.gain.setValueAtTime(0.12, time+n.d-0.1); g.gain.exponentialRampToValueAtTime(0.01, time+n.d); o.connect(g); g.connect(ctx.destination); o.start(time); o.stop(time+n.d); time += n.d-0.05; });
+                if(cb) setTimeout(cb, (time - ctx.currentTime)*1000); } catch(e) { if(cb) cb(); }
+        }
+        
+        function playCustomAudio(id) {
+            const v = volcanoData.find(x => String(x.id) === String(id)); 
+            if(v && v.customAudio) { const audio = new Audio(v.customAudio); audio.play(); showToast("再生中", "録音された噴火音声を再生しています"); }
+        }
+
+        function playSiren() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(320, ctx.currentTime); osc.frequency.linearRampToValueAtTime(640, ctx.currentTime+0.3); osc.frequency.linearRampToValueAtTime(320, ctx.currentTime+0.6);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2); osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 1.2);
+            } catch(e){}
+        }
+
+        function stopAllSpeechAndAlarms() { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); showToast("緊急停止", "アラート音および音声読み上げを強制停止しました。"); }
+
+        function playEmergencyBroadcastById(id) {
+            const v = volcanoData.find(x => String(x.id) === String(id)); if(!v) return;
+            if('speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); }
+            playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]);
+            setTimeout(() => { if('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(`、、、、、、火山防災情報。${v.name}の警戒レベルは、レベル${v.level}です。状況をお伝えします。${v.comment}`); u.lang="ja-JP"; u.rate=speechRate; u.pitch=speechPitch; window.speechSynthesis.speak(u); } }, 300);
+        }
+
+        function readAllHighLevelAlerts() {
+            const highLevelVols = volcanoData.filter(v => v.level >= 3);
+            if (highLevelVols.length === 0) return showToast("情報", "現在、重大警報火山はありません。");
+            if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); }
+            playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]);
+            setTimeout(() => {
+                let fullText = "、、、、、、緊急避難警報。一括読み上げを開始します。";
+                highLevelVols.forEach(v => { fullText += `、${v.name}、警戒レベル${v.level}。${v.comment}`; }); fullText += "、以上です。命を守る行動を心がけてください。";
+                if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(fullText); u.lang = "ja-JP"; u.rate = speechRate; u.pitch = speechPitch; window.speechSynthesis.speak(u); }
+            }, 300);
+        }
+
+        function updateSpeechSettings() {
+            speechRate = parseFloat(document.getElementById("speech-rate").value); speechPitch = parseFloat(document.getElementById("speech-pitch").value);
+            document.getElementById("rate-val").innerText = speechRate.toFixed(1) + "x"; document.getElementById("pitch-val").innerText = speechPitch.toFixed(1);
+            safeStorage.setItem("volcano_speech_rate", speechRate); safeStorage.setItem("volcano_speech_pitch", speechPitch);
+        }
+
+        function updateTextSize(size) {
+            safeStorage.setItem("volcano_text_size", size); const body = document.getElementById("app-body"); if (!body) return;
+            body.classList.remove("text-size-large", "text-size-xl"); if (size === "large") { body.classList.add("text-size-large"); } else if (size === "xl") { body.classList.add("text-size-xl"); }
         }
 
         // =============================================================
-        // ✍_ 管理者・データCRUD 
+        // ✍️ 管理者・データCRUD 
         // =============================================================
         function setTab(vid, idx) { currentTabs[String(vid)] = idx; renderUI(); }
 
@@ -1364,9 +1530,6 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             } catch(e) { showToast("通信エラー", "クラウドからの削除に失敗しました", true); }
         }
 
-        // =============================================================
-        // 🔑 匿名ログイン・認証機能
-        // =============================================================
         function checkAdminPassword() {
             const passwordInput = document.getElementById("modal-admin-pass");
             const val = passwordInput ? passwordInput.value : "";
@@ -1457,6 +1620,85 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 if(db && auth && auth.currentUser) { await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').doc(String(tid)).update({cardColor: firebase.firestore.FieldValue.delete()}); }
                 saveLocalVolcanos(); renderUI(); showToast("カスタマイズ", "カードの色をリセットしました");
             } catch(e) { console.error(e); }
+        }
+
+        function toggleDarkMode(isDark) { if (isDark) { document.documentElement.classList.add('dark'); safeStorage.setItem("volcano_dark_mode", "true"); } else { document.documentElement.classList.remove('dark'); safeStorage.setItem("volcano_dark_mode", "false"); } applyBackground(); }
+        function toggleCompactMode(isCompact) { if (isCompact) { document.body.classList.add('compact-mode'); safeStorage.setItem("volcano_compact_mode", "true"); } else { document.body.classList.remove('compact-mode'); safeStorage.setItem("volcano_compact_mode", "false"); } }
+
+        function setThemeColor(theme) {
+            activeTheme = theme; safeStorage.setItem("volcano_accent_theme", theme);
+            let p = "#6750A4", op = "#FFFFFF", pc = "#EADDFF", opc = "#21005D", pa = "rgba(103, 80, 164, 0.2)", pca = "rgba(234, 221, 255, 0.2)"; 
+            if (theme === 'blue') { p = "#1A73E8"; pc = "#D2E3FC"; opc = "#001D36"; pa = "rgba(26, 115, 232, 0.2)"; pca = "rgba(210, 227, 252, 0.2)"; }
+            else if (theme === 'terracotta') { p = "#BF360C"; pc = "#FBECEB"; opc = "#310000"; pa = "rgba(191, 54, 12, 0.2)"; pca = "rgba(251, 236, 235, 0.2)"; }
+            else if (theme === 'emerald') { p = "#00897B"; pc = "#EBFBF0"; opc = "#002107"; pa = "rgba(0, 137, 123, 0.2)"; pca = "rgba(235, 251, 240, 0.2)"; }
+            
+            document.documentElement.style.setProperty('--primary', p); document.documentElement.style.setProperty('--on-primary', op); document.documentElement.style.setProperty('--primary-container', pc); document.documentElement.style.setProperty('--on-primary-container', opc); document.documentElement.style.setProperty('--primary-alpha', pa); document.documentElement.style.setProperty('--primary-container-alpha', pca);
+            ["header-accent-glow", "header-icon-box"].forEach(id => { const el = document.getElementById(id); if(el) el.style.backgroundColor = p; });
+            ["modal-title-icon", "theme-card-sync-icon", "theme-card-palette-icon", "theme-card-bell-icon", "theme-card-history-icon", "theme-card-bg-icon"].forEach(id => { const el = document.getElementById(id); if(el) el.style.color = p; });
+            ['purple', 'blue', 'terracotta', 'emerald'].forEach(t => { const btn = document.getElementById(`theme-btn-${t}`); if (btn) btn.style.borderColor = 'transparent'; });
+            const tb = document.getElementById(`theme-btn-${theme}`); if (tb) tb.style.borderColor = p; applyThemeColorsToDynamicElements();
+        }
+
+        function applyThemeColorsToDynamicElements() {
+            const bgEl = document.getElementById("force-sync-btn"); if (bgEl) { bgEl.style.backgroundColor = 'var(--primary-container)'; bgEl.style.color = 'var(--on-primary-container)'; }
+            document.querySelectorAll('.readout-btn').forEach(btn => btn.style.color = 'var(--primary)');
+            const cu = document.getElementById("btn-update-volcano"); if(cu) cu.style.backgroundColor = 'var(--primary)';
+            const cc = document.getElementById("btn-create-volcano"); if(cc) cc.style.backgroundColor = 'var(--primary)';
+        }
+
+        function setVisualType(mode, type) {
+            if (mode === 'create') visualTypeCreate = type; else visualTypeUpdate = type;
+            ['animation', 'preset', 'custom'].forEach(t => {
+                const btn = document.getElementById(`vtype-${mode}-${t}`);
+                if (t === type) btn.className = "py-2 text-[10px] font-bold rounded-lg border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white border-gray-400";
+                else btn.className = "py-2 text-[10px] font-bold rounded-lg border text-gray-500 border-gray-200 dark:border-gray-800";
+            });
+            document.getElementById(`vstyle-${mode}-preset-box`).style.display = (type === 'preset') ? 'block' : 'none';
+            document.getElementById(`vstyle-${mode}-custom-box`).style.display = (type === 'custom') ? 'block' : 'none';
+        }
+
+        function processCustomImage(mode, input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0]; const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (file.type === "image/gif") {
+                        if (e.target.result.length > 800000) { showToast("エラー", "GIF画像が大きすぎます(約600KB推奨)", true); input.value = ""; return; }
+                        document.getElementById(`${mode}-visual-base64`).value = e.target.result; showToast("GIF処理完了", "GIFアニメーションを正常に認識しました。");
+                    } else {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement("canvas"); const ctx = canvas.getContext("2d");
+                            const scale = 400 / img.width; canvas.width = 400; canvas.height = img.height * scale;
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            document.getElementById(`${mode}-visual-base64`).value = canvas.toDataURL("image/jpeg", 0.7); showToast("画像処理完了", "画像を適用準備が完了しました。");
+                        };
+                        img.src = e.target.result;
+                    }
+                }; reader.readAsDataURL(file);
+            }
+        }
+
+        function getLevelTheme(level) {
+            const num = Number(level);
+            if (num >= 100) return { badge: 'bg-black text-red-500 animate-ping shadow-[0_0_15px_red]', lava: '#ffffff' };
+            if (num >= 10) return { badge: 'bg-[#310000] text-red-400 animate-pulse', lava: '#ff0000' };
+            if (num > 5) return { badge: 'bg-[#5e0000] text-red-300', lava: '#ff1100' };
+            switch(num) {
+                case 5: return { badge: 'bg-[#722ebc]', lava: '#aa4dff' }; case 4: return { badge: 'bg-[#bc3c35]', lava: '#f42222' }; case 3: return { badge: 'bg-[#d97c36]', lava: '#ff7700' }; case 2: return { badge: 'bg-[#f2d05d]', lava: '#ffdd00' }; default: return { badge: 'bg-[#f0f2f6] text-gray-800', lava: '#66bb6a' };
+            }
+        }
+
+        function getVolcanoArtHTML(vol, theme, isModal = false) {
+            const imgClass = isModal ? "w-full h-full object-contain bg-black/20" : "w-full h-full object-cover";
+            const bgClass = isModal ? "bg-contain bg-no-repeat bg-center bg-black/20" : "bg-cover bg-center";
+            if (vol.visualType === 'custom' && vol.customImage) return `<img src="${vol.customImage}" class="${imgClass}" alt="火山"><div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>`;
+            if (vol.visualType === 'preset' && vol.visualPreset) {
+                let u="", l="";
+                if(vol.visualPreset==='fuji'){u="https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=500&q=80";} else if(vol.visualPreset==='island'){u="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&q=80";} else {u="https://images.unsplash.com/photo-1518098268026-4e43a1a009de?w=500&q=80";}
+                return `<div class="absolute inset-0 w-full h-full ${bgClass}" style="background-image: url('${u}');"><div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div></div>`;
+            }
+            const sL = vol.level >= 3 ? "block" : "none"; const oD = vol.level / 5;
+            return `<div class="absolute inset-0 bg-gradient-to-b from-sky-100 to-sky-200 dark:from-slate-800 dark:to-slate-900 pointer-events-none"></div><svg class="absolute top-1/4 left-1/2 -translate-x-1/2 w-32 h-32 pointer-events-none" viewBox="0 0 100 100" style="opacity: ${oD}"><circle cx="50" cy="50" r="10" fill="#78909c" class="drift-smoke"/><circle cx="45" cy="45" r="13" fill="#90a4ae" class="drift-smoke" style="animation-delay: 1.3s" /><circle cx="53" cy="48" r="9" fill="#b0bec5" class="drift-smoke" style="animation-delay: 2.6s" /></svg><svg class="w-2/3 h-auto relative z-10 mb-4 pointer-events-none" viewBox="0 0 200 100"><polygon points="15,100 100,15 185,100" fill="#3e2723" /><ellipse cx="100" cy="17" rx="14" ry="4" fill="${theme.lava}" class="pulse-lava" /><path d="M 100 17 Q 96 45 92 65" stroke="${theme.lava}" stroke-width="4.5" fill="none" style="display: ${sL}" /><path d="M 101 17 Q 107 55 114 75" stroke="${theme.lava}" stroke-width="3" fill="none" style="display: ${sL}" /></svg><div class="absolute bottom-0 inset-x-0 h-[10%] bg-[#2e7d32] z-20 pointer-events-none"></div>`;
         }
 
         // =============================================================
