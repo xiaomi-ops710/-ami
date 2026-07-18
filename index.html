@@ -763,6 +763,9 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         <button onclick="testPushNotification()" class="w-full mt-2.5 py-3.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors shadow-sm cursor-pointer active:scale-95">
                             <span class="material-symbols-rounded text-[18px]">send</span> 配信テスト (デバイス & GChat)
                         </button>
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+                            💡 通知が届かない場合、Android端末の「設定 → アプリ → 火山防災情報局 → 電池」から<b>バッテリー最適化の対象外</b>に設定すると改善することがあります(特にXiaomi/Samsung/Huawei端末)。
+                        </p>
                         <button onclick="window.location.reload(true)" class="w-full mt-2.5 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors cursor-pointer active:scale-95 shadow-sm">
                             <span class="material-symbols-rounded text-[16px]">refresh</span> アプリを再起動 (同期をリセット)
                         </button>
@@ -1035,6 +1038,9 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             } catch(e){}
 
             setTimeout(() => { tryAutoConnectFirebase(); }, 1500);
+            // 🚀 バグ修正: 既に通知許可済みの端末で、裏でトークンが更新されて無効化される問題への対策。
+            // 接続完了後、無言でトークンを再確認し、変わっていればサーバー側の記録を最新化する。
+            setTimeout(() => { silentlyRefreshTokenIfGranted(); }, 4000);
         };
 
         // =============================================================
@@ -1372,6 +1378,40 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // =============================================================
         // 🔔 バックグラウンド Push 通信 (FCM + GAS)
         // =============================================================
+        // 🚀 バグ修正: 「通知を許可したのに一部端末で届かない」問題への対策。
+        // FCMのトークンは端末側で無言のうちに更新(ローテーション)されることがあり、
+        // 一度登録したきり放置していると、新しいトークンがサーバーに保存されないまま
+        // 古い無効なトークンに送り続けてしまい、通知が届かなくなることがある。
+        // この関数を毎回の起動時にも呼ぶことで、常に最新のトークンをサーバーに同期させる。
+        async function saveFcmToken(currentToken, silent) {
+            if (!currentToken || !db || !auth || !auth.currentUser) return false;
+            const tokensRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens');
+            const safeDocId = currentToken.replace(/\//g, '_');
+            await tokensRef.doc(safeDocId).set({ token: currentToken, updatedAt: new Date(), uid: auth.currentUser.uid });
+            try {
+                const dupSnap = await tokensRef.where('token', '==', currentToken).get();
+                const dupDeletes = [];
+                dupSnap.forEach(d => { if (d.id !== safeDocId) dupDeletes.push(d.ref.delete()); });
+                if (dupDeletes.length > 0) await Promise.all(dupDeletes);
+            } catch (cleanupErr) { console.warn("重複トークンのクリーンアップに失敗", cleanupErr); }
+            if (!silent) { const s = document.getElementById("notification-status-text"); if (s) s.innerText = "バックグラウンドPush：有効！"; showToast("登録完了", "トークンをDBに保存しました！通知を受信できます。"); }
+            return true;
+        }
+
+        // 🚀 新機能: アプリ起動のたびに、既に通知許可済みなら無言でトークンを再確認・再登録する
+        async function silentlyRefreshTokenIfGranted() {
+            try {
+                if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+                if (!MY_VAPID_KEY || MY_VAPID_KEY.length < 80) return;
+                if (!db || !auth || !auth.currentUser) { await connectFirebase(JSON.stringify(firebaseConfig)); }
+                if (!messaging) return;
+                const registration = await navigator.serviceWorker.ready;
+                const currentToken = await messaging.getToken({ vapidKey: MY_VAPID_KEY, serviceWorkerRegistration: registration });
+                await saveFcmToken(currentToken, true);
+                console.log("FCMトークンをバックグラウンドで再確認・同期しました");
+            } catch (e) { console.warn("バックグラウンドでのトークン再確認に失敗(通知許可自体には影響なし)", e); }
+        }
+
         async function requestNotificationPermission() {
             if(!window.location.protocol.startsWith('http')) { return showToast("制限あり", "プレビュー画面では通知は動作しません。正式なURL(https://~)で開いてください。", true); }
             if(!("Notification" in window)) return showToast("非対応","端末がプッシュ通知に非対応です", true);
@@ -1395,17 +1435,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             // 再インストール等でUIDが変わるたびに新しいドキュメントが増え続けていた。
                             // 「トークン文字列そのもの」をドキュメントIDにすることで、UIDが何度変わっても
                             // 同じ端末なら常に同じドキュメントが上書きされるだけになり、構造的に重複しなくなる。
-                            const tokensRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens');
-                            const safeDocId = currentToken.replace(/\//g, '_'); // Firestoreのドキュメント名に使えない文字の念のための置換
-                            await tokensRef.doc(safeDocId).set({ token: currentToken, updatedAt: new Date(), uid: auth.currentUser.uid });
-                            // 過去の実装(UIDキー)で残ってしまった同じトークンの重複ドキュメントも合わせて掃除する
-                            try {
-                                const dupSnap = await tokensRef.where('token', '==', currentToken).get();
-                                const dupDeletes = [];
-                                dupSnap.forEach(d => { if (d.id !== safeDocId) dupDeletes.push(d.ref.delete()); });
-                                if (dupDeletes.length > 0) { await Promise.all(dupDeletes); console.log(`重複トークンを${dupDeletes.length}件クリーンアップしました`); }
-                            } catch (cleanupErr) { console.warn("重複トークンのクリーンアップに失敗(通知自体は正常に登録済み)", cleanupErr); }
-                            if (s) s.innerText = "バックグラウンドPush：有効！"; showToast("登録完了", "トークンをDBに保存しました！通知を受信できます。");
+                            await saveFcmToken(currentToken, false);
                         }
                         else { showToast("エラー", "トークンの保存に失敗しました。", true); }
                     } else { showToast("エラー", "FCMモジュールがありません", true); }
