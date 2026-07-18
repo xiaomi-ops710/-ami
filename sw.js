@@ -65,8 +65,9 @@ self.addEventListener('push', (event) => {
   const title = data.title || '火山防災情報局';
   const options = {
     body: data.body || '新着の火山情報があります。',
-    icon: '/-ami/icon-192.png',
-    badge: '/-ami/icon-192.png'
+    // 大アイコンは非表示（iconフィールドを指定しない）
+    // ステータスバーに表示される小アイコン（★白一色・透過背景のPNGを用意すること）
+    badge: '/-ami/notification-badge.png'
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
