@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.xiaomi_ops710.twa",
+        "sha256_cert_fingerprints": ["76:98:57:45:D5:D9:F6:CC:DF:22:E9:63:C5:B9:BF:71:7E:6B:BA:F2:07:12:26:76:FF:73:A0:BE:FB:29:9A:50"]
+      }
+    }]
