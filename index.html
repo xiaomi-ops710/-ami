@@ -899,9 +899,9 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
         function triggerSystemNotification(n, l, c) {
             const t = `🚨 【防災速報】${n}`; const b = `レベル${l}: ${c}`;
-            if(Notification.permission === "granted" && swRegistration) {
-                swRegistration.showNotification(t, { body: b, icon: './icon-192.png', vibrate: [300,100,300,100,400], requireInteraction: true }).catch(()=> new Notification(t, {body:b}));
-            } else if (Notification.permission === "granted") { new Notification(t, {body:b}); }
+            // 🚀 バグ修正: 以前はここでもOS通知(swRegistration.showNotification)を出していたため、
+            // 実際のFCMプッシュ通知と合わせて同じ内容が2重に届いていました。
+            // リアルタイム検知時はアプリ内トースト表示＋履歴記録のみとし、OS通知はFCMプッシュ側の1回に統一します。
             showToast(t, b, l>=4); addNotificationToHistory(t, b);
         }
 
@@ -1119,6 +1119,24 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     
                     // 🚨 初期キャッシュ読み込み時に空配列が来たら、ローカルデータを消去せずに待機する
                     if (snapshot.metadata.fromCache && list.length === 0 && volcanoData.length > 0) return;
+
+                    // 🚀 バグ修正: 「同期完了と表示されるのに山が全部消える」問題への対策。
+                    // Firestoreはネットワーク再接続時などに、本データが届く直前に一瞬だけ
+                    // fromCache:false(サーバー由来扱い)の空データを返すことがある。
+                    // 既にデータが表示されている状態でいきなり0件が来た場合は即座に信用せず、
+                    // 少し待ってサーバーに再確認してから反映する(本当に空ならその時点で反映される)。
+                    if (!snapshot.metadata.fromCache && list.length === 0 && volcanoData.length > 0 && !isFirstLoad) {
+                        console.warn("⚠️ 疑わしい空データを検知。サーバーに再確認します。");
+                        setTimeout(() => {
+                            if (!db) return;
+                            db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').get({ source: 'server' }).then(freshSnap => {
+                                const freshList = []; freshSnap.forEach(d => freshList.push({ docId: d.id, ...d.data() }));
+                                volcanoData = freshList; saveLocalVolcanos(); renderUI();
+                                updateSyncStatus('connected', `データベース同期完了 (${getNowTimeStr()})`);
+                            }).catch(() => { /* 再確認に失敗した場合は現在の表示を維持 */ });
+                        }, 1500);
+                        return;
+                    }
                     
                     const newVolcanoData = list;
                     
@@ -1166,10 +1184,20 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             try {
                 if (!db && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) { await connectFirebase(JSON.stringify(firebaseConfig)); }
                 if (db && auth && auth.currentUser) {
-                    const fetchPromise = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').get();
+                    // 🚀 バグ修正: キャッシュ経由の古い結果を掴まないよう、必ずサーバーから取得する
+                    const fetchPromise = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos').get({ source: 'server' });
                     const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('通信タイムアウト (電波状況を確認してください)')), 8000));
                     const snap = await Promise.race([fetchPromise, timeoutPromise]);
                     const list = []; snap.forEach(doc => { list.push({ docId: doc.id, ...doc.data() }); });
+
+                    // 🚀 バグ修正: 直前まで山が表示されていたのに、今回だけ0件が返ってきた場合は
+                    // 通信の一時的な不具合の可能性が高いため、画面を空にせず既存表示を維持する
+                    if (list.length === 0 && volcanoData.length > 0) {
+                        showToast("同期を保留", "サーバーから空のデータが返ってきたため、念のため現在の表示を維持しました。時間を置いて再度お試しください。", true);
+                        updateSyncStatus('offline', '⚠️ 同期を保留(空データ検知)');
+                        return;
+                    }
+
                     volcanoData = list; saveLocalVolcanos(); renderUI(); playPingSound(); updateSyncStatus('connected', `同期データ受信完了 (${getNowTimeStr()})`);
                 } else { switchToLocalMode(); }
             } catch (e) { showToast("同期エラー", "同期に失敗しました: " + e.message, true); handleFirebaseError(e, "手動同期"); } 
@@ -1248,7 +1276,20 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         try { const registration = await navigator.serviceWorker.ready; if (swRegistration) { currentToken = await messaging.getToken({ vapidKey: MY_VAPID_KEY, serviceWorkerRegistration: registration }); } else { currentToken = await messaging.getToken({ vapidKey: MY_VAPID_KEY }); } } 
                         catch (err) { console.error('トークン取得詳細エラー:', err); const msg = err.message || ""; if (msg.includes("P-256 public key")) showToast("鍵エラー", "VAPIDキーの形式が間違っています。公開鍵を取得し直してください！", true); else showToast("FCMエラー", err.message || "トークン取得に失敗しました", true); return; }
 
-                        if (currentToken && db && auth && auth.currentUser) { await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({ token: currentToken, updatedAt: new Date() }); if (s) s.innerText = "バックグラウンドPush：有効！"; showToast("登録完了", "トークンをDBに保存しました！通知を受信できます。"); } 
+                        if (currentToken && db && auth && auth.currentUser) {
+                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').doc(auth.currentUser.uid).set({ token: currentToken, updatedAt: new Date() });
+                            // 🚀 バグ修正: 通知が2重に届く問題への対策。
+                            // 再インストールや匿名ログインのUID変化により、同じ端末の古いトークンが
+                            // 別ドキュメントとして残ってしまうことがあるため、同じtoken文字列を持つ
+                            // 自分以外の古いドキュメントを検出して自動的に削除する。
+                            try {
+                                const dupSnap = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').where('token', '==', currentToken).get();
+                                const dupDeletes = [];
+                                dupSnap.forEach(d => { if (d.id !== auth.currentUser.uid) dupDeletes.push(d.ref.delete()); });
+                                if (dupDeletes.length > 0) { await Promise.all(dupDeletes); console.log(`重複トークンを${dupDeletes.length}件クリーンアップしました`); }
+                            } catch (cleanupErr) { console.warn("重複トークンのクリーンアップに失敗(通知自体は正常に登録済み)", cleanupErr); }
+                            if (s) s.innerText = "バックグラウンドPush：有効！"; showToast("登録完了", "トークンをDBに保存しました！通知を受信できます。");
+                        }
                         else { showToast("エラー", "トークンの保存に失敗しました。", true); }
                     } else { showToast("エラー", "FCMモジュールがありません", true); }
                 } else { if (s) s.innerText = "プッシュ通知：ブロック中"; if (b) b.className = "w-full py-3.5 bg-red-100 text-red-800 rounded-m3-full text-xs font-bold flex justify-center gap-2 shadow-sm"; showToast("ブロック", "端末の設定から通知を許可してください", true); }
@@ -1262,14 +1303,17 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 const fetchPromise = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').get(); const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('トークン取得タイムアウト')), 15000));
                 const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
                 const tokens = []; snapshot.forEach(doc => { if (doc.data().token) tokens.push(doc.data().token); });
+                // 🚀 バグ修正: 通知が2重に届く問題への対策(送信直前の最終防御)。
+                // 万一同じトークンが複数ドキュメントに残っていても、送信先は1端末1回になるよう重複を排除する。
+                const uniqueTokens = [...new Set(tokens)];
                 
                 // GC Webhook が登録されていればGASにURLも送信して連携させる
                 const gchatUrl = document.getElementById("gchat-url-input") ? document.getElementById("gchat-url-input").value : "";
                 
-                if (tokens.length === 0 && !gchatUrl) { console.warn("送信スキップ 通知先が登録されていません"); return; }
+                if (uniqueTokens.length === 0 && !gchatUrl) { console.warn("送信スキップ 通知先が登録されていません"); return; }
                 showToast("送信中...", "プッシュリクエストを送信しています");
 
-                fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: tokens, gchatUrl: gchatUrl }) }).then(() => { showToast("送信完了", "プッシュ通知リクエストを送信しました！"); }).catch(err => { showToast("送信エラー", "GASへの通信に失敗: " + err.message, true); });
+                fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: uniqueTokens, gchatUrl: gchatUrl }) }).then(() => { showToast("送信完了", "プッシュ通知リクエストを送信しました！"); }).catch(err => { showToast("送信エラー", "GASへの通信に失敗: " + err.message, true); });
             } catch(e) { console.error("バックグラウンド通知送信失敗", e); }
         }
 
