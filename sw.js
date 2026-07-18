@@ -6,6 +6,7 @@ const CACHE_NAME = 'kazan-bousai-cache-v1';
 const OFFLINE_URLS = [
   '/-ami/index.html',
   '/-ami/manifest.json',
+  '/-ami/tailwind.css',
   '/-ami/icon-192.png',
   '/-ami/icon-512.png'
 ];
