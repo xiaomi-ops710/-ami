@@ -1714,9 +1714,21 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         function triggerInstall() { if(deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById("install-banner").classList.add("hidden"); }); } }
         function dismissInstallBanner() { document.getElementById("install-banner").classList.add("hidden"); }
         
-        async function runDynamicServiceWorker() { 
-            if('serviceWorker' in navigator) { try { if(window.location.protocol.startsWith('http')) { swRegistration = await navigator.serviceWorker.register('./firebase-messaging-sw.js'); console.log('通知用ワーカーの登録完了'); } } catch(e) { console.warn('SW registration skipped', e); } }
+   async function runDynamicServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        try {
+            if (window.location.protocol.startsWith('http')) {
+                // 🌟 キャッシュと通知の両方が入った「sw.js」を登録します！
+                swRegistration = await navigator.serviceWorker.register('/-ami/sw.js', {
+                    scope: '/-ami/'
+                });
+                console.log('PWA Service Worker (sw.js) の登録に完全成功しました！');
+            }
+        } catch (e) {
+            console.warn('SW registration skipped', e);
         }
+    }
+}
     </script>
 </body>
 </html>
