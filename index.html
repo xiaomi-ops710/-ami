@@ -87,6 +87,14 @@
             0% { transform: translateY(10px) translateX(0) scale(0.8); opacity: 1; }
             100% { transform: translateY(-100px) translateX(5px) scale(0.2); opacity: 0; }
         }
+        @keyframes erupt-particle-4 {
+            0% { transform: translateY(10px) translateX(0) scale(0.9); opacity: 1; }
+            100% { transform: translateY(-115px) translateX(-45px) scale(0.15); opacity: 0; }
+        }
+        @keyframes erupt-particle-5 {
+            0% { transform: translateY(10px) translateX(0) scale(0.7); opacity: 1; }
+            100% { transform: translateY(-90px) translateX(45px) scale(0.15); opacity: 0; }
+        }
         @keyframes mountain-shake {
             0%, 100% { transform: rotate(0deg) scale(1); }
             50% { transform: rotate(0.5deg) scale(1.02); }
@@ -95,9 +103,23 @@
             0% { transform: translateY(0) scale(1); opacity: 0.4; }
             100% { transform: translateY(-90px) scale(2.5); opacity: 0; }
         }
+        /* 🚀 豪華化: 噴火口が脈打つように光るグロー効果 */
+        @keyframes crater-glow-pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.4); }
+        }
+        /* 🚀 豪華化: 画面全体がうっすら赤く明滅し、噴火の迫力を演出 */
+        @keyframes splash-flash-pulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.35; }
+        }
         .splash-erupt-1 { animation: erupt-particle-1 1.2s infinite ease-out; }
         .splash-erupt-2 { animation: erupt-particle-2 1.4s infinite ease-out 0.2s; }
         .splash-erupt-3 { animation: erupt-particle-3 1.1s infinite ease-out 0.4s; }
+        .splash-erupt-4 { animation: erupt-particle-4 1.5s infinite ease-out 0.6s; }
+        .splash-erupt-5 { animation: erupt-particle-5 1.3s infinite ease-out 0.8s; }
+        .splash-crater-glow { animation: crater-glow-pulse 1.2s infinite ease-in-out; }
+        .splash-flash { animation: splash-flash-pulse 2.4s infinite ease-in-out; }
         .splash-mountain { animation: mountain-shake 0.8s infinite ease-in-out; }
         .splash-smoke { animation: splash-smoke-drift 3s infinite ease-out; }
 
@@ -190,14 +212,39 @@
             .dark body.m3-expressive .m3-card {
                 background-color: rgba(30, 31, 34, 0.97);
             }
-            /* 🚀 モバイル向けコンパクト化: 1カラム表示だと正方形画像が縦に大きく場所を取り、
-               一覧性が悪いため、横長(16:9)に変更しカード内の余白も詰めて情報密度を上げる */
-            .card-visual {
-                aspect-ratio: 16 / 9 !important;
-                margin-bottom: 0.75rem !important;
+            /* 🚀 モバイル向けコンパクト化(本対応): 1カラム表示の時、画像を左・情報を右に並べる
+               横長レイアウトに変更。活動履歴タブや共有・コピー・読上・避難所ボタンは
+               カードタップ時の全画面詳細表示のみに集約し、一覧性を優先する。 */
+            .card-top-row {
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 0.85rem;
             }
+            .card-visual-wrap {
+                width: 92px;
+                flex-shrink: 0;
+            }
+            .card-visual-wrap .card-visual {
+                aspect-ratio: 1 / 1 !important;
+                margin-bottom: 0 !important;
+            }
+            .card-info-wrap {
+                flex: 1;
+                min-width: 0;
+            }
+            .card-title-row { margin-bottom: 0.5rem !important; }
+            .card-title-row h2 { font-size: 1.15rem !important; }
+            .card-tabs, .tab-panel-history, .card-footer-actions, .card-footer-map {
+                display: none !important;
+            }
+            .card-content { min-height: 0 !important; }
             .m3-card.p-6 {
                 padding: 1.1rem !important;
+            }
+            /* 🚀 スマホ縦画面では、レベル1〜5の凡例が画面を圧迫するため非表示にする */
+            #legend-bar {
+                display: none !important;
             }
         }
         /* 🚀 新機能: パフォーマンス優先モード(手動トグル)。画面幅に関係なく、
@@ -227,17 +274,35 @@
 
     <!-- 🌋 脈動＆噴火するおしゃれなCSS起動画面 -->
     <div id="splash-screen" class="fixed inset-0 z-[100] bg-[#1D1B20] flex flex-col items-center justify-center text-white transition-opacity duration-700">
+        <!-- 🚀 豪華化: 画面全体がうっすら赤く明滅する噴火フラッシュ -->
+        <div class="splash-flash absolute inset-0 bg-red-600 pointer-events-none" style="mix-blend-mode: screen;"></div>
         <div class="relative w-36 h-36 mb-8 flex items-center justify-center">
+            <!-- 🚀 豪華化: 噴火口の光るグロー -->
+            <div class="splash-crater-glow absolute w-16 h-16 rounded-full pointer-events-none" style="top: 22px; background: radial-gradient(circle, rgba(255,120,0,0.9) 0%, rgba(255,60,0,0.4) 45%, transparent 75%); filter: blur(4px);"></div>
             <div class="absolute w-6 h-6 bg-gray-600 rounded-full blur-[3px] splash-smoke -top-2"></div>
             <div class="absolute w-8 h-8 bg-gray-500 rounded-full blur-[4px] splash-smoke -top-4" style="animation-delay: 0.8s;"></div>
+            <div class="absolute w-7 h-7 bg-gray-700 rounded-full blur-[4px] splash-smoke -top-6" style="animation-delay: 1.6s;"></div>
             <div class="absolute w-3.5 h-3.5 bg-red-500 rounded-full blur-[1px] splash-erupt-1"></div>
             <div class="absolute w-2.5 h-2.5 bg-orange-400 rounded-full blur-[1px] splash-erupt-2"></div>
             <div class="absolute w-3 h-3 bg-yellow-400 rounded-full blur-[1px] splash-erupt-3"></div>
+            <div class="absolute w-2 h-2 bg-orange-300 rounded-full blur-[1px] splash-erupt-4"></div>
+            <div class="absolute w-2.5 h-2.5 bg-red-400 rounded-full blur-[1px] splash-erupt-5"></div>
             <svg class="w-24 h-24 relative z-10 splash-mountain" viewBox="0 0 100 100"><polygon points="10,90 50,15 90,90" fill="#2d2d2d" /><polygon points="40,32 50,15 60,32" fill="#d2d2d2" /><ellipse cx="50" cy="18" rx="8" ry="2.5" fill="#ff2200" /></svg>
             <div class="absolute w-full h-full rounded-full border-2 border-[var(--primary)] opacity-20 animate-ping"></div>
         </div>
         <h1 class="text-3xl font-black tracking-widest mb-2 drop-shadow-md">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v8.2 Ultimate Evolution</p>
+        <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v9.0 Ultimate Evolution</p>
+    </div>
+
+    <!-- 🚀 新機能: アプリロック画面(デバイスの生体認証/画面ロックで解除) -->
+    <div id="app-lock-screen" class="hidden fixed inset-0 z-[99] bg-[#1D1B20] flex flex-col items-center justify-center text-white text-center px-8">
+        <span class="material-symbols-rounded text-6xl mb-6 text-[var(--primary)]">lock</span>
+        <h2 class="text-xl font-black mb-2">アプリはロックされています</h2>
+        <p class="text-xs text-gray-400 mb-8">端末の生体認証または画面ロックで解除してください</p>
+        <button onclick="attemptUnlockApp()" class="px-8 py-3.5 bg-[var(--primary)] hover:opacity-90 text-white text-sm font-black rounded-m3-full shadow-lg transition active:scale-95 flex items-center gap-2">
+            <span class="material-symbols-rounded">fingerprint</span> ロックを解除
+        </button>
+        <p id="app-lock-error-text" class="text-[11px] text-red-400 mt-4 hidden"></p>
     </div>
 
     <!-- 🚨 速報テロップ -->
@@ -288,7 +353,8 @@
                 <button onclick="closeHistoryModal()" class="w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v8.2 (究極進化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】噴火音の録音をアップロードして再生できる音声機能の実装</li><li>【新機能】カスタムアラート音のアップロード・全体同期機能の追加</li><li>【機密設定】特殊コードによる高度な設定管理機能を解放</li><li>設定モーダル等が開けなくなるスクリプト切断バグを完全に根絶・復元</li><li>時計表示が「ーーー」になって動作停止していたエラーを完全に解決</li><li>同期のタイミングで山が一時的に消える・通知が重複するバグを徹底修正</li><li>スマートフォン（縦長画面）におけるタイトル非表示などのダッシュボードコンパクト化</li><li>スマートフォン用の下部タブバーに正しく「ホーム」「通知履歴」「設定」の文字ラベルを完全復活</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v9.0 (安定・セキュリティ強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】アプリのバージョン自動確認・キャッシュ由来の旧バージョン残留を検知して更新を促す機能を追加</li><li>【新機能】端末の生体認証/画面ロックでアプリ自体をロックできる「アプリロック」機能を追加</li><li>【新機能】起動アニメーションをより豪華に(噴火口グロー・追加の噴石・画面フラッシュ演出)</li><li>設定画面のアイコンが中心からズレていた表示崩れを修正</li><li>GChat Webhook機能を削除し、プッシュ通知まわりをシンプル化</li><li>スマートフォン(縦長画面)のレベル1〜5凡例を非表示にし、画面占有を削減</li><li>火山カードに添付した音声が再生できなかった不具合を修正(再生ボタンの追加と再生失敗時のエラー表示)</li><li>スマートフォン表示のカードを大幅コンパクト化(画像を左・状況を右に配置、履歴/共有等は詳細画面へ集約)</li><li>カード内の「気象局発表」表記を削除</li><li>設定画面を含む全体的なMaterial 3 Expressiveデザインの底上げ</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v8.2 (究極進化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>【新機能】噴火音の録音をアップロードして再生できる音声機能の実装</li><li>【新機能】カスタムアラート音のアップロード・全体同期機能の追加</li><li>【機密設定】特殊コードによる高度な設定管理機能を解放</li><li>設定モーダル等が開けなくなるスクリプト切断バグを完全に根絶・復元</li><li>時計表示が「ーーー」になって動作停止していたエラーを完全に解決</li><li>同期のタイミングで山が一時的に消える・通知が重複するバグを徹底修正</li><li>スマートフォン（縦長画面）におけるタイトル非表示などのダッシュボードコンパクト化</li><li>スマートフォン用の下部タブバーに正しく「ホーム」「通知履歴」「設定」の文字ラベルを完全復活</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v8.0 〜 v8.1</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>過去のプッシュ通知閲覧・保持機能を実装（設定の隣およびボトムナビに配置）</li><li>アプリ名の下のサブメッセージ文字を削除し、ヘッダーを劇的にクリーン化</li><li>スプラッシュ（起動画面）にCSS3によるおしゃれな「山体噴火アニメーション」を搭載</li><li>GIFアニメーション（動く画像）のカスタム画像アップロードに対応（キャンバス圧縮を自動バイパス）</li><li>全体的な画面・カードへの滑らかなM3Eアニメーションを追加</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-90"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v7.3 (2026/06/29)</h4><ul class="list-disc pl-4 space-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>途切れていた全コードを完全復活させ、動作の安定性を向上</li><li>アップデート履歴を専用ページ（全画面表示）に変更</li><li>画像拡大時のアスペクト比を保持（画像全体が正確に見えるように修正）</li><li>複数回通知が届くバグの修正（1回の更新につき1回のみ確実に配信）</li><li>並び替え機能の不具合修正と最適化（降順・昇順の安定化）</li><li>スライダーデザインを最新 of M3E仕様に完全変更</li><li>詳細画面から気象庁の火山マップへ直接飛べる機能を追加</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-80"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v7.0 (2026/06/29)</h4><ul class="list-disc pl-4 space-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>緊急時のカード赤枠点滅アニメーションを追加</li><li>カードタップで詳細情報を全画面表示する機能を追加</li><li>カード並び替えの動作を修正</li><li>緊急停止ボタンを使いやすい位置へ移動</li><li>M3Eデザインの常時適用化とアイコン不具合の修正</li><li>アクセントカラーの全体同期を完全対応</li></ul></div>
@@ -375,6 +441,14 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             </div>
         </header>
 
+        <!-- 🚀 新機能: アップデート通知バナー -->
+        <div id="update-available-banner" class="hidden mb-5 p-4 rounded-m3-large bg-[var(--primary-container)] text-[var(--on-primary-container)] shadow-m3-elevation-2 flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-rounded">system_update</span>
+                <span id="update-available-text" class="text-sm font-bold">新しいバージョンが公開されています</span>
+            </div>
+            <button onclick="applyAppUpdate()" class="px-4 py-2 bg-white/90 hover:bg-white text-[var(--primary)] text-xs font-black rounded-m3-full shadow-sm transition active:scale-95">今すぐアップデートを適用</button>
+        </div>
         <div id="legend-bar" class="flex flex-wrap gap-2 sm:gap-3 mb-6 pl-1 transition-all duration-500 relative z-10 drop-shadow-sm">
             <div class="px-3.5 py-1.5 bg-[#f0f2f6]/90 backdrop-blur-md dark:bg-[#1E1F22]/90 border border-gray-300 dark:border-gray-700 rounded-full text-[11px] font-bold text-gray-800 dark:text-gray-200 shadow-sm flex items-center gap-1.5">レベル1: 活火山であることに留意</div>
             <div class="px-3.5 py-1.5 bg-[#f2d05d]/90 backdrop-blur-md text-gray-900 rounded-full text-[11px] font-bold shadow-sm flex items-center gap-1.5 border border-[#e5c143]">レベル2: 火口周辺規制</div>
@@ -576,7 +650,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                 <div class="space-y-6 overflow-y-auto max-h-[75vh] pr-1 pb-10">
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex items-center gap-1.5"><span class="material-symbols-rounded text-sm w-6 h-6 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px;">shield</span> 管理者モード</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">shield</span> 管理者モード</h4>
                         <div id="settings-admin-login" class="flex gap-2">
                             <input type="password" id="modal-admin-pass" placeholder="パスワード" class="flex-1 bg-white dark:bg-[#1E1F22] border rounded-m3-small px-3.5 py-2 text-xs font-bold dark:text-white dark:border-gray-800">
                             <button onclick="checkAdminPassword()" class="bg-[var(--primary)] hover:opacity-90 text-white text-xs font-black px-5 py-2 rounded-m3-full shadow-sm transition">認証</button>
@@ -585,11 +659,16 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-full flex items-center gap-1" id="admin-status-badge"><span class="material-symbols-rounded text-[14px]">check_circle</span>認証済み</span>
                             <button onclick="logoutAdmin()" class="bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 px-4 py-1.5 rounded-full text-[10px] font-black transition">ログアウト</button>
                         </div>
+                        <div id="settings-admin-version-panel" class="hidden pt-2">
+                            <button onclick="publishCurrentVersionToServer()" class="w-full py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-[10px] font-black rounded-m3-full transition flex items-center justify-center gap-1.5 dark:text-white">
+                                <span class="material-symbols-rounded text-sm">cloud_upload</span> 現在のバージョン(v9.0)を全端末に配信登録
+                            </button>
+                        </div>
                     </div>
 
                     <!-- 🎨 追加設定項目：便利アラーム設定 -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex gap-1.5"><span class="material-symbols-rounded text-sm w-6 h-6 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px;">brand_awareness</span> アラーム＆通知詳細設定</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase flex gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">brand_awareness</span> アラーム＆通知詳細設定</h4>
                         
                         <!-- 警報アラーム音の選択 -->
                         <div class="flex items-center justify-between">
@@ -633,7 +712,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                     <!-- 🚀 新機能: パフォーマンス優先モード -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded text-sm w-6 h-6 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px;">speed</span> パフォーマンス</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">speed</span> パフォーマンス</h4>
                         <div class="flex items-center justify-between">
                             <div>
                                 <span class="text-xs font-bold dark:text-white block">パフォーマンス優先モード</span>
@@ -659,8 +738,24 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         </div>
                     </div>
 
+                    <!-- 🚀 新機能: アプリロック(端末の生体認証/画面ロックで解除) -->
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">lock</span> セキュリティ</h4>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-bold dark:text-white block">アプリロック</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">端末の生体認証・画面ロックで解除しないとアプリを開けなくします</span>
+                            </div>
+                            <label class="m3-switch shrink-0 ml-3">
+                                <input type="checkbox" id="app-lock-toggle" onchange="toggleAppLockSetting(this.checked)">
+                                <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
+                            </label>
+                        </div>
+                        <p id="app-lock-support-warning" class="hidden text-[10px] text-amber-600 dark:text-amber-400">この端末/ブラウザは生体認証・画面ロック機能に対応していないため、この機能は使用できません。</p>
+                    </div>
+
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bg-icon" class="material-symbols-rounded text-sm w-6 h-6 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px;">wallpaper</span> 背景設定</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bg-icon" class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">wallpaper</span> 背景設定</h4>
                         <div class="flex gap-2 mb-3">
                             <button onclick="setBackgroundMode('color')" id="bg-mode-color" class="flex-1 py-2 text-[10px] font-bold rounded-m3-small border bg-[var(--primary-container)] text-[var(--on-primary-container)] transition shadow-sm">単色</button>
                             <button onclick="setBackgroundMode('image')" id="bg-mode-image" class="flex-1 py-2 text-[10px] font-bold rounded-m3-small border text-gray-500 dark:border-gray-800 hover:bg-gray-100/50 transition">画像</button>
@@ -708,7 +803,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </div>
 
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded text-sm w-6 h-6 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px;">record_voice_over</span> 読み上げ音声の設定</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">record_voice_over</span> 読み上げ音声の設定</h4>
                         <div class="space-y-4 bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
                             <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>読み上げ速度</span><span id="rate-val">1.0x</span></div><input type="range" id="speech-rate" min="0.5" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full"></div>
                             <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>声の高さ（ピッチ）</span><span id="pitch-val">1.0</span></div><input type="range" id="speech-pitch" min="0.1" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full"></div>
@@ -745,12 +840,9 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                     <!-- 🔔 バックグラウンド Push 通信の設定パネル -->
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">notifications</span> プッシュ通知 ＆ GChat Webhook</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">notifications</span> プッシュ通知</h4>
                         <div class="p-3 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 mb-3">
                             <div class="space-y-2">
-                                <label class="block text-[10px] font-bold text-gray-500">Google Chat Webhook URL (Ver8.2統合)</label>
-                                <input type="text" id="gchat-url-input" placeholder="https://chat.googleapis.com/v1/spaces/..." class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
-                                
                                 <div class="hidden">
                                     <input type="text" id="vapid-key-input" placeholder="Firebase VAPID Key" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
                                     <input type="text" id="gas-url-input" placeholder="GAS Webhook URL" class="w-full bg-white dark:bg-[#1E1F22] border rounded p-2 text-[10px] font-mono focus:outline-none dark:text-white dark:border-gray-800">
@@ -761,7 +853,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <span class="material-symbols-rounded text-[18px]">volume_up</span> <span id="notification-status-text">ブラウザ通知を許可して登録</span>
                         </button>
                         <button onclick="testPushNotification()" class="w-full mt-2.5 py-3.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors shadow-sm cursor-pointer active:scale-95">
-                            <span class="material-symbols-rounded text-[18px]">send</span> 配信テスト (デバイス & GChat)
+                            <span class="material-symbols-rounded text-[18px]">send</span> 配信テスト
                         </button>
                         <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
                             💡 通知が届かない場合、Android端末の「設定 → アプリ → 火山防災情報局 → 電池」から<b>バッテリー最適化の対象外</b>に設定すると改善することがあります(特にXiaomi/Samsung/Huawei端末)。
@@ -776,7 +868,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 </div>
             </div>
             <div class="border-t dark:border-gray-800 pt-4 text-center">
-                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v8.2 (Ultimate Custom Pro)</span>
+                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v9.0 (Ultimate Custom Pro)</span>
             </div>
         </div>
     </div>
@@ -819,6 +911,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbwUYhNMvF1e-_-vUn-CQz8MlvDofw09wmI6aWyi4evrrKkpmaP3aDTcj_qSM8h1CoBl/exec";
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'volcano-app-pwa-m3';
+        // 🚀 新機能: アプリバージョン管理(キャッシュにより古いバージョンが開き続ける問題への対策)
+        const APP_VERSION = "9.0";
 
         let volcanoData = [];
         let currentTabs = {}; 
@@ -985,6 +1079,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // =============================================================
         window.onload = function() {
             document.documentElement.classList.add('splash-active');
+            // 🚀 新機能: アプリロックが有効なら、スプラッシュの裏側に即座にロック画面を用意しておく
+            checkAppLockOnStartup();
             setTimeout(() => { const splash = document.getElementById('splash-screen'); if (splash) splash.classList.add('hide'); document.documentElement.classList.remove('splash-active'); }, 1200);
 
             try { tickClock(); setInterval(tickClock, 1000); } catch(e){}
@@ -1081,6 +1177,84 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             const text = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
             display.innerText = text;
             safeStorage.setItem("volcano_last_sync_time", d.toISOString());
+        }
+
+        // 🚀 新機能: アプリロック(端末の生体認証/画面ロックでアプリの起動を保護する)
+        // サーバーを使わず、端末のWebAuthn(生体認証/画面ロックAPI)だけで完結させる。
+        function isWebAuthnPlatformSupported() {
+            return !!(window.PublicKeyCredential && navigator.credentials);
+        }
+
+        async function toggleAppLockSetting(isOn) {
+            if (isOn) {
+                if (!isWebAuthnPlatformSupported()) {
+                    document.getElementById("app-lock-toggle").checked = false;
+                    document.getElementById("app-lock-support-warning").classList.remove("hidden");
+                    showToast("非対応", "この端末はアプリロック機能に対応していません", true);
+                    return;
+                }
+                try {
+                    showToast("登録中", "端末の生体認証・画面ロックを設定してください...");
+                    const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+                    const userId = new Uint8Array(16); crypto.getRandomValues(userId);
+                    const credential = await navigator.credentials.create({
+                        publicKey: {
+                            challenge: challenge,
+                            rp: { name: "火山防災情報局" },
+                            user: { id: userId, name: "app-lock-user", displayName: "アプリロック" },
+                            pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
+                            authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
+                            timeout: 60000
+                        }
+                    });
+                    if (!credential) throw new Error("登録がキャンセルされました");
+                    const credentialIdB64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+                    safeStorage.setItem("volcano_app_lock_credential_id", credentialIdB64);
+                    safeStorage.setItem("volcano_app_lock_enabled", "true");
+                    showToast("設定完了", "アプリロックを有効にしました");
+                } catch (e) {
+                    console.error("アプリロック登録失敗", e);
+                    document.getElementById("app-lock-toggle").checked = false;
+                    showToast("設定失敗", "生体認証・画面ロックの登録に失敗しました: " + e.message, true);
+                }
+            } else {
+                safeStorage.setItem("volcano_app_lock_enabled", "false");
+                showToast("設定完了", "アプリロックを無効にしました");
+            }
+        }
+
+        async function attemptUnlockApp() {
+            const errorText = document.getElementById("app-lock-error-text");
+            errorText.classList.add("hidden");
+            try {
+                const credentialIdB64 = safeStorage.getItem("volcano_app_lock_credential_id");
+                if (!credentialIdB64) { hideAppLockScreen(); return; } // 登録情報が無ければロックできないため解除扱い
+                const credentialId = Uint8Array.from(atob(credentialIdB64), c => c.charCodeAt(0));
+                const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+                await navigator.credentials.get({
+                    publicKey: {
+                        challenge: challenge,
+                        allowCredentials: [{ id: credentialId, type: "public-key" }],
+                        userVerification: "required",
+                        timeout: 60000
+                    }
+                });
+                hideAppLockScreen();
+            } catch (e) {
+                console.error("アプリロック解除失敗", e);
+                errorText.innerText = "認証に失敗しました。もう一度お試しください。";
+                errorText.classList.remove("hidden");
+            }
+        }
+
+        function hideAppLockScreen() { const el = document.getElementById("app-lock-screen"); if (el) el.classList.add("hidden"); }
+
+        // 🚀 起動時、アプリロックが有効なら即座にロック画面を表示する
+        function checkAppLockOnStartup() {
+            const enabled = safeStorage.getItem("volcano_app_lock_enabled") === "true";
+            document.getElementById("app-lock-toggle").checked = enabled;
+            if (!isWebAuthnPlatformSupported()) { document.getElementById("app-lock-support-warning").classList.remove("hidden"); }
+            if (enabled) { document.getElementById("app-lock-screen").classList.remove("hidden"); }
         }
 
         function updateAlarmSound(value) {
@@ -1265,6 +1439,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     const statusText = snapshot.metadata.fromCache ? "オフライン読込中" : `データベース同期完了 (${getNowTimeStr()})`;
                     const statusType = snapshot.metadata.fromCache ? "offline" : "connected";
                     updateSyncStatus(statusType, statusText);
+                    if (!snapshot.metadata.fromCache) { checkForAppUpdate(); }
                 }, (error) => { handleFirebaseError(error, "Firestore Database"); });
 
                 currentTickerUnsubscribe = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('ticker').onSnapshot((doc) => {
@@ -1273,6 +1448,42 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                 return true;
             } catch (err) { handleFirebaseError(err, "初期接続"); throw err; } finally { isConnecting = false; }
+        }
+
+        // 🚀 新機能: アプリバージョンの確認とアップデート通知
+        // サーバー側に保存されたバージョンと、今開いているアプリ自身のバージョンを比較し、
+        // 食い違っていれば「アップデートがあります」バナーを表示する。
+        // これにより、端末のキャッシュが原因で古いバージョンのまま使い続けてしまう事故を防ぐ。
+        async function checkForAppUpdate() {
+            try {
+                if (!db) return;
+                const metaDoc = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('meta').doc('version').get();
+                if (!metaDoc.exists) return;
+                const latest = metaDoc.data().latest;
+                if (latest && latest !== APP_VERSION) {
+                    const banner = document.getElementById("update-available-banner");
+                    if (banner) { banner.classList.remove("hidden"); document.getElementById("update-available-text").innerText = `新しいバージョン(v${latest})が公開されています`; }
+                }
+            } catch (e) { console.warn("バージョン確認に失敗(通常利用には影響ありません)", e); }
+        }
+
+        // 🚀 新機能: 「アップデートを適用」ボタン押下時。キャッシュを全て破棄してから再読み込みする。
+        async function applyAppUpdate() {
+            try {
+                showToast("更新中...", "最新バージョンを読み込んでいます...");
+                if ('caches' in window) { const keys = await caches.keys(); await Promise.all(keys.map(k => caches.delete(k))); }
+                if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); }
+            } catch (e) { console.warn("キャッシュ削除中にエラー", e); }
+            finally { window.location.reload(); }
+        }
+
+        // 🚀 新機能: 管理者が新バージョンを公開したことをサーバーに記録する(設定画面から実行)
+        async function publishCurrentVersionToServer() {
+            if (!isAdmin || !db) { showToast("エラー", "管理者としてログインしてから実行してください", true); return; }
+            try {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('meta').doc('version').set({ latest: APP_VERSION, updatedAt: new Date() });
+                showToast("公開完了", `バージョン v${APP_VERSION} を最新版としてサーバーに記録しました`);
+            } catch (e) { showToast("エラー", "バージョン情報の保存に失敗しました: " + e.message, true); }
         }
 
         async function forceSyncFromFirebase() {
@@ -1303,7 +1514,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                 return;
                             }
 
-                            volcanoData = list; saveLocalVolcanos(); renderUI(); playPingSound(); updateSyncStatus('connected', `同期データ受信完了 (${getNowTimeStr()})`);
+                            volcanoData = list; saveLocalVolcanos(); renderUI(); playPingSound(); updateSyncStatus('connected', `同期データ受信完了 (${getNowTimeStr()})`); checkForAppUpdate();
                             return; // 成功したのでループを抜ける
                         } else { switchToLocalMode(); return; }
                     } catch (e) {
@@ -1463,13 +1674,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     // 万一同じトークンが複数ドキュメントに残っていても、送信先は1端末1回になるよう重複を排除する。
                     const uniqueTokens = [...new Set(tokens)];
 
-                    // GC Webhook が登録されていればGASにURLも送信して連携させる
-                    const gchatUrl = document.getElementById("gchat-url-input") ? document.getElementById("gchat-url-input").value : "";
-
-                    if (uniqueTokens.length === 0 && !gchatUrl) { console.warn("送信スキップ 通知先が登録されていません"); showToast("通知スキップ", "通知先が1件も登録されていません", true); return; }
+                    if (uniqueTokens.length === 0) { console.warn("送信スキップ 通知先が登録されていません"); showToast("通知スキップ", "通知先が1件も登録されていません", true); return; }
                     showToast("送信中...", "プッシュリクエストを送信しています");
 
-                    await fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: uniqueTokens, gchatUrl: gchatUrl }) });
+                    await fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: uniqueTokens }) });
                     showToast("送信完了", "プッシュ通知リクエストを送信しました！");
                     return; // 成功したので終了
                 } catch (e) {
@@ -1507,7 +1715,12 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             document.getElementById("detail-time").innerText = vol.updateTime || "時間未定";
             
             const actionContainer = document.getElementById("detail-action-buttons");
+            const safeNameForBtn = (vol.name || "名称未設定").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            const safeCommentForBtn = (vol.comment || "").replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '\\n').replace(/\r/g, '');
+            const safeTimeForBtn = (vol.updateTime || "時間未定").replace(/'/g, "\\'");
             let actionHtml = `<button onclick="playEmergencyBroadcastById('${vol.id}')" class="readout-btn m3-btn w-full py-3 bg-[var(--primary-container)] hover:opacity-90 dark:bg-gray-800 dark:hover:bg-gray-700 text-[var(--on-primary-container)] dark:text-white rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">volume_up</span>読上</button>`;
+            actionHtml += `<button onclick="copyVolcanoReport('${safeNameForBtn}', ${vol.level}, '${safeCommentForBtn}', '${safeTimeForBtn}')" class="m3-btn w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">content_copy</span>コピー</button>`;
+            actionHtml += `<button onclick="shareVolcano('${safeNameForBtn}', ${vol.level})" class="m3-btn w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">share</span>共有</button>`;
             if (vol.level >= 3) { actionHtml += `<button onclick="openMap('${(vol.name || "名称未設定").replace(/'/g, "\\'")}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-red-200 dark:border-red-800/50 flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">map</span>避難所</button>`; }
             if (vol.customAudio) { actionHtml += `<button onclick="playCustomAudio('${vol.id}')" class="m3-btn w-full py-3 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-emerald-200 dark:border-emerald-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 col-span-2 mt-2"><span class="material-symbols-rounded text-xl">play_circle</span>噴火音声を再生</button>`; } 
             else { actionHtml += `<button onclick="window.open('https://www.jma.go.jp/bosai/map.html#contents=volcano', '_blank')" class="m3-btn w-full py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-blue-200 dark:border-blue-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 col-span-2 mt-2"><span class="material-symbols-rounded text-xl">public</span>気象庁 火山マップを開く</button>`; }
@@ -1544,7 +1757,12 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         
         function playCustomAudio(id) {
             const v = volcanoData.find(x => String(x.id) === String(id)); 
-            if(v && v.customAudio) { const audio = new Audio(v.customAudio); audio.play(); showToast("再生中", "録音された噴火音声を再生しています"); }
+            if(v && v.customAudio) {
+                const audio = new Audio(v.customAudio);
+                // 🚀 バグ修正: 再生に失敗しても無音のまま何も表示されなかった問題への対策。
+                // 特にiPhoneで録音した.m4a/.caf形式は、Android端末では再生できないことがある。
+                audio.play().then(() => { showToast("再生中", "録音された噴火音声を再生しています"); }).catch(err => { console.error("音声再生エラー", err); showToast("再生エラー", "この端末では音声を再生できませんでした(形式非対応の可能性があります)", true); });
+            } else { showToast("エラー", "音声データが見つかりませんでした", true); }
         }
 
         function playSiren() {
@@ -1638,32 +1856,39 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 const cardBaseClass = vol.cardColor ? "" : "bg-white dark:bg-[#1E1F22]";
                 
                 const statusBadge = vol.level >= 100 ? `<span class="text-[10px] sm:text-xs text-red-500 font-black mt-1 flex items-center gap-1 animate-pulse"><span class="material-symbols-rounded text-sm">warning</span>超噴火危険警報</span>` : vol.level >= 6 ? `<span class="text-[10px] sm:text-xs text-red-500 font-black mt-1 flex items-center gap-1"><span class="material-symbols-rounded text-sm">warning</span>破局噴火危険状態</span>` : `<div class="text-[10px] sm:text-xs text-green-600 dark:text-green-400 font-bold mt-1 flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>${vol.status || "監視中"}</div>`;
-                const audioBtn = vol.customAudio ? `<button onclick="playCustomAudio('${volIdStr}')" title="噴火音を再生" class="m3-btn flex items-center justify-center w-10 h-10 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm border border-emerald-200 dark:border-emerald-800/50"><span class="material-symbols-rounded text-[18px]">play_circle</span></button>` : '';
+                const audioBtn = vol.customAudio ? `<button onclick="event.stopPropagation(); playCustomAudio('${volIdStr}')" title="噴火音を再生" class="m3-btn flex items-center justify-center w-10 h-10 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm border border-emerald-200 dark:border-emerald-800/50"><span class="material-symbols-rounded text-[18px]">play_circle</span></button>` : '';
                 const emergencyClass = vol.level >= 100 ? 'ultra-emergency-card' : vol.level >= 4 ? 'emergency-card' : 'border-[#E1E2EC] dark:border-gray-800/60';
 
                 htmlParts.push(`<div data-id="${volIdStr}" onclick="openDetailModal('${volIdStr}')" ${customBg} class="card-container m3-card ${cardBaseClass} border ${emergencyClass} p-6 shadow-m3-elevation-1 hover:shadow-m3-elevation-3 transition-all duration-300 flex flex-col justify-between overflow-hidden relative cursor-pointer group animate-m3-fade-in">
                         <div>
-                            <div class="flex justify-between items-start mb-4">
-                                <div><h2 class="card-title text-2xl font-black ${vol.level >= 100 ? 'text-red-500 animate-pulse' : 'text-[#1C1B1F] dark:text-white group-hover:text-[var(--primary)]'} tracking-tight drop-shadow-sm transition-colors">${safeName}</h2>${statusBadge}</div>
-                                <div class="${tClass} text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-m3-full shadow-sm tracking-wide border border-black/5">⚠️ レベル ${vol.level || 1}</div>
-                            </div>
-                            <div class="card-visual m3-visual-box w-full rounded-m3-medium mb-5 relative overflow-hidden flex items-end justify-center shadow-inner bg-gray-100 dark:bg-gray-900 aspect-square">${getVolcanoArtHTML(vol, theme)}</div>
-                            <div class="card-tabs flex bg-[#E1E2EC]/60 dark:bg-gray-800/80 p-1.5 rounded-m3-full mb-4 backdrop-blur-sm" onclick="event.stopPropagation()"><button onclick="setTab('${volIdStr}', 0)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t0}">現在の状況</button><button onclick="setTab('${volIdStr}', 1)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t1}">活動履歴</button></div>
-                            <div class="card-content relative min-h-[110px]" onclick="event.stopPropagation()">
-                                ${currentTabs[volIdStr] === 0 ? `<div class="bg-gray-50/80 dark:bg-[#111318]/80 border border-gray-100 dark:border-gray-800 rounded-m3-medium p-4 text-sm text-[#44474E] dark:text-gray-300 leading-relaxed font-semibold backdrop-blur-sm whitespace-pre-wrap">${commentText}</div>` : `<div class="bg-gray-50/80 dark:bg-[#111318]/80 border border-gray-100 dark:border-gray-800 rounded-m3-medium p-3 text-xs text-[#44474E] dark:text-gray-300 max-h-[110px] overflow-y-auto font-medium backdrop-blur-sm"><ul class="space-y-2">${historyList}</ul></div>`}
+                            <div class="card-top-row">
+                                <div class="card-visual-wrap">
+                                    <div class="card-visual m3-visual-box w-full rounded-m3-large relative overflow-hidden flex items-end justify-center shadow-inner bg-gray-100 dark:bg-gray-900 aspect-square">${getVolcanoArtHTML(vol, theme)}</div>
+                                </div>
+                                <div class="card-info-wrap">
+                                    <div class="flex justify-between items-start mb-4 card-title-row">
+                                        <div><h2 class="card-title text-2xl font-black ${vol.level >= 100 ? 'text-red-500 animate-pulse' : 'text-[#1C1B1F] dark:text-white group-hover:text-[var(--primary)]'} tracking-tight drop-shadow-sm transition-colors">${safeName}</h2>${statusBadge}</div>
+                                        <div class="${tClass} text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-m3-full shadow-sm tracking-wide border border-black/5 shrink-0">⚠️ レベル ${vol.level || 1}</div>
+                                    </div>
+                                    <div class="card-tabs flex bg-[#E1E2EC]/60 dark:bg-gray-800/80 p-1.5 rounded-m3-full mb-4 backdrop-blur-sm" onclick="event.stopPropagation()"><button onclick="setTab('${volIdStr}', 0)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t0}">現在の状況</button><button onclick="setTab('${volIdStr}', 1)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t1}">活動履歴</button></div>
+                                    <div class="card-content relative min-h-[110px]" onclick="event.stopPropagation()">
+                                        <div class="tab-panel-status ${currentTabs[volIdStr] === 0 ? '' : 'hidden'} bg-gray-50/80 dark:bg-[#111318]/80 border border-gray-100 dark:border-gray-800 rounded-m3-medium p-4 text-sm text-[#44474E] dark:text-gray-300 leading-relaxed font-semibold backdrop-blur-sm whitespace-pre-wrap">${commentText}</div>
+                                        <div class="tab-panel-history ${currentTabs[volIdStr] === 1 ? '' : 'hidden'} bg-gray-50/80 dark:bg-[#111318]/80 border border-gray-100 dark:border-gray-800 rounded-m3-medium p-3 text-xs text-[#44474E] dark:text-gray-300 max-h-[110px] overflow-y-auto font-medium backdrop-blur-sm"><ul class="space-y-2">${historyList}</ul></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="card-footer mt-5 pt-3 border-t border-gray-100 dark:border-gray-800/60 flex flex-col gap-3 relative z-10" onclick="event.stopPropagation()">
                             <div class="flex justify-between items-center w-full">
-                                <div class="flex flex-col gap-0.5"><div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold flex items-center gap-1"><span class="material-symbols-rounded text-xs">gavel</span> 気象局発表</div><div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold drop-shadow-sm">⏳ ${safeTime}</div></div>
-                                <div class="flex gap-2">
+                                <div class="flex flex-col gap-0.5"><div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold drop-shadow-sm">⏳ ${safeTime}</div></div>
+                                <div class="card-footer-actions flex gap-2">
                                     ${audioBtn}
                                     <button onclick="copyVolcanoReport('${safeName}', ${vol.level}, '${safeComment}', '${safeTime}')" title="レポートコピー" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">content_copy</span></button>
                                     <button onclick="shareVolcano('${safeName}', ${vol.level})" title="SNS等に共有" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">share</span></button>
                                     <button onclick="playEmergencyBroadcastById('${volIdStr}')" title="AI読み上げ" class="readout-btn m3-btn flex items-center gap-1.5 bg-[#E1E2EC]/50 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2 rounded-m3-full text-[11px] font-black transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-[16px]">volume_up</span>読上</button>
                                 </div>
                             </div>
-                            ${vol.level >= 3 ? `<button onclick="openMap('${safeName}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-m3-full text-xs font-black flex justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-sm">map</span> 周辺の避難所マップを開く</button>` : ''}
+                            <div class="card-footer-map">${vol.level >= 3 ? `<button onclick="openMap('${safeName}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-m3-full text-xs font-black flex justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-sm">map</span> 周辺の避難所マップを開く</button>` : ''}</div>
                         </div>
                     </div>`);
             });
@@ -1760,7 +1985,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 isAdmin = true; isSecretAdmin = (val === "oa31");
                 if (passwordInput) passwordInput.value = "";
                 showToast("認証成功", "管理パネルが有効になりました", false);
-                document.getElementById("admin-panel").classList.remove("hidden"); document.getElementById("settings-admin-login").classList.add("hidden"); document.getElementById("settings-admin-status").classList.remove("hidden");
+                document.getElementById("admin-panel").classList.remove("hidden"); document.getElementById("settings-admin-login").classList.add("hidden"); document.getElementById("settings-admin-status").classList.remove("hidden"); document.getElementById("settings-admin-version-panel").classList.remove("hidden");
                 if (isSecretAdmin) {
                     document.getElementById("create-level-standard").classList.add("hidden"); document.getElementById("create-level-secret").classList.remove("hidden");
                     document.getElementById("update-level-standard").classList.add("hidden"); document.getElementById("update-level-secret").classList.remove("hidden");
@@ -1778,7 +2003,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
         function logoutAdmin() {
             isAdmin = false; isSecretAdmin = false; showToast("ログアウト", "閲覧モードに戻りました", false);
-            document.getElementById("admin-panel").classList.add("hidden"); document.getElementById("settings-admin-login").classList.remove("hidden"); document.getElementById("settings-admin-status").classList.add("hidden");
+            document.getElementById("admin-panel").classList.add("hidden"); document.getElementById("settings-admin-login").classList.remove("hidden"); document.getElementById("settings-admin-status").classList.add("hidden"); document.getElementById("settings-admin-version-panel").classList.add("hidden");
             renderUI();
         }
 
