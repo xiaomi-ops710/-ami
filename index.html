@@ -1445,23 +1445,44 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
         async function sendBackgroundPushNotification(title, bodyText) {
             if (typeof MY_GAS_URL === 'undefined' || !db) return;
-            try {
-                if (!db || !auth || !auth.currentUser) await connectFirebase(JSON.stringify(firebaseConfig)); if (!db) return;
-                const fetchPromise = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').get(); const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('トークン取得タイムアウト')), 15000));
-                const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
-                const tokens = []; snapshot.forEach(doc => { if (doc.data().token) tokens.push(doc.data().token); });
-                // 🚀 バグ修正: 通知が2重に届く問題への対策(送信直前の最終防御)。
-                // 万一同じトークンが複数ドキュメントに残っていても、送信先は1端末1回になるよう重複を排除する。
-                const uniqueTokens = [...new Set(tokens)];
-                
-                // GC Webhook が登録されていればGASにURLも送信して連携させる
-                const gchatUrl = document.getElementById("gchat-url-input") ? document.getElementById("gchat-url-input").value : "";
-                
-                if (uniqueTokens.length === 0 && !gchatUrl) { console.warn("送信スキップ 通知先が登録されていません"); return; }
-                showToast("送信中...", "プッシュリクエストを送信しています");
+            // 🚀 バグ修正: 「情報更新は成功するのに、通知が来たり来なかったりする」問題への対策。
+            // 原因は、通知先一覧の取得に時々失敗(タイムアウト等)した際、エラーがconsole.errorだけで
+            // 握りつぶされ、ユーザーには一切表示されずに送信自体がスキップされていたこと。
+            // ①失敗を必ずトーストで可視化 ②一時的な失敗は自動で1回リトライ、の2つで対応する。
+            const MAX_RETRIES = 2;
+            for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                try {
+                    if (!db || !auth || !auth.currentUser) await connectFirebase(JSON.stringify(firebaseConfig));
+                    if (!db) { showToast("通知エラー", "データベースに未接続のため通知を送信できませんでした", true); return; }
+                    // 🚀 常に最新の登録状況を反映させるため、キャッシュではなくサーバーから取得する
+                    const fetchPromise = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tokens').get({ source: 'server' });
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('トークン取得タイムアウト')), 15000));
+                    const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
+                    const tokens = []; snapshot.forEach(doc => { if (doc.data().token) tokens.push(doc.data().token); });
+                    // 🚀 バグ修正: 通知が2重に届く問題への対策(送信直前の最終防御)。
+                    // 万一同じトークンが複数ドキュメントに残っていても、送信先は1端末1回になるよう重複を排除する。
+                    const uniqueTokens = [...new Set(tokens)];
 
-                fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: uniqueTokens, gchatUrl: gchatUrl }) }).then(() => { showToast("送信完了", "プッシュ通知リクエストを送信しました！"); }).catch(err => { showToast("送信エラー", "GASへの通信に失敗: " + err.message, true); });
-            } catch(e) { console.error("バックグラウンド通知送信失敗", e); }
+                    // GC Webhook が登録されていればGASにURLも送信して連携させる
+                    const gchatUrl = document.getElementById("gchat-url-input") ? document.getElementById("gchat-url-input").value : "";
+
+                    if (uniqueTokens.length === 0 && !gchatUrl) { console.warn("送信スキップ 通知先が登録されていません"); showToast("通知スキップ", "通知先が1件も登録されていません", true); return; }
+                    showToast("送信中...", "プッシュリクエストを送信しています");
+
+                    await fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: uniqueTokens, gchatUrl: gchatUrl }) });
+                    showToast("送信完了", "プッシュ通知リクエストを送信しました！");
+                    return; // 成功したので終了
+                } catch (e) {
+                    console.error("バックグラウンド通知送信失敗", e);
+                    if (attempt < MAX_RETRIES) {
+                        console.warn(`通知送信リトライ中... (${attempt}/${MAX_RETRIES})`);
+                        await new Promise(r => setTimeout(r, 1500));
+                        continue;
+                    }
+                    // 🚀 ここが今まで欠けていた部分: 失敗を必ずユーザーに見えるようにする
+                    showToast("通知送信エラー", "通知の送信に失敗しました(" + (e.message || "不明なエラー") + ")。お手数ですが再度お試しください。", true);
+                }
+            }
         }
 
         async function testPushNotification() { showToast("テスト送信", "デモ通知を送信しています..."); await sendBackgroundPushNotification("🌋 テスト通知", "これはバックグラウンドPushのテストです。"); }
