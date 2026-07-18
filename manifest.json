@@ -1,26 +1,57 @@
-```json
 {
-  "name": "火山防災情報局",
-  "short_name": "火山モニター",
-  "start_url": "./index.html",
+  "background_color": "#1d1b20",
+  "dir": "ltr",
   "display": "standalone",
-  "background_color": "#111418",
-  "theme_color": "#ba1a1a",
-  "description": "仮想火山防災情報局 リアルタイムモニター",
+  "name": "火山防災情報局-REAL TIME MONITOR",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "火山防災情報局",
+  "start_url": "/index.html",
+  "theme_color": "#1D1B20",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
+      "src": "https://xiaomi-ops710.github.io/-ami/icon-192.png",
       "type": "image/png",
-      "purpose": "any maskable"
+      "sizes": "192x192",
+      "isSquare": true,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 192,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": true
+    }
+  ],
+  "id": "1",
+  "description": "リアルタイム火山防災情報モニターアプリ",
+  "lang": "ja",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
+  "shortcuts": [
+    {
+      "name": "通知履歴",
+      "url": "./index.html?tab=notifications",
+      "description": null
     },
     {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "name": "アプリの設定",
+      "url": "./index.html?tab=settings",
+      "description": null
     }
-  ]
+  ],
+  "categories": [
+    "weather"
+  ],
+  "share_target": {
+    "method": "GET",
+    "action": "/index.html",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
-
-```
