@@ -294,15 +294,67 @@
         <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v9.0 Ultimate Evolution</p>
     </div>
 
-    <!-- 🚀 新機能: アプリロック画面(デバイスの生体認証/画面ロックで解除) -->
+    <!-- 🚀 新機能: アプリロック画面(PINコードが基本、対応端末では生体認証もショートカットとして使える) -->
     <div id="app-lock-screen" class="hidden fixed inset-0 z-[99] bg-[#1D1B20] flex flex-col items-center justify-center text-white text-center px-8">
-        <span class="material-symbols-rounded text-6xl mb-6 text-[var(--primary)]">lock</span>
-        <h2 class="text-xl font-black mb-2">アプリはロックされています</h2>
-        <p class="text-xs text-gray-400 mb-8">端末の生体認証または画面ロックで解除してください</p>
-        <button onclick="attemptUnlockApp()" class="px-8 py-3.5 bg-[var(--primary)] hover:opacity-90 text-white text-sm font-black rounded-m3-full shadow-lg transition active:scale-95 flex items-center gap-2">
-            <span class="material-symbols-rounded">fingerprint</span> ロックを解除
-        </button>
-        <p id="app-lock-error-text" class="text-[11px] text-red-400 mt-4 hidden"></p>
+        <span class="material-symbols-rounded text-6xl mb-4 text-[var(--primary)]">lock</span>
+        <h2 class="text-xl font-black mb-1">アプリはロックされています</h2>
+        <p class="text-xs text-gray-400 mb-6">PINコードを入力して解除してください</p>
+        <div id="app-lock-pin-dots" class="flex gap-3 mb-6">
+            <span class="w-3.5 h-3.5 rounded-full border-2 border-gray-500"></span>
+            <span class="w-3.5 h-3.5 rounded-full border-2 border-gray-500"></span>
+            <span class="w-3.5 h-3.5 rounded-full border-2 border-gray-500"></span>
+            <span class="w-3.5 h-3.5 rounded-full border-2 border-gray-500"></span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 w-full max-w-[260px] mb-4">
+            <button onclick="appLockKeyPress('1')" class="app-lock-key">1</button>
+            <button onclick="appLockKeyPress('2')" class="app-lock-key">2</button>
+            <button onclick="appLockKeyPress('3')" class="app-lock-key">3</button>
+            <button onclick="appLockKeyPress('4')" class="app-lock-key">4</button>
+            <button onclick="appLockKeyPress('5')" class="app-lock-key">5</button>
+            <button onclick="appLockKeyPress('6')" class="app-lock-key">6</button>
+            <button onclick="appLockKeyPress('7')" class="app-lock-key">7</button>
+            <button onclick="appLockKeyPress('8')" class="app-lock-key">8</button>
+            <button onclick="appLockKeyPress('9')" class="app-lock-key">9</button>
+            <button id="app-lock-biometric-btn" onclick="attemptBiometricUnlock()" class="app-lock-key hidden"><span class="material-symbols-rounded">fingerprint</span></button>
+            <button onclick="appLockKeyPress('0')" class="app-lock-key">0</button>
+            <button onclick="appLockKeyPress('del')" class="app-lock-key"><span class="material-symbols-rounded">backspace</span></button>
+        </div>
+        <p id="app-lock-error-text" class="text-[11px] text-red-400 mt-2 hidden"></p>
+    </div>
+
+    <style>
+        .app-lock-key { padding: 1rem 0; font-size: 1.25rem; font-weight: 900; color: white; background: rgba(255,255,255,0.06); border-radius: 9999px; display:flex; align-items:center; justify-content:center; transition: background 0.15s; }
+        .app-lock-key:active { background: rgba(255,255,255,0.18); transform: scale(0.94); }
+    </style>
+
+    <!-- 🚀 アプリロックの初回設定(PIN登録)モーダル -->
+    <div id="app-lock-setup-modal" class="hidden fixed inset-0 z-[101] bg-black/70 flex items-center justify-center px-6">
+        <div class="bg-white dark:bg-[#1E1F22] rounded-m3-large p-6 w-full max-w-sm text-center shadow-2xl">
+            <span class="material-symbols-rounded text-4xl text-[var(--primary)] mb-2">lock</span>
+            <h3 id="app-lock-setup-title" class="text-base font-black dark:text-white mb-1">4桁のPINを設定してください</h3>
+            <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-4">次回からこのPINでアプリを解除します</p>
+            <div id="app-lock-setup-dots" class="flex justify-center gap-3 mb-5">
+                <span class="w-3.5 h-3.5 rounded-full border-2 border-gray-400"></span>
+                <span class="w-3.5 h-3.5 rounded-full border-2 border-gray-400"></span>
+                <span class="w-3.5 h-3.5 rounded-full border-2 border-gray-400"></span>
+                <span class="w-3.5 h-3.5 rounded-full border-2 border-gray-400"></span>
+            </div>
+            <div class="grid grid-cols-3 gap-3 w-full max-w-[240px] mx-auto mb-3">
+                <button onclick="appLockSetupKeyPress('1')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">1</button>
+                <button onclick="appLockSetupKeyPress('2')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">2</button>
+                <button onclick="appLockSetupKeyPress('3')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">3</button>
+                <button onclick="appLockSetupKeyPress('4')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">4</button>
+                <button onclick="appLockSetupKeyPress('5')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">5</button>
+                <button onclick="appLockSetupKeyPress('6')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">6</button>
+                <button onclick="appLockSetupKeyPress('7')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">7</button>
+                <button onclick="appLockSetupKeyPress('8')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">8</button>
+                <button onclick="appLockSetupKeyPress('9')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">9</button>
+                <div></div>
+                <button onclick="appLockSetupKeyPress('0')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800">0</button>
+                <button onclick="appLockSetupKeyPress('del')" class="app-lock-key !text-gray-900 dark:!text-white !bg-gray-100 dark:!bg-gray-800"><span class="material-symbols-rounded">backspace</span></button>
+            </div>
+            <button onclick="cancelAppLockSetup()" class="text-xs font-bold text-gray-500 dark:text-gray-400 mt-2">キャンセル</button>
+        </div>
     </div>
 
     <!-- 🚨 速報テロップ -->
@@ -489,7 +541,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <input type="number" id="update-level-secret" min="1" max="100" placeholder="レベル設定 (1〜100)" class="hidden w-full bg-[#310000] text-red-400 border border-red-900 rounded-m3-medium p-3.5 text-xs font-black focus:outline-none">
                         </div>
 
-                        <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
+                        <div class="bg-gray-50 dark:bg-[#111318] p-3.5 rounded-m3-large border border-gray-100 dark:border-gray-800 space-y-3 shadow-sm">
                             <label class="block text-[10px] font-black text-gray-400 uppercase">山のスタイル変更</label>
                             <div class="grid grid-cols-3 gap-2">
                                 <button onclick="setVisualType('update', 'animation')" id="vtype-update-animation" class="py-2 text-[10px] font-bold rounded-lg border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white border-gray-400">SVGアニメ</button>
@@ -501,7 +553,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         </div>
 
                         <!-- 🎤 噴火音声アップロード機能 -->
-                        <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
+                        <div class="bg-gray-50 dark:bg-[#111318] p-3.5 rounded-m3-large border border-gray-100 dark:border-gray-800 space-y-3 shadow-sm">
                             <label class="block text-[10px] font-black text-gray-400 uppercase flex items-center gap-1"><span class="material-symbols-rounded text-sm">mic</span> 噴火音・録音データ (オプション)</label>
                             <input type="file" id="update-audio-file" accept="audio/*, video/*, .m4a, .mp4, .wav, .mp3, .aac, .ogg, .caf" onchange="processCustomAudio('update', this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
                             <input type="hidden" id="update-audio-base64">
@@ -534,7 +586,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <input type="number" id="create-level-secret" min="1" max="100" placeholder="レベル設定 (1〜100)" class="hidden w-full bg-[#310000] text-red-400 border border-red-900 rounded-m3-medium p-3.5 text-xs font-black focus:outline-none">
                         </div>
 
-                        <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
+                        <div class="bg-gray-50 dark:bg-[#111318] p-3.5 rounded-m3-large border border-gray-100 dark:border-gray-800 space-y-3 shadow-sm">
                             <label class="block text-[10px] font-black text-gray-400">山のスタイル</label>
                             <div class="grid grid-cols-3 gap-2">
                                 <button type="button" onclick="setVisualType('create', 'animation')" id="vtype-create-animation" class="py-2 text-[10px] font-bold rounded-lg border bg-[#E1E2EC] dark:bg-gray-700 text-[#1C1B1F] dark:text-white border-gray-400">SVGアニメ</button>
@@ -545,7 +597,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <div id="vstyle-create-custom-box" class="hidden"><input type="file" id="create-visual-file" accept="image/*, image/gif" onchange="processCustomImage('create', this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[var(--primary)] file:text-white cursor-pointer"><input type="hidden" id="create-visual-base64"></div>
                         </div>
 
-                        <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
+                        <div class="bg-gray-50 dark:bg-[#111318] p-3.5 rounded-m3-large border border-gray-100 dark:border-gray-800 space-y-3 shadow-sm">
                             <label class="block text-[10px] font-black text-gray-400 uppercase flex items-center gap-1"><span class="material-symbols-rounded text-sm">mic</span> 噴火音・録音データ (オプション)</label>
                             <input type="file" id="create-audio-file" accept="audio/*, video/*, .m4a, .mp4, .wav, .mp3, .aac, .ogg, .caf" onchange="processCustomAudio('create', this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
                             <input type="hidden" id="create-audio-base64">
@@ -570,7 +622,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     
                     <!-- 🎨 カスタマイズタブ -->
                     <div id="admin-form-customize" class="space-y-4 hidden">
-                        <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
+                        <div class="bg-gray-50 dark:bg-[#111318] p-3.5 rounded-m3-large border border-gray-100 dark:border-gray-800 space-y-3 shadow-sm">
                             <label class="block text-[10px] font-black text-gray-400 uppercase">カードの長押し並び替え</label>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold dark:text-white">編集モード</span>
@@ -582,7 +634,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <p class="text-[9px] text-gray-500">※上部の並び替えメニューを「手動並び順」に設定してください</p>
                         </div>
                         
-                        <div class="bg-gray-50 dark:bg-[#111318] p-3 rounded-m3-medium border border-gray-100 dark:border-gray-800 space-y-3">
+                        <div class="bg-gray-50 dark:bg-[#111318] p-3.5 rounded-m3-large border border-gray-100 dark:border-gray-800 space-y-3 shadow-sm">
                             <label class="block text-[10px] font-black text-gray-400 uppercase">カード背景色カスタム</label>
                             <select id="customize-volcano-id" class="w-full bg-[#F3F4F9] dark:bg-[#111318] border border-gray-200 dark:border-gray-800 rounded-m3-small p-2 text-xs font-bold dark:text-white focus:outline-none"><option value="">-- 火山を選択 --</option></select>
                             <div class="flex items-center gap-2">
@@ -650,7 +702,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                 <div class="space-y-6 overflow-y-auto max-h-[75vh] pr-1 pb-10">
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">shield</span> 管理者モード</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">shield</span> 管理者モード</h4>
                         <div id="settings-admin-login" class="flex gap-2">
                             <input type="password" id="modal-admin-pass" placeholder="パスワード" class="flex-1 bg-white dark:bg-[#1E1F22] border rounded-m3-small px-3.5 py-2 text-xs font-bold dark:text-white dark:border-gray-800">
                             <button onclick="checkAdminPassword()" class="bg-[var(--primary)] hover:opacity-90 text-white text-xs font-black px-5 py-2 rounded-m3-full shadow-sm transition">認証</button>
@@ -668,7 +720,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                     <!-- 🎨 追加設定項目：便利アラーム設定 -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">brand_awareness</span> アラーム＆通知詳細設定</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase flex gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">brand_awareness</span> アラーム＆通知詳細設定</h4>
                         
                         <!-- 警報アラーム音の選択 -->
                         <div class="flex items-center justify-between">
@@ -712,7 +764,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                     <!-- 🚀 新機能: パフォーマンス優先モード -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">speed</span> パフォーマンス</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">speed</span> パフォーマンス</h4>
                         <div class="flex items-center justify-between">
                             <div>
                                 <span class="text-xs font-bold dark:text-white block">パフォーマンス優先モード</span>
@@ -740,22 +792,21 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                     <!-- 🚀 新機能: アプリロック(端末の生体認証/画面ロックで解除) -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">lock</span> セキュリティ</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">lock</span> セキュリティ</h4>
                         <div class="flex items-center justify-between">
                             <div>
                                 <span class="text-xs font-bold dark:text-white block">アプリロック</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">端末の生体認証・画面ロックで解除しないとアプリを開けなくします</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">4桁のPINコードでアプリを保護します(対応端末では生体認証もショートカットとして使えます)</span>
                             </div>
                             <label class="m3-switch shrink-0 ml-3">
                                 <input type="checkbox" id="app-lock-toggle" onchange="toggleAppLockSetting(this.checked)">
                                 <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
                             </label>
                         </div>
-                        <p id="app-lock-support-warning" class="hidden text-[10px] text-amber-600 dark:text-amber-400">この端末/ブラウザは生体認証・画面ロック機能に対応していないため、この機能は使用できません。</p>
                     </div>
 
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bg-icon" class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">wallpaper</span> 背景設定</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bg-icon" class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">wallpaper</span> 背景設定</h4>
                         <div class="flex gap-2 mb-3">
                             <button onclick="setBackgroundMode('color')" id="bg-mode-color" class="flex-1 py-2 text-[10px] font-bold rounded-m3-small border bg-[var(--primary-container)] text-[var(--on-primary-container)] transition shadow-sm">単色</button>
                             <button onclick="setBackgroundMode('image')" id="bg-mode-image" class="flex-1 py-2 text-[10px] font-bold rounded-m3-small border text-gray-500 dark:border-gray-800 hover:bg-gray-100/50 transition">画像</button>
@@ -803,7 +854,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </div>
 
                     <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1;">record_voice_over</span> 読み上げ音声の設定</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">record_voice_over</span> 読み上げ音声の設定</h4>
                         <div class="space-y-4 bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
                             <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>読み上げ速度</span><span id="rate-val">1.0x</span></div><input type="range" id="speech-rate" min="0.5" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full"></div>
                             <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>声の高さ（ピッチ）</span><span id="pitch-val">1.0</span></div><input type="range" id="speech-pitch" min="0.1" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full"></div>
@@ -1179,82 +1230,147 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             safeStorage.setItem("volcano_last_sync_time", d.toISOString());
         }
 
-        // 🚀 新機能: アプリロック(端末の生体認証/画面ロックでアプリの起動を保護する)
-        // サーバーを使わず、端末のWebAuthn(生体認証/画面ロックAPI)だけで完結させる。
+        // 🚀 新機能(作り直し): アプリロック。PINコードを本体の鍵とし、対応端末では
+        // 生体認証(WebAuthn)を「PIN入力を省略できるショートカット」として追加提供する。
+        // WebAuthnはiOS/Android/ブラウザによって挙動差が大きく単独では信頼できないため、
+        // 必ずPINで解除できることを保証した上で、生体認証は補助的に使う設計にした。
+        async function sha256Hex(text) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         function isWebAuthnPlatformSupported() {
             return !!(window.PublicKeyCredential && navigator.credentials);
         }
 
+        let appLockSetupBuffer = "";
+        let appLockSetupFirstPin = null;
+
         async function toggleAppLockSetting(isOn) {
             if (isOn) {
-                if (!isWebAuthnPlatformSupported()) {
-                    document.getElementById("app-lock-toggle").checked = false;
-                    document.getElementById("app-lock-support-warning").classList.remove("hidden");
-                    showToast("非対応", "この端末はアプリロック機能に対応していません", true);
-                    return;
-                }
-                try {
-                    showToast("登録中", "端末の生体認証・画面ロックを設定してください...");
-                    const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
-                    const userId = new Uint8Array(16); crypto.getRandomValues(userId);
-                    const credential = await navigator.credentials.create({
-                        publicKey: {
-                            challenge: challenge,
-                            rp: { name: "火山防災情報局" },
-                            user: { id: userId, name: "app-lock-user", displayName: "アプリロック" },
-                            pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
-                            authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
-                            timeout: 60000
-                        }
-                    });
-                    if (!credential) throw new Error("登録がキャンセルされました");
-                    const credentialIdB64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-                    safeStorage.setItem("volcano_app_lock_credential_id", credentialIdB64);
-                    safeStorage.setItem("volcano_app_lock_enabled", "true");
-                    showToast("設定完了", "アプリロックを有効にしました");
-                } catch (e) {
-                    console.error("アプリロック登録失敗", e);
-                    document.getElementById("app-lock-toggle").checked = false;
-                    showToast("設定失敗", "生体認証・画面ロックの登録に失敗しました: " + e.message, true);
-                }
+                appLockSetupBuffer = ""; appLockSetupFirstPin = null;
+                document.getElementById("app-lock-setup-title").innerText = "4桁のPINを設定してください";
+                updateAppLockSetupDots();
+                document.getElementById("app-lock-setup-modal").classList.remove("hidden");
             } else {
                 safeStorage.setItem("volcano_app_lock_enabled", "false");
                 showToast("設定完了", "アプリロックを無効にしました");
             }
         }
 
-        async function attemptUnlockApp() {
-            const errorText = document.getElementById("app-lock-error-text");
-            errorText.classList.add("hidden");
-            try {
-                const credentialIdB64 = safeStorage.getItem("volcano_app_lock_credential_id");
-                if (!credentialIdB64) { hideAppLockScreen(); return; } // 登録情報が無ければロックできないため解除扱い
-                const credentialId = Uint8Array.from(atob(credentialIdB64), c => c.charCodeAt(0));
-                const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
-                await navigator.credentials.get({
-                    publicKey: {
-                        challenge: challenge,
-                        allowCredentials: [{ id: credentialId, type: "public-key" }],
-                        userVerification: "required",
-                        timeout: 60000
+        function cancelAppLockSetup() {
+            document.getElementById("app-lock-setup-modal").classList.add("hidden");
+            document.getElementById("app-lock-toggle").checked = safeStorage.getItem("volcano_app_lock_enabled") === "true";
+        }
+
+        function updateAppLockSetupDots() {
+            const dots = document.querySelectorAll("#app-lock-setup-dots span");
+            dots.forEach((d, i) => { d.classList.toggle("bg-[var(--primary)]", i < appLockSetupBuffer.length); d.classList.toggle("border-[var(--primary)]", i < appLockSetupBuffer.length); });
+        }
+
+        async function appLockSetupKeyPress(key) {
+            if (key === 'del') { appLockSetupBuffer = appLockSetupBuffer.slice(0, -1); updateAppLockSetupDots(); return; }
+            if (appLockSetupBuffer.length >= 4) return;
+            appLockSetupBuffer += key; updateAppLockSetupDots();
+            if (appLockSetupBuffer.length === 4) {
+                if (appLockSetupFirstPin === null) {
+                    // 1回目の入力 → 確認のためもう一度入力させる
+                    appLockSetupFirstPin = appLockSetupBuffer;
+                    appLockSetupBuffer = "";
+                    document.getElementById("app-lock-setup-title").innerText = "もう一度同じPINを入力してください";
+                    setTimeout(updateAppLockSetupDots, 150);
+                } else {
+                    if (appLockSetupBuffer === appLockSetupFirstPin) {
+                        const hash = await sha256Hex(appLockSetupFirstPin);
+                        safeStorage.setItem("volcano_app_lock_pin_hash", hash);
+                        safeStorage.setItem("volcano_app_lock_enabled", "true");
+                        document.getElementById("app-lock-setup-modal").classList.add("hidden");
+                        showToast("設定完了", "アプリロックを有効にしました(PINコード)");
+                        // 対応端末なら、生体認証ショートカットの登録も追加で提案する
+                        if (isWebAuthnPlatformSupported()) { setTimeout(offerBiometricShortcutSetup, 500); }
+                    } else {
+                        showToast("不一致", "PINが一致しませんでした。もう一度設定してください", true);
+                        appLockSetupBuffer = ""; appLockSetupFirstPin = null;
+                        document.getElementById("app-lock-setup-title").innerText = "4桁のPINを設定してください";
+                        setTimeout(updateAppLockSetupDots, 150);
                     }
-                });
-                hideAppLockScreen();
-            } catch (e) {
-                console.error("アプリロック解除失敗", e);
-                errorText.innerText = "認証に失敗しました。もう一度お試しください。";
-                errorText.classList.remove("hidden");
+                }
             }
         }
 
-        function hideAppLockScreen() { const el = document.getElementById("app-lock-screen"); if (el) el.classList.add("hidden"); }
+        async function offerBiometricShortcutSetup() {
+            try {
+                const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+                const userId = new Uint8Array(16); crypto.getRandomValues(userId);
+                const credential = await navigator.credentials.create({
+                    publicKey: {
+                        challenge: challenge,
+                        rp: { name: "火山防災情報局" },
+                        user: { id: userId, name: "app-lock-user", displayName: "アプリロック" },
+                        pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
+                        authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
+                        timeout: 60000
+                    }
+                });
+                if (credential) {
+                    const credentialIdB64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+                    safeStorage.setItem("volcano_app_lock_credential_id", credentialIdB64);
+                    showToast("登録完了", "生体認証でも解除できるようになりました(PINは引き続き使えます)");
+                }
+            } catch (e) { console.warn("生体認証ショートカットの登録はスキップされました", e); }
+        }
+
+        let appLockUnlockBuffer = "";
+        function updateAppLockDots() {
+            const dots = document.querySelectorAll("#app-lock-pin-dots span");
+            dots.forEach((d, i) => { d.classList.toggle("bg-[var(--primary)]", i < appLockUnlockBuffer.length); d.classList.toggle("border-[var(--primary)]", i < appLockUnlockBuffer.length); });
+        }
+
+        async function appLockKeyPress(key) {
+            const errorText = document.getElementById("app-lock-error-text"); errorText.classList.add("hidden");
+            if (key === 'del') { appLockUnlockBuffer = appLockUnlockBuffer.slice(0, -1); updateAppLockDots(); return; }
+            if (appLockUnlockBuffer.length >= 4) return;
+            appLockUnlockBuffer += key; updateAppLockDots();
+            if (appLockUnlockBuffer.length === 4) {
+                const inputHash = await sha256Hex(appLockUnlockBuffer);
+                const savedHash = safeStorage.getItem("volcano_app_lock_pin_hash");
+                if (inputHash === savedHash) { hideAppLockScreen(); }
+                else {
+                    errorText.innerText = "PINが違います。もう一度入力してください。"; errorText.classList.remove("hidden");
+                    appLockUnlockBuffer = ""; setTimeout(updateAppLockDots, 150);
+                }
+            }
+        }
+
+        async function attemptBiometricUnlock() {
+            const errorText = document.getElementById("app-lock-error-text"); errorText.classList.add("hidden");
+            try {
+                const credentialIdB64 = safeStorage.getItem("volcano_app_lock_credential_id");
+                if (!credentialIdB64) return;
+                const credentialId = Uint8Array.from(atob(credentialIdB64), c => c.charCodeAt(0));
+                const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+                await navigator.credentials.get({
+                    publicKey: { challenge: challenge, allowCredentials: [{ id: credentialId, type: "public-key" }], userVerification: "required", timeout: 60000 }
+                });
+                hideAppLockScreen();
+            } catch (e) {
+                console.warn("生体認証での解除に失敗、PINで解除してください", e);
+                errorText.innerText = "生体認証に失敗しました。PINで解除してください。"; errorText.classList.remove("hidden");
+            }
+        }
+
+        function hideAppLockScreen() { const el = document.getElementById("app-lock-screen"); if (el) el.classList.add("hidden"); appLockUnlockBuffer = ""; updateAppLockDots(); }
 
         // 🚀 起動時、アプリロックが有効なら即座にロック画面を表示する
         function checkAppLockOnStartup() {
             const enabled = safeStorage.getItem("volcano_app_lock_enabled") === "true";
-            document.getElementById("app-lock-toggle").checked = enabled;
-            if (!isWebAuthnPlatformSupported()) { document.getElementById("app-lock-support-warning").classList.remove("hidden"); }
-            if (enabled) { document.getElementById("app-lock-screen").classList.remove("hidden"); }
+            const hasPin = !!safeStorage.getItem("volcano_app_lock_pin_hash");
+            const toggle = document.getElementById("app-lock-toggle"); if (toggle) toggle.checked = enabled && hasPin;
+            if (enabled && hasPin) {
+                document.getElementById("app-lock-screen").classList.remove("hidden");
+                const bioBtn = document.getElementById("app-lock-biometric-btn");
+                if (safeStorage.getItem("volcano_app_lock_credential_id") && bioBtn) { bioBtn.classList.remove("hidden"); }
+            }
         }
 
         function updateAlarmSound(value) {
@@ -1881,11 +1997,13 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         <div class="card-footer mt-5 pt-3 border-t border-gray-100 dark:border-gray-800/60 flex flex-col gap-3 relative z-10" onclick="event.stopPropagation()">
                             <div class="flex justify-between items-center w-full">
                                 <div class="flex flex-col gap-0.5"><div class="text-[10px] text-[#757780] dark:text-gray-400 font-bold drop-shadow-sm">⏳ ${safeTime}</div></div>
-                                <div class="card-footer-actions flex gap-2">
+                                <div class="flex gap-2">
                                     ${audioBtn}
-                                    <button onclick="copyVolcanoReport('${safeName}', ${vol.level}, '${safeComment}', '${safeTime}')" title="レポートコピー" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">content_copy</span></button>
-                                    <button onclick="shareVolcano('${safeName}', ${vol.level})" title="SNS等に共有" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">share</span></button>
-                                    <button onclick="playEmergencyBroadcastById('${volIdStr}')" title="AI読み上げ" class="readout-btn m3-btn flex items-center gap-1.5 bg-[#E1E2EC]/50 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2 rounded-m3-full text-[11px] font-black transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-[16px]">volume_up</span>読上</button>
+                                    <div class="card-footer-actions flex gap-2">
+                                        <button onclick="copyVolcanoReport('${safeName}', ${vol.level}, '${safeComment}', '${safeTime}')" title="レポートコピー" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">content_copy</span></button>
+                                        <button onclick="shareVolcano('${safeName}', ${vol.level})" title="SNS等に共有" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">share</span></button>
+                                        <button onclick="playEmergencyBroadcastById('${volIdStr}')" title="AI読み上げ" class="readout-btn m3-btn flex items-center gap-1.5 bg-[#E1E2EC]/50 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2 rounded-m3-full text-[11px] font-black transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-[16px]">volume_up</span>読上</button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-footer-map">${vol.level >= 3 ? `<button onclick="openMap('${safeName}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-m3-full text-xs font-black flex justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-sm">map</span> 周辺の避難所マップを開く</button>` : ''}</div>
@@ -2124,6 +2242,22 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     }
                 }; reader.readAsDataURL(file);
             }
+        }
+
+        // 🚀 バグ修正: 音声ファイルを選択しても実際には何も処理されていなかった問題への対応。
+        // この関数自体がこれまで存在しておらず、選択してもBase64への変換が一度も行われていなかった。
+        function processCustomAudio(mode, input) {
+            if (!(input.files && input.files[0])) return;
+            const file = input.files[0];
+            // Firestoreの1ドキュメントは1MB制限のため、音声データも安全な範囲に収める
+            if (file.size > 900000) { showToast("エラー", "音声ファイルが大きすぎます(900KB以下推奨)。短く録音するか圧縮してください。", true); input.value = ""; return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById(`${mode}-audio-base64`).value = e.target.result;
+                showToast("音声処理完了", "噴火音声を適用準備しました。「情報を更新」または「登録」を押すと保存されます。");
+            };
+            reader.onerror = function() { showToast("エラー", "音声ファイルの読み込みに失敗しました。", true); };
+            reader.readAsDataURL(file);
         }
 
         function getLevelTheme(level) {
