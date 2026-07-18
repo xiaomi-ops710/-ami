@@ -56,16 +56,23 @@ self.addEventListener('fetch', (event) => {
 
 // プッシュ通知受信時
 self.addEventListener('push', (event) => {
-  let data = {};
+  let payload = {};
   try {
-    data = event.data ? event.data.json() : {};
+    payload = event.data ? event.data.json() : {};
   } catch (e) {
-    data = { title: '火山防災情報局', body: event.data ? event.data.text() : '新着情報があります' };
+    payload = { title: '火山防災情報局', body: event.data ? event.data.text() : '新着情報があります' };
   }
 
-  const title = data.title || '火山防災情報局';
+  // 🚀 バグ修正: 通知内容が固定文言になる問題への対策。
+  // FCMのペイロードは送信方法によって形が異なる(以下のいずれかで届く):
+  //  ①{ notification: { title, body }, data: {...} }  ← 通知メッセージ形式
+  //  ②{ data: { title, body, ... } }                   ← データメッセージ形式
+  //  ③{ title, body }                                  ← トップレベル直書き
+  // すべてのパターンに対応できるよう、優先順位をつけて実際の値を探す。
+  const src = payload.notification || payload.data || payload;
+  const title = src.title || payload.title || '火山防災情報局';
   const options = {
-    body: data.body || '新着の火山情報があります。',
+    body: src.body || payload.body || '新着の火山情報があります。',
     // 大アイコンは非表示（iconフィールドを指定しない）
     // ステータスバーに表示される小アイコン（★白一色・透過背景のPNGを用意すること）
     badge: '/-ami/notification-badge.png'
