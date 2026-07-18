@@ -299,9 +299,9 @@ v3.2: カスタム画像、PWA移行、Material 3 Expressive移行
 v3.1: 起動アニメーション、カード色変更（一時搭載）
 v3.0: 接続エラー表示、効果音、一括読み上げ、アクセントカラー
 v2.0: データベースFirebase自動同期、活動履歴、GithubPages公開
-v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
+v1.0: S氏の噴火アプリに感銘を受け開発開始
 
-作成協力：Google Gemini 3.1 PRO・鈴木麟汰様</div></div>
+作成協力：Anthropic Claude Sonnet 5・Google Gemini 3.1 PRO</div></div>
             </div>
             <div class="p-4 border-t border-gray-100 dark:border-gray-800 shrink-0 text-center"><button onclick="closeHistoryModal()" class="px-8 py-2.5 bg-[var(--primary-container)] hover:opacity-90 text-[var(--on-primary-container)] dark:text-white font-black rounded-m3-full text-sm transition-all shadow-sm">閉じる</button></div>
         </div>
@@ -530,22 +530,22 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <option value="id_desc">登録日時 (新しい順)</option>
                             <option value="level_desc">警戒レベル (高い順)</option>
                             <option value="name">五十音順</option>
-                            <option value="manual">手動並び順</option>
+                            <option value="manual">手動並び順（管理者モードのカスタマイズ設定から変更します）</option>
                         </select>
                     </div>
                     
                     <div class="flex gap-2">
                         <button onclick="readAllHighLevelAlerts()" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-red-200 dark:border-red-900/60 cursor-pointer active:scale-95">
                             <span class="material-symbols-rounded text-[16px]">campaign</span>
-                            <span class="hidden sm:inline">重大警報を一括読上</span>
+                            <span class="hidden sm:inline">自動読み上げ</span>
                         </button>
                         <button onclick="stopAllSpeechAndAlarms()" id="mute-panel-btn" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-950/60 text-red-800 dark:text-red-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-red-300 dark:border-red-900/60 cursor-pointer active:scale-95" title="全ての読み上げ・アラームを強制停止">
                             <span class="material-symbols-rounded text-[16px]">volume_off</span>
-                            <span class="hidden sm:inline">緊急停止</span>
+                            <span class="hidden sm:inline">停止</span>
                         </button>
                         <button onclick="toggleFullScreen()" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#2A2B2E] dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer active:scale-95">
                             <span class="material-symbols-rounded text-[16px]" id="fullscreen-icon">fullscreen</span>
-                            <span id="fullscreen-text" class="hidden sm:inline">全画面モード</span>
+                            <span id="fullscreen-text" class="hidden sm:inline">全画面</span>
                         </button>
                     </div>
                 </div>
@@ -636,8 +636,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded text-sm w-6 h-6 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px;">speed</span> パフォーマンス</h4>
                         <div class="flex items-center justify-between">
                             <div>
-                                <span class="text-xs font-bold dark:text-white block">パフォーマンス優先モード</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">端末が重い場合、ぼかし効果や演出を画面幅に関係なく常に軽量化します</span>
+                                <span class="text-xs font-bold dark:text-white block">パフォーマンスモード</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">デバイスの動作が重い場合、グラフィックを下げアプリを軽量化します</span>
                             </div>
                             <label class="m3-switch shrink-0 ml-3">
                                 <input type="checkbox" id="perf-mode-toggle" onchange="togglePerfMode(this.checked)">
@@ -740,7 +740,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                     <!-- 📜 更新履歴ボタン -->
                     <button onclick="openHistoryModal()" class="w-full py-4 bg-gray-50 hover:bg-gray-100 dark:bg-[#111318] dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-m3-large flex justify-center items-center gap-2 transition-colors border border-gray-200 dark:border-gray-800 shadow-sm cursor-pointer mt-4 active:scale-95">
-                        <span class="material-symbols-rounded text-lg text-[var(--primary)]">history</span> アップデート履歴を見る
+                        <span class="material-symbols-rounded text-lg text-[var(--primary)]">history</span> アップデート履歴
                     </button>
 
                     <!-- 🔔 バックグラウンド Push 通信の設定パネル -->
@@ -761,10 +761,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <span class="material-symbols-rounded text-[18px]">volume_up</span> <span id="notification-status-text">ブラウザ通知を許可して登録</span>
                         </button>
                         <button onclick="testPushNotification()" class="w-full mt-2.5 py-3.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors shadow-sm cursor-pointer active:scale-95">
-                            <span class="material-symbols-rounded text-[18px]">send</span> 配信テスト (デバイス & GChat)
+                            <span class="material-symbols-rounded text-[18px]">send</span> 通知配信テスト
                         </button>
                         <button onclick="window.location.reload(true)" class="w-full mt-2.5 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors cursor-pointer active:scale-95 shadow-sm">
-                            <span class="material-symbols-rounded text-[16px]">refresh</span> アプリを再起動 (同期をリセット)
+                            <span class="material-symbols-rounded text-[16px]">refresh</span> アプリのアップデートを適用
                         </button>
                         <button onclick="clearLocalCache()" class="w-full mt-2.5 py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-m3-full flex justify-center gap-2 transition-colors border border-red-200 dark:border-red-900/50 cursor-pointer active:scale-95">
                             <span class="material-symbols-rounded text-[16px]">delete</span> 古いキャッシュを強制削除
