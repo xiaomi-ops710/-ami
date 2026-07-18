@@ -61,11 +61,20 @@
     "social"
   ],
   "prefer_related_applications": false,
-  "related_applications": [],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.ohamigo.volcanomonitor",
+      "id": "com.ohamigo.volcanomonitor"
+    }
+  ],
   "iarc_rating_id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
   "scope_extensions": [
     {
       "origin": "https://xiaomi-ops710.github.io"
+    },
+    {
+      "origin": "https://*.github.io"
     }
   ],
   "screenshots": [
