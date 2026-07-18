@@ -21,6 +21,19 @@
       "is512x512": false,
       "is256x256": false,
       "is192x192": true
+    },
+    {
+      "src": "https://xiaomi-ops710.github.io/-ami/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "isSquare": true,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 512,
+      "is512x512": true,
+      "is256x256": false,
+      "is192x192": false
     }
   ],
   "id": "1",
@@ -41,17 +54,5 @@
       "url": "./index.html?tab=settings",
       "description": null
     }
-  ],
-  "categories": [
-    "weather"
-  ],
-  "share_target": {
-    "method": "GET",
-    "action": "/index.html",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  }
+  ]
 }
