@@ -286,7 +286,7 @@
                 gap: 0.85rem;
             }
             .card-visual-wrap {
-                width: 92px;
+                width: 128px;
                 flex-shrink: 0;
             }
             .card-visual-wrap .card-visual {
@@ -304,10 +304,10 @@
                 flex-direction: column !important;
                 align-items: stretch !important;
                 gap: 0.5rem;
-                margin-bottom: 0.75rem !important;
+                margin-bottom: 0.6rem !important;
             }
             .card-title-row h2 {
-                font-size: 1.05rem !important;
+                font-size: 1.35rem !important;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -325,6 +325,13 @@
                 display: none !important;
             }
             .card-content { min-height: 0 !important; }
+            /* 🚀 画像・山名を拡大した分、状況テキストは3行までに制限してカード全体の高さを維持する */
+            .tab-panel-status {
+                display: -webkit-box !important;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
             .m3-card.p-6 {
                 padding: 1.1rem !important;
             }
@@ -645,10 +652,15 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         </header>
 
         <!-- 🚀 新機能: アップデート通知バナー -->
-        <!-- 🚀 新機能: 火山名での検索 -->
-        <div class="relative mb-5">
-            <span class="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">search</span>
-            <input type="text" id="volcano-search-input" oninput="renderUI()" placeholder="火山名で検索..." class="w-full bg-white/90 dark:bg-[#1E1F22]/90 backdrop-blur-md border border-gray-200 dark:border-gray-800 rounded-m3-full pl-11 pr-4 py-3 text-sm font-bold dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all">
+        <!-- 🚀 新機能: 火山名での検索(コンパクトなトグルボタン方式) -->
+        <div class="mb-5">
+            <button onclick="toggleSearchBox()" id="search-toggle-btn" class="flex items-center gap-1.5 px-4 py-2 bg-white/90 dark:bg-[#1E1F22]/90 backdrop-blur-md border border-gray-200 dark:border-gray-800 rounded-m3-full text-xs font-bold dark:text-white shadow-sm transition-all hover:shadow-md active:scale-95">
+                <span class="material-symbols-rounded text-[16px]">search</span> 検索
+            </button>
+            <div id="search-box-wrap" class="hidden relative mt-2">
+                <span class="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">search</span>
+                <input type="text" id="volcano-search-input" oninput="renderUI()" placeholder="火山名で検索..." class="w-full bg-white/90 dark:bg-[#1E1F22]/90 backdrop-blur-md border border-gray-200 dark:border-gray-800 rounded-m3-full pl-11 pr-4 py-3 text-sm font-bold dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all">
+            </div>
         </div>
         <div id="update-available-banner" class="hidden mb-5 p-4 rounded-m3-large bg-[var(--primary-container)] text-[var(--on-primary-container)] shadow-m3-elevation-2 flex items-center justify-between gap-3 flex-wrap">
             <div class="flex items-center gap-2">
@@ -825,10 +837,6 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <span class="material-symbols-rounded text-[16px]">volume_off</span>
                             <span class="hidden sm:inline">緊急停止</span>
                         </button>
-                        <button onclick="toggleFullScreen()" class="m3-btn flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#2A2B2E] dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-bold transition shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer active:scale-95">
-                            <span class="material-symbols-rounded text-[16px]" id="fullscreen-icon">fullscreen</span>
-                            <span id="fullscreen-text" class="hidden sm:inline">全画面モード</span>
-                        </button>
                     </div>
                 </div>
 
@@ -973,6 +981,27 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     <button onclick="openHandbookModal()" class="w-full py-4 bg-gray-50 hover:bg-gray-100 dark:bg-[#111318] dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-m3-large flex justify-center items-center gap-2 transition-colors border border-gray-200 dark:border-gray-800 shadow-sm cursor-pointer active:scale-95">
                         <span class="material-symbols-rounded text-lg text-[var(--primary)]">menu_book</span> 防災ハンドブック(レベル別の行動指針)
                     </button>
+
+                    <!-- 🚀 新機能: 通知(トースト)の表示設定 -->
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">notifications</span> アプリ内通知</h4>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold dark:text-white">効果音(UI操作音)</span>
+                            <label class="m3-switch shrink-0 ml-3">
+                                <input type="checkbox" id="ui-sound-toggle" onchange="toggleUiSound(this.checked)">
+                                <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <span class="text-xs font-bold dark:text-white">通知の表示時間</span>
+                            <select id="toast-duration-select" onchange="updateToastDuration(this.value)" class="bg-transparent text-xs font-bold text-gray-800 dark:text-gray-200 focus:outline-none appearance-none cursor-pointer">
+                                <option value="3000">3秒</option>
+                                <option value="4500">4.5秒</option>
+                                <option value="6000">6秒</option>
+                                <option value="8000">8秒</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <!-- 🚀 新機能: アプリロック(端末の生体認証/画面ロックで解除) -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
@@ -1120,7 +1149,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
     <!-- トースト -->
     <!-- 🚀 M3E: 通知バー風のトースト(iOSの通知バナーのようにスプリング(弾む)アニメーションで表示) -->
-    <div id="in-app-toast" class="ios-toast-hidden fixed top-4 left-1/2 -translate-x-1/2 max-w-md w-[92vw] sm:w-full bg-white/95 dark:bg-[#1E1F22]/95 backdrop-blur-xl text-[#1C1B1F] dark:text-white p-4 rounded-[28px] shadow-m3-elevation-3 z-[9999] pointer-events-none flex items-center gap-3.5 border border-gray-100 dark:border-gray-800">
+    <div id="in-app-toast" class="ios-toast-hidden fixed top-4 left-1/2 -translate-x-1/2 max-w-md w-[92vw] sm:w-full bg-white/85 dark:bg-[#1E1F22]/85 backdrop-blur-xl text-[#1C1B1F] dark:text-white p-4 rounded-[28px] shadow-m3-elevation-3 z-[9999] pointer-events-none flex items-center gap-3.5 border border-gray-100 dark:border-gray-800">
         <div id="toast-icon-wrap" class="bg-[var(--primary-container)] text-[var(--on-primary-container)] p-2.5 rounded-full shrink-0 shadow-inner flex items-center justify-center w-11 h-11"><span class="material-symbols-rounded text-xl" id="toast-icon">notifications</span></div>
         <div class="flex-1 min-w-0">
             <h5 class="font-black text-[13px] tracking-tight" id="toast-title">通知</h5>
@@ -1197,6 +1226,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // =======================
         // 🕒 基本ユーティリティ
         // =======================
+        // 🚀 新機能: トースト表示時間の設定(既定4.5秒)
+        let toastDisplayDuration = 4500;
         function showToast(t, m, u=false, icon=null) {
             const o = document.getElementById("in-app-toast");
             if(document.getElementById("toast-title")) document.getElementById("toast-title").innerText = t; 
@@ -1222,7 +1253,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     o.classList.remove("ios-toast-show");
                     o.classList.add("ios-toast-exit");
                     setTimeout(() => { o.classList.remove("ios-toast-exit"); o.classList.add("ios-toast-hidden"); }, 320);
-                }, 4500);
+                }, toastDisplayDuration);
             }
         }
 
@@ -1327,7 +1358,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // =======================
         // 🕒 音声・アラートユーティリティ
         // =======================
+        // 🚀 新機能: 効果音マスタースイッチ
+        let uiSoundEnabled = true;
         function playPingSound() {
+            if (!uiSoundEnabled) return;
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator(); const gain = ctx.createGain();
@@ -1380,6 +1414,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 document.getElementById("auto-sync-interval-select").value = savedAutoSyncInterval; updateAutoSyncInterval(savedAutoSyncInterval);
                 const lastSyncSaved = safeStorage.getItem("volcano_last_sync_time"); if (lastSyncSaved) updateLastSyncDisplay(lastSyncSaved);
                 restoreSilentTimeSettingUI();
+                uiSoundEnabled = safeStorage.getItem("volcano_ui_sound_enabled") !== "false";
+                document.getElementById("ui-sound-toggle").checked = uiSoundEnabled;
+                toastDisplayDuration = Number(safeStorage.getItem("volcano_toast_duration") || 4500);
+                document.getElementById("toast-duration-select").value = String(toastDisplayDuration);
             } catch(e){}
 
             try {
@@ -1599,19 +1637,17 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             } catch (e) { showToast("エラー", "バックアップの作成に失敗しました: " + e.message, true); }
         }
 
-        // 🚀 新機能: 現在地から避難所までの経路をGoogleマップで表示
-        function openMapWithDirections(volcanoName) {
-            if (!navigator.geolocation) { openMap(volcanoName); return; }
-            showToast("現在地取得中...", "現在地から避難所までの経路を計算しています");
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const { latitude, longitude } = pos.coords;
-                    const url = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${encodeURIComponent(volcanoName + ' 避難所')}`;
-                    window.open(url, '_blank');
-                },
-                (err) => { console.warn("現在地取得失敗、通常検索にフォールバック", err); openMap(volcanoName); },
-                { timeout: 8000 }
-            );
+        // 🚀 新機能: UI効果音のオン/オフ設定
+        function toggleUiSound(checked) {
+            uiSoundEnabled = checked;
+            safeStorage.setItem("volcano_ui_sound_enabled", checked ? "true" : "false");
+            if (checked) playPingSound();
+        }
+        // 🚀 新機能: トースト表示時間の設定
+        function updateToastDuration(value) {
+            toastDisplayDuration = Number(value);
+            safeStorage.setItem("volcano_toast_duration", value);
+            showToast("設定完了", `通知の表示時間を${Number(value)/1000}秒に変更しました`, false, "timer");
         }
 
         function updateAlarmSound(value) {
@@ -2078,7 +2114,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             let actionHtml = `<button onclick="playEmergencyBroadcastById('${vol.id}')" class="readout-btn m3-btn w-full py-3 bg-[var(--primary-container)] hover:opacity-90 dark:bg-gray-800 dark:hover:bg-gray-700 text-[var(--on-primary-container)] dark:text-white rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">volume_up</span>読上</button>`;
             actionHtml += `<button onclick="copyVolcanoReport('${safeNameForBtn}', ${vol.level}, '${safeCommentForBtn}', '${safeTimeForBtn}')" class="m3-btn w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">content_copy</span>コピー</button>`;
             actionHtml += `<button onclick="shareVolcano('${safeNameForBtn}', ${vol.level})" class="m3-btn w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">share</span>共有</button>`;
-            if (vol.level >= 3) { actionHtml += `<button onclick="openMapWithDirections('${(vol.name || "名称未設定").replace(/'/g, "\\'")}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-red-200 dark:border-red-800/50 flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">map</span>避難所</button>`; }
+            if (vol.level >= 3) { actionHtml += `<button onclick="openMap('${(vol.name || "名称未設定").replace(/'/g, "\\'")}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-red-200 dark:border-red-800/50 flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">map</span>避難所</button>`; }
             if (vol.customAudio) { actionHtml += `<button onclick="playCustomAudio('${vol.id}')" class="m3-btn w-full py-3 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-emerald-200 dark:border-emerald-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 col-span-2 mt-2"><span class="material-symbols-rounded text-xl">play_circle</span>噴火音声を再生</button>`; } 
             else { actionHtml += `<button onclick="window.open('https://www.jma.go.jp/bosai/map.html#contents=volcano', '_blank')" class="m3-btn w-full py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-blue-200 dark:border-blue-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 col-span-2 mt-2"><span class="material-symbols-rounded text-xl">public</span>気象庁 火山マップを開く</button>`; }
             actionContainer.innerHTML = actionHtml;
@@ -2227,6 +2263,20 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             renderUI();
         }
 
+        // 🚀 検索ボックスの開閉トグル
+        function toggleSearchBox() {
+            const wrap = document.getElementById("search-box-wrap");
+            const isHidden = wrap.classList.contains("hidden");
+            if (isHidden) {
+                wrap.classList.remove("hidden");
+                setTimeout(() => document.getElementById("volcano-search-input").focus(), 50);
+            } else {
+                document.getElementById("volcano-search-input").value = "";
+                wrap.classList.add("hidden");
+                renderUI();
+            }
+        }
+
         function getSortedData() {
             let sorted = [...volcanoData].filter(v => Number(v.level || 1) >= minLevelFilter);
             // 🚀 新機能: 火山名での検索フィルタ
@@ -2310,7 +2360,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer-map">${vol.level >= 3 ? `<button onclick="openMapWithDirections('${safeName}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-m3-full text-xs font-black flex justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-sm">map</span> 周辺の避難所マップを開く</button>` : ''}</div>
+                            <div class="card-footer-map">${vol.level >= 3 ? `<button onclick="openMap('${safeName}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-m3-full text-xs font-black flex justify-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-sm">map</span> 周辺の避難所マップを開く</button>` : ''}</div>
                         </div>
                     </div>`);
             });
