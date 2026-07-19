@@ -142,6 +142,34 @@
         .splash-erupt-5 { animation: erupt-particle-5 1.3s infinite ease-out 0.8s; }
         .splash-crater-glow { animation: crater-glow-pulse 1.2s infinite ease-in-out; }
         .splash-flash { animation: splash-flash-pulse 2.4s infinite ease-in-out; }
+
+        /* 🚀 iOS風トースト通知アニメーション */
+        /* 隠れている時: 画面上部のさらに外側で少し縮んで待機(iOSの通知バナーと同じ準備状態) */
+        .ios-toast-hidden {
+            opacity: 0;
+            transform: translate(-50%, -130%) scale(0.92);
+            pointer-events: none;
+        }
+        /* 登場: iOSのようにキュッと弾みながら定位置に収まる(スプリングイージング) */
+        @keyframes ios-toast-in {
+            0% { opacity: 0; transform: translate(-50%, -130%) scale(0.92); }
+            55% { opacity: 1; transform: translate(-50%, 6%) scale(1.015); }
+            75% { transform: translate(-50%, -2%) scale(0.995); }
+            100% { opacity: 1; transform: translate(-50%, 0%) scale(1); }
+        }
+        .ios-toast-show {
+            animation: ios-toast-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            pointer-events: auto;
+        }
+        /* 退場: iOSのように素早く上へスッと吸い込まれて消える */
+        @keyframes ios-toast-out {
+            0% { opacity: 1; transform: translate(-50%, 0%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -110%) scale(0.94); }
+        }
+        .ios-toast-exit {
+            animation: ios-toast-out 0.32s cubic-bezier(0.4, 0, 1, 1) forwards;
+            pointer-events: none;
+        }
         /* 🚀 よりリアルに: big-burstの瞬間(2.4秒周期)に合わせて放射状に飛び散る火の粉 */
         @keyframes ember-burst-out {
             0%, 82% { transform: translate(0, 0) scale(0); opacity: 0; }
@@ -1003,8 +1031,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     </div>
 
     <!-- トースト -->
-    <!-- 🚀 M3E: 通知バー風のトースト(スマホの通知シェードのように上部からスライドイン) -->
-    <div id="in-app-toast" class="fixed top-4 left-1/2 -translate-x-1/2 -translate-y-24 opacity-0 max-w-md w-[92vw] sm:w-full bg-white/95 dark:bg-[#1E1F22]/95 backdrop-blur-xl text-[#1C1B1F] dark:text-white p-4 rounded-[28px] shadow-m3-elevation-3 transition-all duration-400 z-[200] pointer-events-none flex items-center gap-3.5 border border-gray-100 dark:border-gray-800">
+    <!-- 🚀 M3E: 通知バー風のトースト(iOSの通知バナーのようにスプリング(弾む)アニメーションで表示) -->
+    <div id="in-app-toast" class="ios-toast-hidden fixed top-4 left-1/2 -translate-x-1/2 max-w-md w-[92vw] sm:w-full bg-white/95 dark:bg-[#1E1F22]/95 backdrop-blur-xl text-[#1C1B1F] dark:text-white p-4 rounded-[28px] shadow-m3-elevation-3 z-[9999] pointer-events-none flex items-center gap-3.5 border border-gray-100 dark:border-gray-800">
         <div id="toast-icon-wrap" class="bg-[var(--primary-container)] text-[var(--on-primary-container)] p-2.5 rounded-full shrink-0 shadow-inner flex items-center justify-center w-11 h-11"><span class="material-symbols-rounded text-xl" id="toast-icon">notifications</span></div>
         <div class="flex-1 min-w-0">
             <h5 class="font-black text-[13px] tracking-tight" id="toast-title">通知</h5>
@@ -1081,28 +1109,31 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // =======================
         // 🕒 基本ユーティリティ
         // =======================
-        function showToast(t, m, u=false) {
+        function showToast(t, m, u=false, icon=null) {
             const o = document.getElementById("in-app-toast");
             if(document.getElementById("toast-title")) document.getElementById("toast-title").innerText = t; 
             if(document.getElementById("toast-body")) document.getElementById("toast-body").innerText = m;
-            const iconWrap = document.getElementById("toast-icon-wrap"); const icon = document.getElementById("toast-icon");
+            const iconWrap = document.getElementById("toast-icon-wrap"); const iconEl = document.getElementById("toast-icon");
             if (o) {
                 // 🚀 M3E: 緊急時は警告トーンの配色、通常時はプライマリカラーのトーンに切り替え
                 if (u) {
                     iconWrap.className = "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 p-2.5 rounded-full shrink-0 shadow-inner flex items-center justify-center w-11 h-11";
-                    icon.innerText = "warning"; icon.classList.add("animate-pulse");
+                    iconEl.innerText = icon || "error"; iconEl.classList.remove("animate-pulse");
                     o.classList.add("border-red-200", "dark:border-red-800/50"); o.classList.remove("border-gray-100", "dark:border-gray-800");
                 } else {
                     iconWrap.className = "bg-[var(--primary-container)] text-[var(--on-primary-container)] p-2.5 rounded-full shrink-0 shadow-inner flex items-center justify-center w-11 h-11";
-                    icon.innerText = "notifications"; icon.classList.remove("animate-pulse");
+                    iconEl.innerText = icon || "notifications"; iconEl.classList.remove("animate-pulse");
                     o.classList.add("border-gray-100", "dark:border-gray-800"); o.classList.remove("border-red-200", "dark:border-red-800/50");
                 }
-                o.classList.remove("-translate-y-24", "opacity-0", "pointer-events-none");
-                o.classList.add("translate-y-0", "opacity-100", "pointer-events-auto");
+                // 🚀 iOS風: 表示中に別の通知が来た場合も、一度リセットしてから弾み直す
+                o.classList.remove("ios-toast-show", "ios-toast-exit", "ios-toast-hidden");
+                void o.offsetWidth; // リフローを強制してアニメーションを確実に再生させる
+                o.classList.add("ios-toast-show");
                 clearTimeout(window._toastHideTimer);
                 window._toastHideTimer = setTimeout(() => {
-                    o.classList.add("-translate-y-24", "opacity-0", "pointer-events-none");
-                    o.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
+                    o.classList.remove("ios-toast-show");
+                    o.classList.add("ios-toast-exit");
+                    setTimeout(() => { o.classList.remove("ios-toast-exit"); o.classList.add("ios-toast-hidden"); }, 320);
                 }, 4500);
             }
         }
@@ -1342,7 +1373,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 document.getElementById("app-lock-setup-modal").classList.remove("hidden");
             } else {
                 safeStorage.setItem("volcano_app_lock_enabled", "false");
-                showToast("設定完了", "アプリロックを無効にしました");
+                showToast("設定完了", "アプリロックを無効にしました", false, "lock_open");
             }
         }
 
@@ -1373,7 +1404,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         safeStorage.setItem("volcano_app_lock_pin_hash", hash);
                         safeStorage.setItem("volcano_app_lock_enabled", "true");
                         document.getElementById("app-lock-setup-modal").classList.add("hidden");
-                        showToast("設定完了", "アプリロックを有効にしました(PINコード)");
+                        showToast("設定完了", "アプリロックを有効にしました(PINコード)", false, "lock");
                     } else {
                         showToast("不一致", "PINが一致しませんでした。もう一度設定してください", true);
                         appLockSetupBuffer = ""; appLockSetupFirstPin = null;
@@ -1475,7 +1506,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 a.href = url; a.download = `volcano-backup-${dateStr}.json`;
                 document.body.appendChild(a); a.click(); document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast("バックアップ完了", "現在のデータをJSONファイルとして保存しました");
+                showToast("バックアップ完了", "現在のデータをJSONファイルとして保存しました", false, "cloud_done");
             } catch (e) { showToast("エラー", "バックアップの作成に失敗しました: " + e.message, true); }
         }
 
@@ -1726,7 +1757,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         async function forceSyncFromFirebase() {
             const btnIcon = document.getElementById("sync-button-icon"); const spinner = document.getElementById("sync-google-spinner"); const fabIcon = document.getElementById("fab-sync-icon");
             if(btnIcon) btnIcon.classList.add("hidden"); if(spinner) spinner.classList.remove("hidden"); if(fabIcon) fabIcon.classList.add("animate-spin-once");
-            showToast("手動同期", "Firebaseに接続してデータを同期しています...", false);
+            showToast("手動同期", "Firebaseに接続してデータを同期しています...", false, "sync");
 
             // 🚀 バグ修正: 起動直後は「dbは既に存在するが認証トークンのサーバー伝播が終わっていない」
             // 一瞬のタイミングがあり、これを掴むとサーバー同期が一時的にエラーになる(少し待てば直る)。
@@ -1751,7 +1782,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                 return;
                             }
 
-                            volcanoData = list; saveLocalVolcanos(); renderUI(); playPingSound(); updateSyncStatus('connected', `同期データ受信完了 (${getNowTimeStr()})`); checkForAppUpdate();
+                            volcanoData = list; saveLocalVolcanos(); renderUI(); playPingSound(); updateSyncStatus('connected', `同期データ受信完了 (${getNowTimeStr()})`); checkForAppUpdate(); showToast("同期完了", `最新のデータを受信しました (${getNowTimeStr()})`, false, "cloud_done");
                             return; // 成功したのでループを抜ける
                         } else { switchToLocalMode(); return; }
                     } catch (e) {
@@ -1842,7 +1873,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 dupSnap.forEach(d => { if (d.id !== safeDocId) dupDeletes.push(d.ref.delete()); });
                 if (dupDeletes.length > 0) await Promise.all(dupDeletes);
             } catch (cleanupErr) { console.warn("重複トークンのクリーンアップに失敗", cleanupErr); }
-            if (!silent) { const s = document.getElementById("notification-status-text"); if (s) s.innerText = "バックグラウンドPush：有効！"; showToast("登録完了", "トークンをDBに保存しました！通知を受信できます。"); }
+            if (!silent) { const s = document.getElementById("notification-status-text"); if (s) s.innerText = "バックグラウンドPush：有効！"; showToast("登録完了", "トークンをDBに保存しました！通知を受信できます。", false, "notifications_active"); }
             return true;
         }
 
@@ -1912,10 +1943,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     const uniqueTokens = [...new Set(tokens)];
 
                     if (uniqueTokens.length === 0) { console.warn("送信スキップ 通知先が登録されていません"); showToast("通知スキップ", "通知先が1件も登録されていません", true); return; }
-                    showToast("送信中...", "プッシュリクエストを送信しています");
+                    showToast("送信中...", "プッシュリクエストを送信しています", false, "sync");
 
                     await fetch(MY_GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ title: title, body: bodyText, tokens: uniqueTokens }) });
-                    showToast("送信完了", "プッシュ通知リクエストを送信しました！");
+                    showToast("送信完了", "プッシュ通知リクエストを送信しました！", false, "check_circle");
                     return; // 成功したので終了
                 } catch (e) {
                     console.error("バックグラウンド通知送信失敗", e);
@@ -1998,7 +2029,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 const audio = new Audio(v.customAudio);
                 // 🚀 バグ修正: 再生に失敗しても無音のまま何も表示されなかった問題への対策。
                 // 特にiPhoneで録音した.m4a/.caf形式は、Android端末では再生できないことがある。
-                audio.play().then(() => { showToast("再生中", "録音された噴火音声を再生しています"); }).catch(err => { console.error("音声再生エラー", err); showToast("再生エラー", "この端末では音声を再生できませんでした(形式非対応の可能性があります)", true); });
+                audio.play().then(() => { showToast("再生中", "録音された噴火音声を再生しています", false, "volume_up"); }).catch(err => { console.error("音声再生エラー", err); showToast("再生エラー", "この端末では音声を再生できませんでした(形式非対応の可能性があります)", true); });
             } else { showToast("エラー", "音声データが見つかりませんでした", true); }
         }
 
@@ -2061,8 +2092,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         function toggleVolcanoPin(id, event) {
             if (event) event.stopPropagation();
             const idStr = String(id); let pinned = getPinnedVolcanoIds();
-            if (pinned.includes(idStr)) { pinned = pinned.filter(x => x !== idStr); showToast("解除", "お気に入りから外しました"); }
-            else { pinned.push(idStr); showToast("お気に入り登録", "一覧の先頭に固定表示されます"); }
+            if (pinned.includes(idStr)) { pinned = pinned.filter(x => x !== idStr); showToast("解除", "お気に入りから外しました", false, "star_border"); }
+            else { pinned.push(idStr); showToast("お気に入り登録", "一覧の先頭に固定表示されます", false, "star"); }
             safeStorage.setItem("volcano_pinned_ids", JSON.stringify(pinned));
             renderUI();
         }
