@@ -297,8 +297,30 @@
                 flex: 1;
                 min-width: 0;
             }
-            .card-title-row { margin-bottom: 0.5rem !important; }
-            .card-title-row h2 { font-size: 1.15rem !important; }
+            /* 🚀 バグ修正: 名前・お気に入り・レベルバッジを横一列に詰め込もうとして、
+               幅不足で山名が1文字ずつ縦に改行されてしまう問題への対策。
+               名前を単独の行でしっかり横一行表示し、レベルバッジ等はその下の行に配置する。 */
+            .card-title-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.5rem;
+                margin-bottom: 0.75rem !important;
+            }
+            .card-title-row h2 {
+                font-size: 1.05rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-break: keep-all;
+                max-width: 100%;
+            }
+            .card-title-name-group {
+                min-width: 0;
+                width: 100%;
+            }
+            .card-title-row > div:last-child {
+                align-self: flex-start;
+            }
             .card-tabs, .tab-panel-history, .card-footer-actions, .card-footer-map {
                 display: none !important;
             }
@@ -521,6 +543,39 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         </div>
     </div>
 
+    <!-- 🚀 新機能: 防災ハンドブックモーダル -->
+    <div id="handbook-modal" class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300">
+        <div id="handbook-card" class="bg-white dark:bg-[#1E1F22] w-11/12 max-w-lg max-h-[80vh] rounded-m3-large shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 border border-gray-200 dark:border-gray-800">
+            <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 shrink-0 bg-gray-50/50 dark:bg-[#111318]/50">
+                <h3 class="text-lg font-black text-[#1C1B1F] dark:text-white flex items-center gap-2"><span class="material-symbols-rounded text-[var(--primary)]">menu_book</span> 防災ハンドブック</h3>
+                <button onclick="closeHandbookModal()" class="w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"><span class="material-symbols-rounded">close</span></button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 space-y-4">
+                <div class="p-4 rounded-m3-medium bg-gray-50 dark:bg-[#111318] border-l-4 border-gray-400">
+                    <h4 class="font-black text-sm text-gray-700 dark:text-gray-200 mb-1">レベル1: 活火山であることに留意</h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">通常の生活で問題ありません。火口周辺の状況変化には留意しましょう。</p>
+                </div>
+                <div class="p-4 rounded-m3-medium bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400">
+                    <h4 class="font-black text-sm text-yellow-800 dark:text-yellow-300 mb-1">レベル2: 火口周辺規制</h4>
+                    <p class="text-xs text-yellow-700 dark:text-yellow-400 leading-relaxed">火口周辺への立ち入りは規制されます。登山・入山を予定している場合は最新情報を必ず確認してください。</p>
+                </div>
+                <div class="p-4 rounded-m3-medium bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-400">
+                    <h4 class="font-black text-sm text-orange-800 dark:text-orange-300 mb-1">レベル3: 入山規制</h4>
+                    <p class="text-xs text-orange-700 dark:text-orange-400 leading-relaxed">住民は通常の生活で構いませんが、状況に応じて要配慮者(高齢者等)は避難準備を。登山禁止・入山規制が敷かれます。</p>
+                </div>
+                <div class="p-4 rounded-m3-medium bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500">
+                    <h4 class="font-black text-sm text-red-700 dark:text-red-400 mb-1">レベル4: 避難準備</h4>
+                    <p class="text-xs text-red-600 dark:text-red-400 leading-relaxed">要配慮者は避難を開始してください。非常持ち出し袋の準備、避難経路・避難場所の再確認をしましょう。</p>
+                </div>
+                <div class="p-4 rounded-m3-medium bg-red-100 dark:bg-red-900/40 border-l-4 border-red-700">
+                    <h4 class="font-black text-sm text-red-800 dark:text-red-300 mb-1">レベル5: 避難</h4>
+                    <p class="text-xs text-red-700 dark:text-red-400 leading-relaxed">危険な区域からただちに避難してください。自治体の指示に従い、落ち着いて行動しましょう。</p>
+                </div>
+                <p class="text-[10px] text-gray-400 text-center pt-2">※本ハンドブックは一般的な目安です。必ず気象庁・自治体からの最新の公式情報に従ってください。</p>
+            </div>
+        </div>
+    </div>
+
     <!-- 📱 モバイル用 ボトムナビゲーション -->
     <nav class="md:hidden fixed bottom-0 inset-x-0 bg-[#F3F4F9]/95 dark:bg-[#111318]/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-800/50 z-[40] flex items-center justify-around px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+8px)] min-h-[75px]">
         <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center justify-center flex-1 cursor-pointer group active:scale-95 transition-transform">
@@ -590,6 +645,11 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         </header>
 
         <!-- 🚀 新機能: アップデート通知バナー -->
+        <!-- 🚀 新機能: 火山名での検索 -->
+        <div class="relative mb-5">
+            <span class="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">search</span>
+            <input type="text" id="volcano-search-input" oninput="renderUI()" placeholder="火山名で検索..." class="w-full bg-white/90 dark:bg-[#1E1F22]/90 backdrop-blur-md border border-gray-200 dark:border-gray-800 rounded-m3-full pl-11 pr-4 py-3 text-sm font-bold dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all">
+        </div>
         <div id="update-available-banner" class="hidden mb-5 p-4 rounded-m3-large bg-[var(--primary-container)] text-[var(--on-primary-container)] shadow-m3-elevation-2 flex items-center justify-between gap-3 flex-wrap">
             <div class="flex items-center gap-2">
                 <span class="material-symbols-rounded">system_update</span>
@@ -885,6 +945,34 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                             <span id="last-sync-display" class="text-[10px] font-mono text-gray-600 dark:text-gray-300">未同期</span>
                         </div>
                     </div>
+
+                    <!-- 🚀 新機能: サイレントタイム -->
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">bedtime</span> サイレントタイム</h4>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-bold dark:text-white block">時間帯で自動読上を停止</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">就寝時間帯など、指定した時間は自動読み上げ・効果音を鳴らしません</span>
+                            </div>
+                            <label class="m3-switch shrink-0 ml-3">
+                                <input type="checkbox" id="silent-time-toggle" onchange="updateSilentTimeSetting()">
+                                <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 shrink-0">時間帯</span>
+                            <div class="flex items-center gap-1.5">
+                                <select id="silent-time-start" onchange="updateSilentTimeSetting()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-2 py-1 text-[10px] font-bold dark:text-white focus:outline-none"></select>
+                                <span class="text-[10px] text-gray-400">〜</span>
+                                <select id="silent-time-end" onchange="updateSilentTimeSetting()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-2 py-1 text-[10px] font-bold dark:text-white focus:outline-none"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🚀 新機能: 防災ハンドブック -->
+                    <button onclick="openHandbookModal()" class="w-full py-4 bg-gray-50 hover:bg-gray-100 dark:bg-[#111318] dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-m3-large flex justify-center items-center gap-2 transition-colors border border-gray-200 dark:border-gray-800 shadow-sm cursor-pointer active:scale-95">
+                        <span class="material-symbols-rounded text-lg text-[var(--primary)]">menu_book</span> 防災ハンドブック(レベル別の行動指針)
+                    </button>
 
                     <!-- 🚀 新機能: アプリロック(端末の生体認証/画面ロックで解除) -->
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
@@ -1291,6 +1379,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 const savedAutoSyncInterval = safeStorage.getItem("volcano_auto_sync_interval") || "0";
                 document.getElementById("auto-sync-interval-select").value = savedAutoSyncInterval; updateAutoSyncInterval(savedAutoSyncInterval);
                 const lastSyncSaved = safeStorage.getItem("volcano_last_sync_time"); if (lastSyncSaved) updateLastSyncDisplay(lastSyncSaved);
+                restoreSilentTimeSettingUI();
             } catch(e){}
 
             try {
@@ -1692,7 +1781,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                     window.processedNotifs.add(notifKey);
                                     triggerSystemNotification(newVol.name, newVol.level, newVol.comment);
                                     playWarningAlert(newVol.level);
-                                    if (autoTTSOnUpdate) { setTimeout(() => playEmergencyBroadcastById(newVol.id), 1200); }
+                                    if (autoTTSOnUpdate && !isInSilentTime()) { setTimeout(() => playEmergencyBroadcastById(newVol.id), 1200); }
                                 }
                             }
                         });
@@ -2043,6 +2132,46 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
         function stopAllSpeechAndAlarms() { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); showToast("緊急停止", "アラート音および音声読み上げを強制停止しました。"); }
 
+        // 🚀 新機能: サイレントタイム。指定した時間帯は自動読み上げ・通知音を鳴らさないようにする。
+        function isInSilentTime() {
+            const enabled = safeStorage.getItem("volcano_silent_time_enabled") === "true";
+            if (!enabled) return false;
+            const start = Number(safeStorage.getItem("volcano_silent_time_start") ?? 22);
+            const end = Number(safeStorage.getItem("volcano_silent_time_end") ?? 7);
+            const nowHour = new Date().getHours();
+            if (start === end) return false;
+            if (start < end) return nowHour >= start && nowHour < end;
+            return nowHour >= start || nowHour < end; // 日をまたぐ場合(例: 22時〜7時)
+        }
+        function updateSilentTimeSetting() {
+            const enabled = document.getElementById("silent-time-toggle").checked;
+            const start = document.getElementById("silent-time-start").value;
+            const end = document.getElementById("silent-time-end").value;
+            safeStorage.setItem("volcano_silent_time_enabled", enabled ? "true" : "false");
+            safeStorage.setItem("volcano_silent_time_start", start);
+            safeStorage.setItem("volcano_silent_time_end", end);
+            showToast("設定完了", enabled ? `サイレントタイムを${start}時〜${end}時に設定しました` : "サイレントタイムを無効にしました", false, "bedtime");
+        }
+        function restoreSilentTimeSettingUI() {
+            const startSel = document.getElementById("silent-time-start"); const endSel = document.getElementById("silent-time-end");
+            if (startSel.options.length === 0) { for (let i = 0; i < 24; i++) { startSel.innerHTML += `<option value="${i}">${i}時</option>`; endSel.innerHTML += `<option value="${i}">${i}時</option>`; } }
+            const enabled = safeStorage.getItem("volcano_silent_time_enabled") === "true";
+            document.getElementById("silent-time-toggle").checked = enabled;
+            startSel.value = safeStorage.getItem("volcano_silent_time_start") || "22";
+            endSel.value = safeStorage.getItem("volcano_silent_time_end") || "7";
+        }
+
+        // 🚀 新機能: 防災ハンドブック(警戒レベル別の行動指針)
+        function openHandbookModal() {
+            const modal = document.getElementById("handbook-modal"); const card = document.getElementById("handbook-card");
+            modal.classList.remove("opacity-0", "pointer-events-none"); card.classList.remove("scale-95"); card.classList.add("scale-100");
+            toggleSettingsModal(false);
+        }
+        function closeHandbookModal() {
+            const modal = document.getElementById("handbook-modal"); const card = document.getElementById("handbook-card");
+            card.classList.remove("scale-100"); card.classList.add("scale-95"); modal.classList.add("opacity-0", "pointer-events-none");
+        }
+
         function playEmergencyBroadcastById(id) {
             const v = volcanoData.find(x => String(x.id) === String(id)); if(!v) return;
             if('speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); }
@@ -2100,6 +2229,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
         function getSortedData() {
             let sorted = [...volcanoData].filter(v => Number(v.level || 1) >= minLevelFilter);
+            // 🚀 新機能: 火山名での検索フィルタ
+            const searchInput = document.getElementById("volcano-search-input");
+            const keyword = searchInput ? searchInput.value.trim() : "";
+            if (keyword) { sorted = sorted.filter(v => (v.name || "").includes(keyword)); }
             if (currentSortOrder === 'level_desc') sorted.sort((a, b) => Number(b.level || 0) - Number(a.level || 0));
             else if (currentSortOrder === 'id_desc') sorted.sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
             else if (currentSortOrder === 'id_asc') sorted.sort((a, b) => Number(a.id || 0) - Number(b.id || 0));
@@ -2154,7 +2287,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                 </div>
                                 <div class="card-info-wrap">
                                     <div class="flex justify-between items-start mb-4 card-title-row">
-                                        <div class="flex items-start gap-1.5"><h2 class="card-title text-2xl font-black ${vol.level >= 100 ? 'text-red-500 animate-pulse' : 'text-[#1C1B1F] dark:text-white group-hover:text-[var(--primary)]'} tracking-tight drop-shadow-sm transition-colors">${safeName}</h2>${statusBadge}<button onclick="toggleVolcanoPin('${volIdStr}', event)" title="お気に入り" class="shrink-0 mt-1 w-6 h-6 flex items-center justify-center rounded-full ${isPinned ? 'text-amber-500' : 'text-gray-300 dark:text-gray-600'} hover:text-amber-500 transition-colors"><span class="material-symbols-rounded text-lg" style="font-variation-settings: 'FILL' ${isPinned ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24;">star</span></button></div>
+                                        <div class="flex items-start gap-1.5 card-title-name-group"><h2 class="card-title text-2xl font-black ${vol.level >= 100 ? 'text-red-500 animate-pulse' : 'text-[#1C1B1F] dark:text-white group-hover:text-[var(--primary)]'} tracking-tight drop-shadow-sm transition-colors min-w-0 truncate">${safeName}</h2>${statusBadge}<button onclick="toggleVolcanoPin('${volIdStr}', event)" title="お気に入り" class="shrink-0 mt-1 w-6 h-6 flex items-center justify-center rounded-full ${isPinned ? 'text-amber-500' : 'text-gray-300 dark:text-gray-600'} hover:text-amber-500 transition-colors"><span class="material-symbols-rounded text-lg" style="font-variation-settings: 'FILL' ${isPinned ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24;">star</span></button></div>
                                         <div class="${tClass} text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-m3-full shadow-sm tracking-wide border border-black/5 shrink-0"><span class="material-symbols-rounded text-[13px] align-middle" style="vertical-align:-2px;">warning</span> レベル ${vol.level || 1}</div>
                                     </div>
                                     <div class="card-tabs flex bg-[#E1E2EC]/60 dark:bg-gray-800/80 p-1.5 rounded-m3-full mb-4 backdrop-blur-sm" onclick="event.stopPropagation()"><button onclick="setTab('${volIdStr}', 0)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t0}">現在の状況</button><button onclick="setTab('${volIdStr}', 1)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t1}">活動履歴</button></div>
