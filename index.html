@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.2">
+    <link rel="stylesheet" href="./tailwind.css?v=9.3">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -354,6 +354,17 @@
             .settings-sheet {
                 border-radius: 0 !important;
             }
+            /* 🚀 新機能: ステータスバー(ヘッダー)と速報テロップを、スクロールしても常に上部に固定表示する */
+            #emergency-ticker {
+                position: sticky;
+                top: 0;
+                z-index: 56;
+            }
+            #main-header {
+                position: sticky;
+                top: 0.5rem;
+                z-index: 55;
+            }
         }
         /* 🚀 新機能: パフォーマンス優先モード(手動トグル)。画面幅に関係なく、
            常にぼかし効果とアニメーションを軽量化したい端末向け。 */
@@ -598,24 +609,26 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         </div>
     </div>
 
-    <!-- 📱 モバイル用 ボトムナビゲーション -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-[#F3F4F9]/95 dark:bg-[#111318]/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-800/50 z-[40] flex items-center justify-around px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+8px)] min-h-[75px]">
-        <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center justify-center flex-1 cursor-pointer group active:scale-95 transition-transform">
-            <div class="w-16 h-8 rounded-full bg-[var(--primary-container)] flex items-center justify-center transition-colors shadow-sm"><span class="material-symbols-rounded text-xl text-[var(--on-primary-container)]">space_dashboard</span></div>
-            <span class="text-[11px] font-black mt-1 text-[var(--primary)]">ホーム</span>
-        </div>
-        <div onclick="openNotificationModal()" class="flex flex-col items-center justify-center flex-1 cursor-pointer group active:scale-95 transition-transform relative">
-            <div class="w-16 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-gray-200 dark:group-hover:bg-gray-800 relative"><span class="material-symbols-rounded text-xl text-gray-600 dark:text-gray-400 group-hover:text-[var(--primary)]">notifications</span><span id="nav-notif-badge" class="absolute top-1 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#111318] hidden"></span></div>
-            <span class="text-[11px] font-black mt-1 text-gray-600 dark:text-gray-400 group-hover:text-[var(--primary)] transition-colors">通知履歴</span>
-        </div>
-        <div onclick="toggleSettingsModal(true)" class="flex flex-col items-center justify-center flex-1 cursor-pointer group active:scale-95 transition-transform">
-            <div class="w-16 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-gray-200 dark:group-hover:bg-gray-800"><span class="material-symbols-rounded text-xl text-gray-600 dark:text-gray-400 group-hover:text-[var(--primary)]">settings</span></div>
-            <span class="text-[11px] font-black mt-1 text-gray-600 dark:text-gray-400 group-hover:text-[var(--primary)] transition-colors">設定</span>
+    <!-- 📱 モバイル用 フローティングボトムナビゲーション(すりガラス風) -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
+        <div class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/75 dark:bg-[#0D0E11]/80 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl px-2 py-2">
+            <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
+                <div class="w-14 h-8 rounded-full bg-white/95 flex items-center justify-center transition-colors shadow-sm"><span class="material-symbols-rounded text-xl text-[#1D1B20]">space_dashboard</span></div>
+                <span class="text-[10px] font-black mt-1 text-white">ホーム</span>
+            </div>
+            <div onclick="openNotificationModal()" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative">
+                <div class="w-14 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-white/10 relative"><span class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">notifications</span><span id="nav-notif-badge" class="absolute top-1 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#1D1B20] hidden"></span></div>
+                <span class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">通知履歴</span>
+            </div>
+            <div onclick="toggleSettingsModal(true)" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
+                <div class="w-14 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-white/10"><span class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">settings</span></div>
+                <span class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">設定</span>
+            </div>
         </div>
     </nav>
 
     <!-- 📱 モバイル用 同期FAB -->
-    <button onclick="forceSyncFromFirebase()" class="md:hidden fixed bottom-[95px] right-5 z-[45] w-14 h-14 bg-[var(--primary-container)] text-[var(--on-primary-container)] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center transition-all hover:shadow-lg border border-white/20 active:scale-95">
+    <button onclick="forceSyncFromFirebase()" class="md:hidden fixed bottom-[105px] right-5 z-[45] w-14 h-14 bg-[var(--primary-container)] text-[var(--on-primary-container)] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center transition-all hover:shadow-lg border border-white/20 active:scale-95">
         <span id="fab-sync-icon" class="material-symbols-rounded text-3xl">sync</span>
     </button>
 
@@ -633,7 +646,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     <!-- 📱 スマホ用に下部の余白を大きく確保 -->
     <main class="max-w-[1400px] mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-28 md:pb-6 relative z-10">
         <!-- 🖥️ PC/Tablet 用 / スマホ用のコンパクトM3Eヘッダー -->
-        <header id="main-header" class="bg-[#1D1B20]/95 backdrop-blur-xl dark:bg-[#121115]/95 text-white p-4 sm:p-5 rounded-[28px] mb-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-m3-elevation-2 relative overflow-hidden border border-white/10 transition-all duration-500">
+        <header id="main-header" class="bg-[#1D1B20]/75 backdrop-blur-2xl dark:bg-[#121115]/80 text-white p-4 sm:p-5 rounded-[28px] mb-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-m3-elevation-2 relative overflow-hidden border border-white/10 transition-all duration-500">
             <div class="absolute -right-6 -top-6 w-48 h-48 bg-red-600 rounded-full opacity-10 blur-3xl pointer-events-none"></div>
             <div id="header-accent-glow" class="absolute -left-6 -bottom-6 w-48 h-48 rounded-full opacity-10 blur-3xl transition-all duration-500 pointer-events-none" style="background-color: var(--primary);"></div>
             
@@ -1162,11 +1175,11 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
     <!-- トースト -->
     <!-- 🚀 M3E: 通知バー風のトースト(iOSの通知バナーのようにスプリング(弾む)アニメーションで表示) -->
-    <div id="in-app-toast" class="ios-toast-hidden fixed top-4 left-1/2 -translate-x-1/2 max-w-md w-[92vw] sm:w-full bg-white/85 dark:bg-[#1E1F22]/85 backdrop-blur-xl text-[#1C1B1F] dark:text-white p-4 rounded-[28px] shadow-m3-elevation-3 z-[9999] pointer-events-none flex items-center gap-3.5 border border-gray-100 dark:border-gray-800">
+    <div id="in-app-toast" class="ios-toast-hidden fixed top-4 left-1/2 -translate-x-1/2 max-w-md w-[92vw] sm:w-full bg-[#1D1B20]/75 dark:bg-[#0D0E11]/80 backdrop-blur-2xl text-white p-4 rounded-[28px] shadow-m3-elevation-3 z-[9999] pointer-events-none flex items-center gap-3.5 border border-white/10">
         <div id="toast-icon-wrap" class="bg-[var(--primary-container)] text-[var(--on-primary-container)] p-2.5 rounded-full shrink-0 shadow-inner flex items-center justify-center w-11 h-11"><span class="material-symbols-rounded text-xl" id="toast-icon">notifications</span></div>
         <div class="flex-1 min-w-0">
             <h5 class="font-black text-[13px] tracking-tight" id="toast-title">通知</h5>
-            <p class="text-[11px] text-gray-600 dark:text-gray-300 mt-0.5 font-semibold leading-relaxed" id="toast-body"></p>
+            <p class="text-[11px] text-gray-300 mt-0.5 font-semibold leading-relaxed" id="toast-body"></p>
         </div>
     </div>
 
