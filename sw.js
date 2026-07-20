@@ -2,11 +2,11 @@
 // 火山防災情報局 PWA 用 Service Worker
 // PWABuilder の「Service Workerが検出されない」警告を解消するための最小実装です。
 
-const CACHE_NAME = 'kazan-bousai-cache-v2';
+const CACHE_NAME = 'kazan-bousai-cache-v3';
 const OFFLINE_URLS = [
   '/-ami/index.html',
   '/-ami/manifest.json',
-  '/-ami/tailwind.css?v=9.2',
+  '/-ami/tailwind.css?v=9.3',
   '/-ami/icon-192.png',
   '/-ami/icon-512.png'
 ];
