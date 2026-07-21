@@ -161,6 +161,17 @@
             animation: ios-toast-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             pointer-events: auto;
         }
+        /* 🚀 バグ修正: 通知にガラス効果(backdrop-filter)がかからない問題への対策。
+           transformアニメーションと同時にbackdrop-filterを使うと、Safari/WebKit系ブラウザで
+           合成レイヤーの生成タイミングがずれてぼかしが反映されないことがあるため、
+           事前に独立した合成レイヤーを強制的に確保しておく。 */
+        #in-app-toast {
+            will-change: transform, opacity;
+            -webkit-backdrop-filter: blur(40px) saturate(1.5);
+            backdrop-filter: blur(40px) saturate(1.5);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
         /* 退場: iOSのように素早く上へスッと吸い込まれて消える */
         @keyframes ios-toast-out {
             0% { opacity: 1; transform: translate(-50%, 0%) scale(1); }
@@ -356,16 +367,20 @@
             }
         }
         /* 🚀 新機能: ステータスバー(ヘッダー)と速報テロップを、スクロールしても常に上部に固定表示する
-           (画面サイズを問わず適用: スマホ・タブレット・PCすべて対象) */
+           (画面サイズを問わず適用: スマホ・タブレット・PCすべて対象。他のCSSに上書きされないようimportant化) */
         #emergency-ticker {
-            position: sticky;
-            top: 0;
-            z-index: 56;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 56 !important;
         }
         #main-header {
-            position: sticky;
-            top: 0.5rem;
-            z-index: 55;
+            position: sticky !important;
+            top: 0.5rem !important;
+            z-index: 55 !important;
+        }
+        @media (min-width: 821px) {
+            #emergency-ticker { position: sticky !important; top: 0 !important; }
+            #main-header { position: sticky !important; top: 0.75rem !important; }
         }
         /* 🚀 新機能: パフォーマンス優先モード(手動トグル)。画面幅に関係なく、
            常にぼかし効果とアニメーションを軽量化したい端末向け。 */
@@ -612,7 +627,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
     <!-- 📱 モバイル用 フローティングボトムナビゲーション(すりガラス風) -->
     <nav class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
-        <div class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/50 dark:bg-[#0D0E11]/55 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl px-2 py-2">
+        <div class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/18 dark:bg-[#0D0E11]/22 backdrop-blur-3xl backdrop-saturate-150 border border-white/25 rounded-full shadow-2xl px-2 py-2">
             <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
                 <div class="w-14 h-8 rounded-full bg-white/95 flex items-center justify-center transition-colors shadow-sm"><span class="material-symbols-rounded text-xl text-[#1D1B20]">space_dashboard</span></div>
                 <span class="text-[10px] font-black mt-1 text-white">ホーム</span>
@@ -647,7 +662,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     <!-- 📱 スマホ用に下部の余白を大きく確保 -->
     <main class="max-w-[1400px] mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-28 md:pb-6 relative z-10">
         <!-- 🖥️ PC/Tablet 用 / スマホ用のコンパクトM3Eヘッダー -->
-        <header id="main-header" class="bg-[#1D1B20]/55 backdrop-blur-3xl dark:bg-[#121115]/60 text-white p-4 sm:p-5 rounded-[28px] mb-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-m3-elevation-2 relative overflow-hidden border border-white/10 transition-all duration-500">
+        <header id="main-header" class="bg-[#1D1B20]/20 backdrop-blur-3xl backdrop-saturate-150 dark:bg-[#121115]/25 text-white p-4 sm:p-5 rounded-[28px] mb-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-m3-elevation-2 relative overflow-hidden border border-white/20 transition-all duration-500">
             <div class="absolute -right-6 -top-6 w-48 h-48 bg-red-600 rounded-full opacity-10 blur-3xl pointer-events-none"></div>
             <div id="header-accent-glow" class="absolute -left-6 -bottom-6 w-48 h-48 rounded-full opacity-10 blur-3xl transition-all duration-500 pointer-events-none" style="background-color: var(--primary);"></div>
             
@@ -1176,7 +1191,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
     <!-- トースト -->
     <!-- 🚀 M3E: 通知バー風のトースト(iOSの通知バナーのようにスプリング(弾む)アニメーションで表示) -->
-    <div id="in-app-toast" class="ios-toast-hidden fixed top-4 left-1/2 -translate-x-1/2 max-w-md w-[92vw] sm:w-full bg-[#1D1B20]/50 dark:bg-[#0D0E11]/55 backdrop-blur-3xl text-white p-4 rounded-[28px] shadow-m3-elevation-3 z-[9999] pointer-events-none flex items-center gap-3.5 border border-white/15">
+    <div id="in-app-toast" class="ios-toast-hidden fixed top-4 left-1/2 -translate-x-1/2 max-w-md w-[92vw] sm:w-full bg-[#1D1B20]/22 dark:bg-[#0D0E11]/26 backdrop-blur-3xl backdrop-saturate-150 text-white p-4 rounded-[28px] shadow-m3-elevation-3 z-[9999] pointer-events-none flex items-center gap-3.5 border border-white/20">
         <div id="toast-icon-wrap" class="bg-[var(--primary-container)] text-[var(--on-primary-container)] p-2.5 rounded-full shrink-0 shadow-inner flex items-center justify-center w-11 h-11"><span class="material-symbols-rounded text-xl" id="toast-icon">notifications</span></div>
         <div class="flex-1 min-w-0">
             <h5 class="font-black text-[13px] tracking-tight" id="toast-title">通知</h5>
