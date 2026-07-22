@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.4">
+    <link rel="stylesheet" href="./tailwind.css?v=9.5">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -365,6 +365,21 @@
             .settings-sheet {
                 border-radius: 0 !important;
             }
+            /* 🚀 新機能: 通知履歴・設定を独立したタブとして扱う(閉じるボタンを非表示にし、
+               フローティングタブバーが常に最前面に表示され続けるようにする) */
+            #notification-close-x, #notification-close-bottom, #settings-close-btn {
+                display: none !important;
+            }
+            #mobile-tab-bar {
+                z-index: 65 !important;
+            }
+            #notification-card .p-6.overflow-y-auto, #settings-modal .overflow-y-auto {
+                padding-bottom: 110px !important;
+            }
+            /* 🚀 スマホではヘッダーの日付・時刻表示を非表示にする */
+            #header-clock-display {
+                display: none !important;
+            }
         }
         /* 🚀 新機能: ステータスバー(ヘッダー)と速報テロップを、スクロールしても常に上部に固定表示する
            (画面サイズを問わず適用: スマホ・タブレット・PCすべて対象。他のCSSに上書きされないようimportant化) */
@@ -383,24 +398,62 @@
             #main-header { position: sticky !important; top: 0.75rem !important; }
         }
         /* 🚀 新機能: パフォーマンス優先モード(手動トグル)。画面幅に関係なく、
-           常にぼかし効果とアニメーションを軽量化したい端末向け。 */
-        html.perf-mode .backdrop-blur-sm, html.perf-mode .backdrop-blur-md, html.perf-mode .settings-overlay {
+           常にぼかし効果とアニメーションを軽量化したい端末向け。
+           🚀 強化: 低スペック端末でも快適に動くよう、ぼかし効果を「一切」完全にオフにする最強版。 */
+        html.perf-mode * {
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
         }
         html.perf-mode body.m3-expressive .m3-card {
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            background-color: rgba(255, 255, 255, 0.97);
+            background-color: rgba(255, 255, 255, 0.98);
         }
         html.perf-mode.dark body.m3-expressive .m3-card,
         html.perf-mode .dark body.m3-expressive .m3-card {
-            background-color: rgba(30, 31, 34, 0.97);
+            background-color: rgba(30, 31, 34, 0.98);
         }
-        html.perf-mode .animate-pulse, html.perf-mode .animate-ping, html.perf-mode .drift-smoke, html.perf-mode .pulse-lava {
+        html.perf-mode #main-header {
+            background-color: rgba(29, 27, 32, 0.98) !important;
+        }
+        html.perf-mode.dark #main-header,
+        html.perf-mode .dark #main-header {
+            background-color: rgba(18, 17, 21, 0.98) !important;
+        }
+        html.perf-mode .floating-tabbar, html.perf-mode #in-app-toast {
+            background-color: rgba(29, 27, 32, 0.98) !important;
+        }
+        /* 🚀 アニメーション類も全面的に停止し、GPU負荷を最小化する */
+        html.perf-mode .animate-pulse, html.perf-mode .animate-ping, html.perf-mode .drift-smoke,
+        html.perf-mode .pulse-lava, html.perf-mode .animate-m3-fade-in, html.perf-mode .animate-ticker,
+        html.perf-mode [class*="splash-"], html.perf-mode .ios-toast-show {
             animation: none !important;
+            transition: none !important;
+        }
+        html.perf-mode .shadow-m3-elevation-1, html.perf-mode .shadow-m3-elevation-2, html.perf-mode .shadow-m3-elevation-3,
+        html.perf-mode .hover\:shadow-m3-elevation-3:hover {
+            box-shadow: none !important;
         }
     </style>
+    <style>
+        /* 🚀 新機能: 読み上げ速度スライダーをMaterial 3 Expressiveデザイン(2分割トラック+縦バーのつまみ)に変更 */
+        #tts-rate-slider {
+            -webkit-appearance: none; appearance: none;
+            height: 20px; border-radius: 9999px; outline: none; cursor: pointer;
+            background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--m3-slider-fill, 50%), var(--primary-container) var(--m3-slider-fill, 50%), var(--primary-container) 100%);
+        }
+        #tts-rate-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 4px; height: 32px; border-radius: 3px;
+            background: var(--primary); border: 4px solid var(--primary);
+            box-shadow: 0 0 0 8px rgba(0,0,0,0.02);
+            cursor: pointer; margin-top: -6px;
+        }
+        #tts-rate-slider::-moz-range-thumb {
+            width: 4px; height: 32px; border-radius: 3px; border: 4px solid var(--primary);
+            background: var(--primary); cursor: pointer;
+        }
+        #tts-rate-slider::-moz-range-track { height: 20px; border-radius: 9999px; background: var(--primary-container); }
+        #tts-rate-slider::-moz-range-progress { height: 20px; border-radius: 9999px; background: var(--primary); }
+
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
     
@@ -538,12 +591,12 @@
         <div id="notification-card" class="bg-white dark:bg-[#1E1F22] w-11/12 max-w-2xl max-h-[80vh] rounded-m3-large shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 shrink-0 bg-gray-50/50 dark:bg-[#111318]/50">
                 <h3 class="text-lg font-black text-[#1C1B1F] dark:text-white flex items-center gap-2"><span class="material-symbols-rounded text-[var(--primary)]">notifications</span> 過去の受信通知履歴</h3>
-                <button onclick="closeNotificationModal()" class="w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"><span class="material-symbols-rounded">close</span></button>
+                <button id="notification-close-x" onclick="closeNotificationModal()" class="w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium"><ul id="notification-history-list" class="space-y-4"></ul></div>
             <div class="p-4 border-t border-gray-100 dark:border-gray-800 shrink-0 flex justify-between items-center bg-gray-50/50 dark:bg-[#111318]/20">
                 <button onclick="clearNotificationHistory()" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400 font-bold rounded-m3-full text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5"><span class="material-symbols-rounded text-sm">delete</span>ログ消去</button>
-                <button onclick="closeNotificationModal()" class="px-8 py-2.5 bg-[var(--primary-container)] hover:opacity-90 text-[var(--on-primary-container)] dark:text-white font-black rounded-m3-full text-sm transition-all shadow-sm active:scale-95">閉じる</button>
+                <button id="notification-close-bottom" onclick="closeNotificationModal()" class="px-8 py-2.5 bg-[var(--primary-container)] hover:opacity-90 text-[var(--on-primary-container)] dark:text-white font-black rounded-m3-full text-sm transition-all shadow-sm active:scale-95">閉じる</button>
             </div>
         </div>
     </div>
@@ -626,7 +679,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     </div>
 
     <!-- 📱 モバイル用 フローティングボトムナビゲーション(すりガラス風) -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
+    <nav id="mobile-tab-bar" class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
         <div class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/18 dark:bg-[#0D0E11]/22 backdrop-blur-3xl backdrop-saturate-150 border border-white/25 rounded-full shadow-2xl px-2 py-2">
             <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
                 <div class="w-14 h-8 rounded-full bg-white/95 flex items-center justify-center transition-colors shadow-sm"><span class="material-symbols-rounded text-xl text-[#1D1B20]">space_dashboard</span></div>
@@ -672,7 +725,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     <div id="header-icon-box" class="text-white w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500" style="background-color: var(--primary);"><span class="material-symbols-rounded text-2xl sm:text-3xl">volcano</span></div>
                     <h1 class="text-xl sm:text-2xl font-black tracking-tight hidden sm:flex items-center gap-2 drop-shadow-md">火山防災情報局<span class="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded-m3-full uppercase font-black tracking-widest animate-pulse shadow-sm">Live</span></h1>
                 </div>
-                <div class="bg-white/10 px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-bold font-mono flex items-center gap-2 border border-white/10 shadow-sm backdrop-blur-md">
+                <div id="header-clock-display" class="bg-white/10 px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-bold font-mono flex items-center gap-2 border border-white/10 shadow-sm backdrop-blur-md">
                     <span class="material-symbols-rounded text-sm text-red-400">schedule</span><span id="live-clock">----/--/-- --:--:--</span>
                 </div>
             </div>
@@ -696,6 +749,11 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         </header>
 
         <!-- 🚀 新機能: アップデート通知バナー -->
+        <!-- 🚀 新機能: オフライン検知バナー -->
+        <div id="offline-banner" class="hidden mb-5 p-4 rounded-m3-large bg-gray-800 text-white shadow-m3-elevation-2 flex items-center gap-3">
+            <span class="material-symbols-rounded text-xl">cloud_off</span>
+            <div><p class="text-sm font-black">オフラインです</p><p class="text-[11px] text-gray-300">インターネットに接続されていません。表示中のデータは最後に同期された時点のものです。</p></div>
+        </div>
         <div id="update-available-banner" class="hidden mb-5 p-4 rounded-m3-large bg-[var(--primary-container)] text-[var(--on-primary-container)] shadow-m3-elevation-2 flex items-center justify-between gap-3 flex-wrap">
             <div class="flex items-center gap-2">
                 <span class="material-symbols-rounded">system_update</span>
@@ -1111,8 +1169,26 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     <div>
                         <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">record_voice_over</span> 読み上げ音声の設定</h4>
                         <div class="space-y-4 bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
-                            <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>読み上げ速度</span><span id="rate-val">1.0x</span></div><input type="range" id="speech-rate" min="0.5" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full"></div>
+                            <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>読み上げ速度</span><span id="rate-val">1.0x</span></div><input type="range" id="tts-rate-slider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSliderFillVar(this)" onchange="updateSpeechSettings()" class="w-full" style="--m3-slider-fill: 33%;"></div>
                             <div><div class="flex justify-between text-[10px] font-bold dark:text-gray-300 mb-1"><span>声の高さ（ピッチ）</span><span id="pitch-val">1.0</span></div><input type="range" id="speech-pitch" min="0.1" max="2.0" step="0.1" value="1.0" onchange="updateSpeechSettings()" class="w-full"></div>
+                            <div class="pt-1">
+                                <span class="text-[10px] font-bold dark:text-gray-300 block mb-1">読み上げ音声</span>
+                                <select id="tts-voice-select" onchange="updateTTSVoice(this.value)" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-m3-full px-3 py-2 text-xs font-bold dark:text-white focus:outline-none"><option>読み込み中...</option></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🚀 新機能: 画面の自動スリープ防止 -->
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-bold dark:text-white block flex items-center gap-1.5"><span class="material-symbols-rounded text-sm">visibility</span>画面のスリープを防止</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">監視中にアプリを開いたままにしておきたい時に</span>
+                            </div>
+                            <label class="m3-switch shrink-0 ml-3">
+                                <input type="checkbox" id="wake-lock-toggle" onchange="toggleWakeLock(this.checked)">
+                                <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
+                            </label>
                         </div>
                     </div>
 
@@ -1419,6 +1495,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // =============================================================
         window.onload = function() {
             document.documentElement.classList.add('splash-active');
+            updateOnlineStatus();
+            if ('speechSynthesis' in window) { setTimeout(populateVoiceOptions, 500); }
             // 🚀 新機能: アプリロックが有効なら、スプラッシュの裏側に即座にロック画面を用意しておく
             checkAppLockOnStartup();
             setTimeout(() => { const splash = document.getElementById('splash-screen'); if (splash) splash.classList.add('hide'); document.documentElement.classList.remove('splash-active'); }, 1200);
@@ -1442,7 +1520,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 const savedTextSize = safeStorage.getItem("volcano_text_size") || "normal";
                 document.getElementById("text-size-select").value = savedTextSize; updateTextSize(savedTextSize);
 
-                document.getElementById("speech-rate").value = safeStorage.getItem("volcano_speech_rate") || "1.0";
+                document.getElementById("tts-rate-slider").value = safeStorage.getItem("volcano_speech_rate") || "1.0";
+                updateSliderFillVar(document.getElementById("tts-rate-slider"));
                 document.getElementById("speech-pitch").value = safeStorage.getItem("volcano_speech_pitch") || "1.0";
                 updateSpeechSettings();
 
@@ -1460,6 +1539,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 document.getElementById("ui-sound-toggle").checked = uiSoundEnabled;
                 toastDisplayDuration = Number(safeStorage.getItem("volcano_toast_duration") || 4500);
                 document.getElementById("toast-duration-select").value = String(toastDisplayDuration);
+                document.getElementById("wake-lock-toggle").checked = safeStorage.getItem("volcano_wake_lock_enabled") === "true";
             } catch(e){}
 
             try {
@@ -1691,6 +1771,66 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             safeStorage.setItem("volcano_toast_duration", value);
             showToast("設定完了", `通知の表示時間を${Number(value)/1000}秒に変更しました`, false, "timer");
         }
+
+        // 🚀 M3Eデザイン: スライダーの値に応じて塗りつぶし位置(--m3-slider-fill)を更新
+        function updateSliderFillVar(el) {
+            const min = Number(el.min), max = Number(el.max), val = Number(el.value);
+            const pct = ((val - min) / (max - min)) * 100;
+            el.style.setProperty('--m3-slider-fill', pct + '%');
+        }
+
+        // 🚀 新機能: オフライン検知
+        function updateOnlineStatus() {
+            const banner = document.getElementById("offline-banner"); if (!banner) return;
+            if (navigator.onLine) { banner.classList.add("hidden"); } else { banner.classList.remove("hidden"); }
+        }
+        window.addEventListener("online", () => { updateOnlineStatus(); showToast("オンライン復帰", "インターネット接続が復旧しました", false, "wifi"); forceSyncFromFirebase(); });
+        window.addEventListener("offline", () => { updateOnlineStatus(); showToast("オフライン", "インターネット接続が切れました", true, "cloud_off"); });
+
+        // 🚀 新機能: 画面の自動スリープ防止(Wake Lock)
+        let wakeLockSentinel = null;
+        async function toggleWakeLock(isOn) {
+            safeStorage.setItem("volcano_wake_lock_enabled", isOn ? "true" : "false");
+            if (isOn) {
+                if (!('wakeLock' in navigator)) { showToast("非対応", "この端末・ブラウザはスリープ防止に対応していません", true); document.getElementById("wake-lock-toggle").checked = false; return; }
+                try {
+                    wakeLockSentinel = await navigator.wakeLock.request('screen');
+                    showToast("設定完了", "画面の自動スリープを防止します", false, "visibility");
+                    wakeLockSentinel.addEventListener('release', () => { console.log("WakeLock released"); });
+                } catch (e) { console.warn("WakeLock取得失敗", e); showToast("エラー", "スリープ防止を有効にできませんでした", true); }
+            } else {
+                if (wakeLockSentinel) { wakeLockSentinel.release(); wakeLockSentinel = null; }
+                showToast("設定完了", "画面の自動スリープ防止をオフにしました", false, "visibility_off");
+            }
+        }
+        // タブがバックグラウンドから復帰した際、WakeLockが自動解除されているので再取得する
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && safeStorage.getItem("volcano_wake_lock_enabled") === "true" && 'wakeLock' in navigator) {
+                try { wakeLockSentinel = await navigator.wakeLock.request('screen'); } catch (e) {}
+            }
+        });
+
+        // 🚀 新機能: 読み上げ音声の選択
+        let selectedTTSVoice = null;
+        function populateVoiceOptions() {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            const jaVoices = voices.filter(v => v.lang.startsWith('ja'));
+            const list = jaVoices.length > 0 ? jaVoices : voices;
+            const select = document.getElementById("tts-voice-select"); if (!select) return;
+            if (list.length === 0) return; // まだ読み込み中の場合は次のonvoiceschangedで再試行される
+            const savedName = safeStorage.getItem("volcano_tts_voice_name");
+            select.innerHTML = list.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
+            const match = list.find(v => v.name === savedName);
+            selectedTTSVoice = match || list[0];
+            select.value = selectedTTSVoice.name;
+        }
+        function updateTTSVoice(name) {
+            const voices = window.speechSynthesis.getVoices();
+            const found = voices.find(v => v.name === name);
+            if (found) { selectedTTSVoice = found; safeStorage.setItem("volcano_tts_voice_name", name); showToast("設定完了", "読み上げ音声を変更しました", false, "record_voice_over"); }
+        }
+        if ('speechSynthesis' in window) { window.speechSynthesis.onvoiceschanged = populateVoiceOptions; }
 
         function updateAlarmSound(value) {
             alarmSoundType = value;
@@ -2254,7 +2394,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             const v = volcanoData.find(x => String(x.id) === String(id)); if(!v) return;
             if('speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); }
             playChimeNotes([{f:440,d:0.6},{f:554,d:0.6},{f:659,d:0.6},{f:880,d:0.9}]);
-            setTimeout(() => { if('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(`、、、、、、火山防災情報。${v.name}の警戒レベルは、レベル${v.level}です。状況をお伝えします。${v.comment}`); u.lang="ja-JP"; u.rate=speechRate; u.pitch=speechPitch; window.speechSynthesis.speak(u); } }, 300);
+            setTimeout(() => { if('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(`、、、、、、火山防災情報。${v.name}の警戒レベルは、レベル${v.level}です。状況をお伝えします。${v.comment}`); u.lang="ja-JP"; u.rate=speechRate; u.pitch=speechPitch; if (selectedTTSVoice) u.voice = selectedTTSVoice; window.speechSynthesis.speak(u); } }, 300);
         }
 
         function readAllHighLevelAlerts() {
@@ -2265,12 +2405,12 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             setTimeout(() => {
                 let fullText = "、、、、、、緊急避難警報。一括読み上げを開始します。";
                 highLevelVols.forEach(v => { fullText += `、${v.name}、警戒レベル${v.level}。${v.comment}`; }); fullText += "、以上です。命を守る行動を心がけてください。";
-                if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(fullText); u.lang = "ja-JP"; u.rate = speechRate; u.pitch = speechPitch; window.speechSynthesis.speak(u); }
+                if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(fullText); u.lang = "ja-JP"; u.rate = speechRate; u.pitch = speechPitch; if (selectedTTSVoice) u.voice = selectedTTSVoice; window.speechSynthesis.speak(u); }
             }, 300);
         }
 
         function updateSpeechSettings() {
-            speechRate = parseFloat(document.getElementById("speech-rate").value); speechPitch = parseFloat(document.getElementById("speech-pitch").value);
+            speechRate = parseFloat(document.getElementById("tts-rate-slider").value); speechPitch = parseFloat(document.getElementById("speech-pitch").value);
             document.getElementById("rate-val").innerText = speechRate.toFixed(1) + "x"; document.getElementById("pitch-val").innerText = speechPitch.toFixed(1);
             safeStorage.setItem("volcano_speech_rate", speechRate); safeStorage.setItem("volcano_speech_pitch", speechPitch);
         }
