@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.6">
+    <link rel="stylesheet" href="./tailwind.css?v=9.7">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -376,12 +376,9 @@
             #notification-card .p-6.overflow-y-auto, #settings-modal .overflow-y-auto {
                 padding-bottom: 110px !important;
             }
-            /* 🚀 スマホではヘッダーの日付・時刻の代わりに同期ステータスを表示する */
-            .header-clock-only {
+            /* 🚀 スマホではヘッダーの日付・時刻表示を非表示にする(同期ステータスは既存の表示のみを使用) */
+            #header-clock-display {
                 display: none !important;
-            }
-            .header-status-only {
-                display: inline-flex !important;
             }
         }
         /* 🚀 新機能: ステータスバー(ヘッダー)と速報テロップを、スクロールしても常に上部に固定表示する
@@ -504,7 +501,7 @@
             <div class="absolute w-full h-full rounded-full border-2 border-[var(--primary)] opacity-20 animate-ping"></div>
         </div>
         <h1 class="text-3xl font-black tracking-widest mb-2 drop-shadow-md">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v9.1 Ultimate Evolution</p>
+        <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v9.7 Ultimate Evolution</p>
     </div>
 
     <!-- 🚀 新機能: アプリロック画面(PINコードで解除) -->
@@ -621,7 +618,9 @@
                 <button onclick="closeHistoryModal()" class="w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v9.1 (M3 Expressive & 実用機能強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】お気に入り(ピン留め)機能 - よく見る火山を一覧の先頭に固定表示</li><li>【新機能】防災チェックリスト機能を追加(水・非常食など標準項目つき、自由にカスタマイズ可能)</li><li>【新機能】避難所ボタンが現在地からの経路をGoogleマップで直接表示するように強化</li><li>【新機能】管理者用データバックアップ機能(現在の火山データをJSONファイルとして書き出し)</li><li>アプリロックから生体認証機能を削除し、確実に動作するPINコード方式に一本化</li><li>詳細画面(全画面カード表示)の操作ボタンを右側から左側(状況・アドバイスの下)に移動</li><li>同期時などのポップアップ通知を、画面下部から上部(スマホの通知シェード風)にデザイン一新</li><li>Tailwindの事前ビルドCSSに新しいクラスが反映されていなかった不具合を修正(アプリロック等の表示崩れの根本原因)</li><li>絵文字アイコンをMaterial Symbolsアイコンに順次置き換え、全体的な角丸をより丸みの強いMaterial 3 Expressiveデザインに強化</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v9.7 (Liquid Glass & 安定性強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】スマホのタブバーを、液体ガラス風の楕円インジケーターがタップ/ドラッグで滑らかに移動するデザインに刷新</li><li>【新機能】オフライン検知バナー・画面の自動スリープ防止(Wake Lock)・読み上げ音声の選択機能を追加</li><li>【新機能】火山名での検索、サイレントタイム(時間帯で自動読上を停止)、防災ハンドブックを追加</li><li>アプリのバージョン表記とキャッシュのバージョンがズレていた問題を解消し、今後は同期させる運用に変更</li><li>ヘッダーの同期ステータスが2重表示されてしまうバグを修正</li><li>ダークモードの背景・カードの角丸・起動アニメーションが崩れることがあった問題に対し、外部CSSファイルに依存しない防御策を追加</li><li>通知履歴・設定をスマホでは独立したタブとして扱うよう変更(閉じるボタンを廃止しタブバーで一貫して行き来できるように)</li><li>パフォーマンス優先モードを強化し、低スペック端末でもぼかし効果を完全にオフにできるように</li><li>読み上げ速度スライダーをMaterial 3 Expressiveデザインに変更</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-90"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-700 dark:text-gray-300 text-base mb-1">v9.2〜v9.6 (デザイン・安定性の継続改善)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>ポップアップ通知をiOS風のスプリングアニメーション・液体ガラス風デザインに変更</li><li>スマホ表示のカードをさらにコンパクト化し、画像・山名を見やすいバランスに調整</li><li>山名が1文字ずつ縦に改行されてしまう表示崩れを修正</li><li>お気に入り(ピン留め)機能を追加</li><li>ヘッダー・速報テロップをスクロール時も常に上部に固定表示するよう変更</li><li>検索ボタンの配置・避難所検索の挙動を調整</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v9.1 (M3 Expressive & 実用機能強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>【新機能】お気に入り(ピン留め)機能 - よく見る火山を一覧の先頭に固定表示</li><li>【新機能】防災チェックリスト機能を追加(水・非常食など標準項目つき、自由にカスタマイズ可能)</li><li>【新機能】避難所ボタンが現在地からの経路をGoogleマップで直接表示するように強化</li><li>【新機能】管理者用データバックアップ機能(現在の火山データをJSONファイルとして書き出し)</li><li>アプリロックから生体認証機能を削除し、確実に動作するPINコード方式に一本化</li><li>詳細画面(全画面カード表示)の操作ボタンを右側から左側(状況・アドバイスの下)に移動</li><li>同期時などのポップアップ通知を、画面下部から上部(スマホの通知シェード風)にデザイン一新</li><li>Tailwindの事前ビルドCSSに新しいクラスが反映されていなかった不具合を修正(アプリロック等の表示崩れの根本原因)</li><li>絵文字アイコンをMaterial Symbolsアイコンに順次置き換え、全体的な角丸をより丸みの強いMaterial 3 Expressiveデザインに強化</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v9.0 (安定・セキュリティ強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>【新機能】アプリのバージョン自動確認・キャッシュ由来の旧バージョン残留を検知して更新を促す機能を追加</li><li>【新機能】4桁のPINコードでアプリ自体をロックできる「アプリロック」機能を追加</li><li>【新機能】起動アニメーションをより豪華に(噴火口グロー・追加の噴石・画面フラッシュ演出)</li><li>設定画面のアイコンが中心からズレていた表示崩れを修正</li><li>GChat Webhook機能を削除し、プッシュ通知まわりをシンプル化</li><li>スマートフォン(縦長画面)のレベル1〜5凡例を非表示にし、画面占有を削減</li><li>火山カードに添付した音声が再生できなかった不具合を修正(再生ボタンの追加と再生失敗時のエラー表示)</li><li>スマートフォン表示のカードを大幅コンパクト化(画像を左・状況を右に配置、履歴/共有等は詳細画面へ集約)</li><li>カード内の「気象局発表」表記を削除</li><li>設定画面を含む全体的なMaterial 3 Expressiveデザインの底上げ</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v8.2 (究極進化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>【新機能】噴火音の録音をアップロードして再生できる音声機能の実装</li><li>【新機能】カスタムアラート音のアップロード・全体同期機能の追加</li><li>【機密設定】特殊コードによる高度な設定管理機能を解放</li><li>設定モーダル等が開けなくなるスクリプト切断バグを完全に根絶・復元</li><li>時計表示が「ーーー」になって動作停止していたエラーを完全に解決</li><li>同期のタイミングで山が一時的に消える・通知が重複するバグを徹底修正</li><li>スマートフォン（縦長画面）におけるタイトル非表示などのダッシュボードコンパクト化</li><li>スマートフォン用の下部タブバーに正しく「ホーム」「通知履歴」「設定」の文字ラベルを完全復活</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v8.0 〜 v8.1</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>過去のプッシュ通知閲覧・保持機能を実装（設定の隣およびボトムナビに配置）</li><li>アプリ名の下のサブメッセージ文字を削除し、ヘッダーを劇的にクリーン化</li><li>スプラッシュ（起動画面）にCSS3によるおしゃれな「山体噴火アニメーション」を搭載</li><li>GIFアニメーション（動く画像）のカスタム画像アップロードに対応（キャンバス圧縮を自動バイパス）</li><li>全体的な画面・カードへの滑らかなM3Eアニメーションを追加</li></ul></div>
@@ -692,17 +691,19 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
     <!-- 📱 モバイル用 フローティングボトムナビゲーション(すりガラス風) -->
     <nav id="mobile-tab-bar" class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
-        <div class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/18 dark:bg-[#0D0E11]/22 backdrop-blur-3xl backdrop-saturate-150 border border-white/25 rounded-full shadow-2xl px-2 py-2">
-            <div onclick="switchToMobileTab('home')" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
-                <div id="nav-tab-home-pill" class="w-14 h-8 rounded-full bg-white/95 flex items-center justify-center transition-colors shadow-sm"><span id="nav-tab-home-icon" class="material-symbols-rounded text-xl text-[#1D1B20]">space_dashboard</span></div>
+        <div id="floating-tabbar-wrap" class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/18 dark:bg-[#0D0E11]/22 backdrop-blur-3xl backdrop-saturate-150 border border-white/25 rounded-full shadow-2xl px-2 py-2 relative">
+            <!-- 🚀 新機能: 液体ガラス風のスライド式インジケーター(タップ/ドラッグで移動) -->
+            <div id="tab-glass-indicator" class="absolute top-2 rounded-full bg-white/95 shadow-sm pointer-events-none" style="transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); height: 32px;"></div>
+            <div onclick="switchToMobileTab('home')" data-tab="home" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
+                <div class="w-14 h-8 flex items-center justify-center"><span id="nav-tab-home-icon" class="material-symbols-rounded text-xl text-[#1D1B20]">space_dashboard</span></div>
                 <span id="nav-tab-home-label" class="text-[10px] font-black mt-1 text-white">ホーム</span>
             </div>
-            <div onclick="switchToMobileTab('notifications')" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative">
-                <div id="nav-tab-notifications-pill" class="w-14 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-white/10 relative"><span id="nav-tab-notifications-icon" class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">notifications</span><span id="nav-notif-badge" class="absolute top-1 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#1D1B20] hidden"></span></div>
+            <div onclick="switchToMobileTab('notifications')" data-tab="notifications" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
+                <div class="w-14 h-8 flex items-center justify-center relative"><span id="nav-tab-notifications-icon" class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">notifications</span><span id="nav-notif-badge" class="absolute top-1 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#1D1B20] hidden"></span></div>
                 <span id="nav-tab-notifications-label" class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">通知履歴</span>
             </div>
-            <div onclick="switchToMobileTab('settings')" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
-                <div id="nav-tab-settings-pill" class="w-14 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-white/10"><span id="nav-tab-settings-icon" class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">settings</span></div>
+            <div onclick="switchToMobileTab('settings')" data-tab="settings" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
+                <div class="w-14 h-8 flex items-center justify-center"><span id="nav-tab-settings-icon" class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">settings</span></div>
                 <span id="nav-tab-settings-label" class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">設定</span>
             </div>
         </div>
@@ -738,9 +739,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     <h1 class="text-xl sm:text-2xl font-black tracking-tight hidden sm:flex items-center gap-2 drop-shadow-md">火山防災情報局<span class="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded-m3-full uppercase font-black tracking-widest animate-pulse shadow-sm">Live</span></h1>
                 </div>
                 <div id="header-clock-display" class="bg-white/10 px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-bold font-mono flex items-center gap-2 border border-white/10 shadow-sm backdrop-blur-md">
-                    <span class="material-symbols-rounded text-sm text-red-400 header-clock-only">schedule</span><span id="live-clock" class="header-clock-only">----/--/-- --:--:--</span>
-                    <!-- 🚀 新機能: スマホでは時刻の代わりに同期ステータスを表示 -->
-                    <span id="header-status-dot" class="header-status-only hidden w-2.5 h-2.5 bg-gray-400 rounded-full"></span><span id="header-status-text" class="header-status-only hidden">接続試行中...</span>
+                    <span class="material-symbols-rounded text-sm text-red-400">schedule</span><span id="live-clock">----/--/-- --:--:--</span>
                 </div>
             </div>
 
@@ -991,7 +990,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         </div>
                         <div id="settings-admin-version-panel" class="hidden pt-2">
                             <button onclick="publishCurrentVersionToServer()" class="w-full py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-[10px] font-black rounded-m3-full transition flex items-center justify-center gap-1.5 dark:text-white">
-                                <span class="material-symbols-rounded text-sm">cloud_upload</span> 現在のバージョン(v9.1)を全端末に配信登録
+                                <span class="material-symbols-rounded text-sm">cloud_upload</span> 現在のバージョン(v9.7)を全端末に配信登録
                             </button>
                         </div>
                     </div>
@@ -1088,6 +1087,20 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                 <span class="text-[10px] text-gray-400">〜</span>
                                 <select id="silent-time-end" onchange="updateSilentTimeSetting()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-2 py-1 text-[10px] font-bold dark:text-white focus:outline-none"></select>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- 🚀 新機能: 触覚フィードバック -->
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-bold dark:text-white block flex items-center gap-1.5"><span class="material-symbols-rounded text-sm">vibration</span>触覚フィードバック</span>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">タブ切替などの操作時に軽く振動させます(対応端末のみ)</span>
+                            </div>
+                            <label class="m3-switch shrink-0 ml-3">
+                                <input type="checkbox" id="haptic-toggle" onchange="toggleHaptic(this.checked)">
+                                <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
+                            </label>
                         </div>
                     </div>
 
@@ -1274,7 +1287,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 </div>
             </div>
             <div class="border-t dark:border-gray-800 pt-4 text-center">
-                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v9.1 (Ultimate Custom Pro)</span>
+                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v9.7 (Ultimate Custom Pro)</span>
             </div>
         </div>
     </div>
@@ -1319,7 +1332,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'volcano-app-pwa-m3';
         // 🚀 新機能: アプリバージョン管理(キャッシュにより古いバージョンが開き続ける問題への対策)
-        const APP_VERSION = "9.1";
+        const APP_VERSION = "9.7";
 
         let volcanoData = [];
         let currentTabs = {}; 
@@ -1403,7 +1416,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // 🚀 バグ修正: ホームタブに戻っても他のタブ(通知履歴・設定)の画面が
         // 重なって表示されたままになる問題への対策。タブ切り替え時に必ず他の画面を閉じてから
         // 目的のタブを開く、一貫した排他制御に統一する。
+        let currentMobileTab = 'home';
         function switchToMobileTab(tab) {
+            currentMobileTab = tab;
+            triggerHaptic(15);
             closeNotificationModal();
             toggleSettingsModal(false);
             if (tab === 'home') {
@@ -1415,22 +1431,77 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             }
             updateMobileTabActiveState(tab);
         }
+        // 🚀 新機能: 液体ガラスのスライド式インジケーター。タップで滑らかに移動し、
+        // ドラッグ(スワイプ)でも指の位置に追従して別のタブへ切り替えられる。
         function updateMobileTabActiveState(tab) {
             const tabs = { home: 'nav-tab-home', notifications: 'nav-tab-notifications', settings: 'nav-tab-settings' };
             Object.keys(tabs).forEach(key => {
-                const pill = document.getElementById(tabs[key] + '-pill'); const label = document.getElementById(tabs[key] + '-label'); const icon = document.getElementById(tabs[key] + '-icon');
-                if (!pill || !label || !icon) return;
+                const label = document.getElementById(tabs[key] + '-label'); const icon = document.getElementById(tabs[key] + '-icon');
+                if (!label || !icon) return;
                 if (key === tab) {
-                    pill.classList.add("bg-white/95"); pill.classList.remove("bg-transparent");
-                    label.classList.add("text-white"); label.classList.remove("text-gray-300");
+                    label.classList.add("text-[#1D1B20]"); label.classList.remove("text-gray-300", "text-white");
                     icon.classList.add("text-[#1D1B20]"); icon.classList.remove("text-gray-300");
                 } else {
-                    pill.classList.remove("bg-white/95"); pill.classList.add("bg-transparent");
-                    label.classList.remove("text-white"); label.classList.add("text-gray-300");
+                    label.classList.remove("text-[#1D1B20]", "text-white"); label.classList.add("text-gray-300");
                     icon.classList.remove("text-[#1D1B20]"); icon.classList.add("text-gray-300");
                 }
             });
+            const activeEl = document.querySelector(`.tab-item[data-tab="${tab}"]`);
+            const indicator = document.getElementById("tab-glass-indicator");
+            if (activeEl && indicator) {
+                indicator.style.left = activeEl.offsetLeft + 'px';
+                indicator.style.width = activeEl.offsetWidth + 'px';
+            }
         }
+
+        // 🚀 タブバーのドラッグ(スワイプ)対応: 楕円を指で押しながら動かすと、
+        // 離した位置に一番近いタブへスナップして切り替わる
+        (function setupTabBarDrag() {
+            let dragging = false;
+            function init() {
+                const wrap = document.getElementById("floating-tabbar-wrap");
+                const indicator = document.getElementById("tab-glass-indicator");
+                if (!wrap || !indicator) return;
+                const start = (e) => {
+                    dragging = true;
+                    indicator.style.transition = 'none';
+                    indicator.classList.add("scale-105");
+                };
+                const move = (e) => {
+                    if (!dragging) return;
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const rect = wrap.getBoundingClientRect();
+                    let x = clientX - rect.left - (indicator.offsetWidth / 2);
+                    x = Math.max(8, Math.min(x, rect.width - indicator.offsetWidth - 8));
+                    indicator.style.left = x + 'px';
+                };
+                const end = (e) => {
+                    if (!dragging) return;
+                    dragging = false;
+                    indicator.style.transition = 'left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    indicator.classList.remove("scale-105");
+                    // 一番近いタブを探してスナップ
+                    const items = Array.from(wrap.querySelectorAll('.tab-item'));
+                    const indicatorCenter = indicator.offsetLeft + (indicator.offsetWidth / 2);
+                    let closest = items[0]; let minDist = Infinity;
+                    items.forEach(item => {
+                        const center = item.offsetLeft + (item.offsetWidth / 2);
+                        const dist = Math.abs(center - indicatorCenter);
+                        if (dist < minDist) { minDist = dist; closest = item; }
+                    });
+                    switchToMobileTab(closest.dataset.tab);
+                    triggerHaptic([10, 30, 10]);
+                };
+                indicator.addEventListener('touchstart', start, { passive: true });
+                indicator.addEventListener('mousedown', start);
+                window.addEventListener('touchmove', move, { passive: true });
+                window.addEventListener('mousemove', move);
+                window.addEventListener('touchend', end);
+                window.addEventListener('mouseup', end);
+            }
+            if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+        })();
+        window.addEventListener('resize', () => { updateMobileTabActiveState(currentMobileTab || 'home'); });
 
         function toggleSettingsModal(s) {
             const m = document.getElementById("settings-modal"); const sh = document.getElementById("settings-sheet");
@@ -1542,6 +1613,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         window.onload = function() {
             document.documentElement.classList.add('splash-active');
             updateOnlineStatus();
+            setTimeout(() => updateMobileTabActiveState('home'), 100);
             if ('speechSynthesis' in window) { setTimeout(populateVoiceOptions, 500); }
             // 🚀 新機能: アプリロックが有効なら、スプラッシュの裏側に即座にロック画面を用意しておく
             checkAppLockOnStartup();
@@ -1586,6 +1658,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 toastDisplayDuration = Number(safeStorage.getItem("volcano_toast_duration") || 4500);
                 document.getElementById("toast-duration-select").value = String(toastDisplayDuration);
                 document.getElementById("wake-lock-toggle").checked = safeStorage.getItem("volcano_wake_lock_enabled") === "true";
+                hapticEnabled = safeStorage.getItem("volcano_haptic_enabled") !== "false";
+                document.getElementById("haptic-toggle").checked = hapticEnabled;
             } catch(e){}
 
             try {
@@ -1878,6 +1952,19 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         }
         if ('speechSynthesis' in window) { window.speechSynthesis.onvoiceschanged = populateVoiceOptions; }
 
+        // 🚀 新機能: 触覚フィードバック(バイブレーション)。対応端末でタブ切替や重要操作時に振動する。
+        let hapticEnabled = true;
+        function triggerHaptic(pattern) {
+            if (!hapticEnabled || !('vibrate' in navigator)) return;
+            try { navigator.vibrate(pattern || 15); } catch (e) {}
+        }
+        function toggleHaptic(checked) {
+            hapticEnabled = checked;
+            safeStorage.setItem("volcano_haptic_enabled", checked ? "true" : "false");
+            if (checked) triggerHaptic(20);
+            showToast("設定完了", checked ? "触覚フィードバックを有効にしました" : "触覚フィードバックを無効にしました", false, "vibration");
+        }
+
         function updateAlarmSound(value) {
             alarmSoundType = value;
             safeStorage.setItem("volcano_alarm_sound", value);
@@ -1968,10 +2055,6 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 if (textEl) { textEl.innerText = text; textEl.className = "text-[11px] font-black text-gray-500"; }
                 if (localBtn) localBtn.classList.add("hidden"); if (fabIcon) fabIcon.classList.add("animate-spin-once");
             }
-            // 🚀 新機能: スマホのヘッダー(旧クロック位置)にも同じステータスをミラー表示する
-            const hDot = document.getElementById("header-status-dot"); const hText = document.getElementById("header-status-text");
-            if (hDot && dot) hDot.className = dot.className.replace("inline-block", "") + " header-status-only";
-            if (hText && textEl) { hText.innerText = textEl.innerText; hText.className = "header-status-only text-white"; }
         }
 
         function switchToLocalMode() {
