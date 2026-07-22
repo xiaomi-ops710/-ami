@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.5">
+    <link rel="stylesheet" href="./tailwind.css?v=9.6">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -376,9 +376,12 @@
             #notification-card .p-6.overflow-y-auto, #settings-modal .overflow-y-auto {
                 padding-bottom: 110px !important;
             }
-            /* 🚀 スマホではヘッダーの日付・時刻表示を非表示にする */
-            #header-clock-display {
+            /* 🚀 スマホではヘッダーの日付・時刻の代わりに同期ステータスを表示する */
+            .header-clock-only {
                 display: none !important;
+            }
+            .header-status-only {
+                display: inline-flex !important;
             }
         }
         /* 🚀 新機能: ステータスバー(ヘッダー)と速報テロップを、スクロールしても常に上部に固定表示する
@@ -432,6 +435,14 @@
         html.perf-mode .hover\:shadow-m3-elevation-3:hover {
             box-shadow: none !important;
         }
+        /* 🚀 バグ修正: tailwind.cssの読み込み不良・キャッシュ不整合が起きても、
+           最低限「ダークモードの背景が黒くなる」「カードの角が丸くなる」ことを
+           プレーンCSSで直接保証する(外部ファイルに依存しない防御策)。 */
+        #app-background { background-color: #F3F4F9; }
+        html.dark #app-background, .dark #app-background { background-color: #111318 !important; }
+        .card-container, .m3-card { border-radius: 28px !important; }
+        .card-visual { border-radius: 28px !important; }
+        #splash-screen { display: flex !important; }
     </style>
     <style>
         /* 🚀 新機能: 読み上げ速度スライダーをMaterial 3 Expressiveデザイン(2分割トラック+縦バーのつまみ)に変更 */
@@ -453,6 +464,7 @@
         }
         #tts-rate-slider::-moz-range-track { height: 20px; border-radius: 9999px; background: var(--primary-container); }
         #tts-rate-slider::-moz-range-progress { height: 20px; border-radius: 9999px; background: var(--primary); }
+    </style>
 
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
@@ -681,17 +693,17 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     <!-- 📱 モバイル用 フローティングボトムナビゲーション(すりガラス風) -->
     <nav id="mobile-tab-bar" class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
         <div class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/18 dark:bg-[#0D0E11]/22 backdrop-blur-3xl backdrop-saturate-150 border border-white/25 rounded-full shadow-2xl px-2 py-2">
-            <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
-                <div class="w-14 h-8 rounded-full bg-white/95 flex items-center justify-center transition-colors shadow-sm"><span class="material-symbols-rounded text-xl text-[#1D1B20]">space_dashboard</span></div>
-                <span class="text-[10px] font-black mt-1 text-white">ホーム</span>
+            <div onclick="switchToMobileTab('home')" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
+                <div id="nav-tab-home-pill" class="w-14 h-8 rounded-full bg-white/95 flex items-center justify-center transition-colors shadow-sm"><span id="nav-tab-home-icon" class="material-symbols-rounded text-xl text-[#1D1B20]">space_dashboard</span></div>
+                <span id="nav-tab-home-label" class="text-[10px] font-black mt-1 text-white">ホーム</span>
             </div>
-            <div onclick="openNotificationModal()" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative">
-                <div class="w-14 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-white/10 relative"><span class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">notifications</span><span id="nav-notif-badge" class="absolute top-1 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#1D1B20] hidden"></span></div>
-                <span class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">通知履歴</span>
+            <div onclick="switchToMobileTab('notifications')" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative">
+                <div id="nav-tab-notifications-pill" class="w-14 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-white/10 relative"><span id="nav-tab-notifications-icon" class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">notifications</span><span id="nav-notif-badge" class="absolute top-1 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#1D1B20] hidden"></span></div>
+                <span id="nav-tab-notifications-label" class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">通知履歴</span>
             </div>
-            <div onclick="toggleSettingsModal(true)" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
-                <div class="w-14 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-white/10"><span class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">settings</span></div>
-                <span class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">設定</span>
+            <div onclick="switchToMobileTab('settings')" class="flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform">
+                <div id="nav-tab-settings-pill" class="w-14 h-8 rounded-full bg-transparent flex items-center justify-center transition-colors group-hover:bg-white/10"><span id="nav-tab-settings-icon" class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">settings</span></div>
+                <span id="nav-tab-settings-label" class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">設定</span>
             </div>
         </div>
     </nav>
@@ -726,7 +738,9 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     <h1 class="text-xl sm:text-2xl font-black tracking-tight hidden sm:flex items-center gap-2 drop-shadow-md">火山防災情報局<span class="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded-m3-full uppercase font-black tracking-widest animate-pulse shadow-sm">Live</span></h1>
                 </div>
                 <div id="header-clock-display" class="bg-white/10 px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-bold font-mono flex items-center gap-2 border border-white/10 shadow-sm backdrop-blur-md">
-                    <span class="material-symbols-rounded text-sm text-red-400">schedule</span><span id="live-clock">----/--/-- --:--:--</span>
+                    <span class="material-symbols-rounded text-sm text-red-400 header-clock-only">schedule</span><span id="live-clock" class="header-clock-only">----/--/-- --:--:--</span>
+                    <!-- 🚀 新機能: スマホでは時刻の代わりに同期ステータスを表示 -->
+                    <span id="header-status-dot" class="header-status-only hidden w-2.5 h-2.5 bg-gray-400 rounded-full"></span><span id="header-status-text" class="header-status-only hidden">接続試行中...</span>
                 </div>
             </div>
 
@@ -1386,6 +1400,38 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         }
 
         // ⚙️ 設定モーダルの開閉機能
+        // 🚀 バグ修正: ホームタブに戻っても他のタブ(通知履歴・設定)の画面が
+        // 重なって表示されたままになる問題への対策。タブ切り替え時に必ず他の画面を閉じてから
+        // 目的のタブを開く、一貫した排他制御に統一する。
+        function switchToMobileTab(tab) {
+            closeNotificationModal();
+            toggleSettingsModal(false);
+            if (tab === 'home') {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } else if (tab === 'notifications') {
+                openNotificationModal();
+            } else if (tab === 'settings') {
+                toggleSettingsModal(true);
+            }
+            updateMobileTabActiveState(tab);
+        }
+        function updateMobileTabActiveState(tab) {
+            const tabs = { home: 'nav-tab-home', notifications: 'nav-tab-notifications', settings: 'nav-tab-settings' };
+            Object.keys(tabs).forEach(key => {
+                const pill = document.getElementById(tabs[key] + '-pill'); const label = document.getElementById(tabs[key] + '-label'); const icon = document.getElementById(tabs[key] + '-icon');
+                if (!pill || !label || !icon) return;
+                if (key === tab) {
+                    pill.classList.add("bg-white/95"); pill.classList.remove("bg-transparent");
+                    label.classList.add("text-white"); label.classList.remove("text-gray-300");
+                    icon.classList.add("text-[#1D1B20]"); icon.classList.remove("text-gray-300");
+                } else {
+                    pill.classList.remove("bg-white/95"); pill.classList.add("bg-transparent");
+                    label.classList.remove("text-white"); label.classList.add("text-gray-300");
+                    icon.classList.remove("text-[#1D1B20]"); icon.classList.add("text-gray-300");
+                }
+            });
+        }
+
         function toggleSettingsModal(s) {
             const m = document.getElementById("settings-modal"); const sh = document.getElementById("settings-sheet");
             if(!m || !sh) return;
@@ -1922,6 +1968,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 if (textEl) { textEl.innerText = text; textEl.className = "text-[11px] font-black text-gray-500"; }
                 if (localBtn) localBtn.classList.add("hidden"); if (fabIcon) fabIcon.classList.add("animate-spin-once");
             }
+            // 🚀 新機能: スマホのヘッダー(旧クロック位置)にも同じステータスをミラー表示する
+            const hDot = document.getElementById("header-status-dot"); const hText = document.getElementById("header-status-text");
+            if (hDot && dot) hDot.className = dot.className.replace("inline-block", "") + " header-status-only";
+            if (hText && textEl) { hText.innerText = textEl.innerText; hText.className = "header-status-only text-white"; }
         }
 
         function switchToLocalMode() {
