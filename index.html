@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.7">
+    <link rel="stylesheet" href="./tailwind.css?v=9.8">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -693,9 +693,9 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     <nav id="mobile-tab-bar" class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
         <div id="floating-tabbar-wrap" class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/18 dark:bg-[#0D0E11]/22 backdrop-blur-3xl backdrop-saturate-150 border border-white/25 rounded-full shadow-2xl px-2 py-2 relative">
             <!-- 🚀 新機能: 液体ガラス風のスライド式インジケーター(タップ/ドラッグで移動) -->
-            <div id="tab-glass-indicator" class="absolute top-2 rounded-full bg-white/95 shadow-sm pointer-events-none" style="transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); height: 32px;"></div>
+            <div id="tab-glass-indicator" class="absolute top-2 rounded-full bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/15 shadow-sm pointer-events-none" style="transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); height: 32px;"></div>
             <div onclick="switchToMobileTab('home')" data-tab="home" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
-                <div class="w-14 h-8 flex items-center justify-center"><span id="nav-tab-home-icon" class="material-symbols-rounded text-xl text-[#1D1B20]">space_dashboard</span></div>
+                <div class="w-14 h-8 flex items-center justify-center"><span id="nav-tab-home-icon" class="material-symbols-rounded text-xl" style="color: var(--on-primary-container);">space_dashboard</span></div>
                 <span id="nav-tab-home-label" class="text-[10px] font-black mt-1 text-white">ホーム</span>
             </div>
             <div onclick="switchToMobileTab('notifications')" data-tab="notifications" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
@@ -1439,11 +1439,11 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 const label = document.getElementById(tabs[key] + '-label'); const icon = document.getElementById(tabs[key] + '-icon');
                 if (!label || !icon) return;
                 if (key === tab) {
-                    label.classList.add("text-[#1D1B20]"); label.classList.remove("text-gray-300", "text-white");
-                    icon.classList.add("text-[#1D1B20]"); icon.classList.remove("text-gray-300");
+                    label.classList.add("text-white"); label.classList.remove("text-gray-300");
+                    icon.style.color = "var(--on-primary-container)"; icon.classList.remove("text-gray-300");
                 } else {
-                    label.classList.remove("text-[#1D1B20]", "text-white"); label.classList.add("text-gray-300");
-                    icon.classList.remove("text-[#1D1B20]"); icon.classList.add("text-gray-300");
+                    label.classList.remove("text-white"); label.classList.add("text-gray-300");
+                    icon.style.color = ""; icon.classList.add("text-gray-300");
                 }
             });
             const activeEl = document.querySelector(`.tab-item[data-tab="${tab}"]`);
