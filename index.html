@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.9">
+    <link rel="stylesheet" href="./tailwind.css?v=9.10">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -380,6 +380,9 @@
             #header-clock-display {
                 display: none !important;
             }
+            #mobile-sync-mirror {
+                display: flex !important;
+            }
         }
         /* 🚀 新機能: ステータスバー(ヘッダー)と速報テロップを、スクロールしても常に上部に固定表示する
            (画面サイズを問わず適用: スマホ・タブレット・PCすべて対象。他のCSSに上書きされないようimportant化) */
@@ -714,11 +717,25 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         </div>
     </div>
 
+    <!-- 🚀 新機能: 統計(警戒レベル推移の折れ線グラフ)モーダル -->
+    <div id="stats-modal" class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300">
+        <div id="stats-card" class="bg-white/85 dark:bg-[#1E1F22]/85 backdrop-blur-2xl backdrop-saturate-150 w-11/12 max-w-lg max-h-[80vh] rounded-m3-large shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300 border border-white/20 dark:border-white/10">
+            <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 shrink-0 bg-gray-50/50 dark:bg-[#111318]/50">
+                <h3 id="stats-modal-title" class="text-lg font-black text-[#1C1B1F] dark:text-white flex items-center gap-2"><span class="material-symbols-rounded text-[var(--primary)]">show_chart</span> 統計</h3>
+                <button onclick="closeStatsModal()" class="w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"><span class="material-symbols-rounded">close</span></button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3">警戒レベルの推移(古い順)</p>
+                <div id="stats-chart-container" class="w-full overflow-x-auto"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- 📱 モバイル用 フローティングボトムナビゲーション(すりガラス風) -->
     <nav id="mobile-tab-bar" class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
         <div id="floating-tabbar-wrap" class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/18 dark:bg-[#0D0E11]/22 backdrop-blur-3xl backdrop-saturate-150 border border-white/25 rounded-full shadow-2xl px-2 py-2 relative">
             <!-- 🚀 新機能: 液体ガラス風のスライド式インジケーター(タップ/ドラッグで移動) -->
-            <div id="tab-glass-indicator" class="absolute top-2 bottom-2 rounded-[20px] bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/15 shadow-sm pointer-events-none" style="transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
+            <div id="tab-glass-indicator" class="absolute top-2 bottom-2 rounded-full bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/15 shadow-sm pointer-events-none" style="transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
             <div onclick="switchToMobileTab('home')" data-tab="home" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
                 <div class="w-14 h-8 flex items-center justify-center"><span id="nav-tab-home-icon" class="material-symbols-rounded text-xl" style="color: var(--on-primary-container);">space_dashboard</span></div>
                 <span id="nav-tab-home-label" class="text-[10px] font-black mt-1 text-white">ホーム</span>
@@ -762,6 +779,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 <div class="flex items-center gap-3">
                     <div id="header-icon-box" class="text-white w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500" style="background-color: var(--primary);"><span class="material-symbols-rounded text-2xl sm:text-3xl">volcano</span></div>
                     <h1 class="text-xl sm:text-2xl font-black tracking-tight hidden sm:flex items-center gap-2 drop-shadow-md">火山防災情報局<span class="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded-m3-full uppercase font-black tracking-widest animate-pulse shadow-sm">Live</span></h1>
+                    <!-- 🚀 新機能: スマホでは同期ステータスをアイコンの右隣に表示(CSSメディアクエリのみで表示切替、JSでの表示制御はしない) -->
+                    <div id="mobile-sync-mirror" class="hidden items-center gap-2 bg-white/10 border border-white/10 rounded-m3-full px-3 py-2 backdrop-blur-sm">
+                        <span id="mobile-sync-dot" class="w-2.5 h-2.5 bg-gray-400 rounded-full inline-block shrink-0"></span><span id="mobile-sync-text" class="text-[11px] font-black text-white whitespace-nowrap">接続試行中...</span>
+                    </div>
                 </div>
                 <div id="header-clock-display" class="bg-white/10 px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-bold font-mono flex items-center gap-2 border border-white/10 shadow-sm backdrop-blur-md">
                     <span class="material-symbols-rounded text-sm text-red-400">schedule</span><span id="live-clock">----/--/-- --:--:--</span>
@@ -1251,7 +1272,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </div>
 
                     <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex gap-1.5"><span id="theme-card-sync-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">cloud_sync</span> 接続・診断</h4>
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-2 flex gap-1.5"><span id="theme-card-sync-icon" class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">cloud_sync</span> 接続・診断</h4>
                         <div class="text-[10px] text-gray-500 font-mono space-y-1"><div>• Project ID: ohamigo-425a8</div></div>
                         <div id="diagnostics-box" class="hidden border-t pt-3 mt-3 dark:border-gray-800">
                             <div class="text-xs font-bold text-red-500 mb-1">⚠️ 接続障害</div>
@@ -1263,8 +1284,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         </div>
                     </div>
 
-                    <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-palette-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">palette</span> Accent Color</h4>
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-palette-icon" class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">palette</span> Accent Color</h4>
                         <div class="grid grid-cols-4 gap-2">
                             <button id="theme-btn-purple" onclick="setThemeColor('purple')" class="border-2 p-2 rounded-m3-medium bg-[#F1ECFB] dark:bg-purple-900/20 text-[#21005D] dark:text-purple-200 text-xs font-black flex flex-col items-center gap-1 transition shadow-sm"><span class="w-6 h-6 rounded-full bg-[#6750A4] shadow-inner"></span>紫</button>
                             <button id="theme-btn-blue" onclick="setThemeColor('blue')" class="border-2 p-2 rounded-m3-medium bg-[#E8F0FE] dark:bg-blue-900/20 text-[#001D36] dark:text-blue-200 text-xs font-black flex flex-col items-center gap-1 transition shadow-sm"><span class="w-6 h-6 rounded-full bg-[#1A73E8] shadow-inner"></span>青</button>
@@ -1289,8 +1310,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </button>
 
                     <!-- 🔔 バックグラウンド Push 通信の設定パネル -->
-                    <div>
-                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded text-sm" style="color: var(--primary);">notifications</span> プッシュ通知</h4>
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
+                        <h4 class="text-xs font-black dark:text-white uppercase mb-3 flex gap-1.5"><span id="theme-card-bell-icon" class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">notifications</span> プッシュ通知</h4>
                         <div class="p-3 bg-gray-50 dark:bg-[#111318] rounded-m3-medium border border-gray-100 dark:border-gray-800 mb-3">
                             <div class="space-y-2">
                                 <div class="hidden">
@@ -2014,6 +2035,39 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             }).join('');
         }
 
+        // 🚀 新機能: 統計(履歴からレベルの推移を抽出し、SVGで折れ線グラフを描画)
+        function openStatsModal(id) {
+            const v = volcanoData.find(x => String(x.id) === String(id)); if (!v) return;
+            document.getElementById("stats-modal-title").innerHTML = `<span class="material-symbols-rounded text-[var(--primary)]">show_chart</span> ${(v.name || "").replace(/</g, '&lt;')} の統計`;
+            // 履歴は新しい順(unshift)で保存されているため、古い順に並べ替えてからレベル数値を抽出する
+            const history = (v.history || []).slice().reverse();
+            const levels = history.map(h => { const m = String(h).match(/レベル\s*(\d+(?:\.\d+)?)/); return m ? Number(m[1]) : null; }).filter(l => l !== null);
+            levels.push(Number(v.level) || 1); // 現在のレベルを最新点として追加
+            renderLevelLineChart(levels);
+            const modal = document.getElementById("stats-modal"); const card = document.getElementById("stats-card");
+            modal.classList.remove("opacity-0", "pointer-events-none"); card.classList.remove("scale-95"); card.classList.add("scale-100");
+        }
+        function closeStatsModal() {
+            const modal = document.getElementById("stats-modal"); const card = document.getElementById("stats-card");
+            card.classList.remove("scale-100"); card.classList.add("scale-95"); modal.classList.add("opacity-0", "pointer-events-none");
+        }
+        function renderLevelLineChart(levels) {
+            const container = document.getElementById("stats-chart-container");
+            if (levels.length < 2) { container.innerHTML = `<p class="text-xs text-gray-400 text-center py-10">履歴データが不足しているため、グラフを表示できません(2件以上必要です)</p>`; return; }
+            const w = Math.max(340, levels.length * 60); const h = 220; const padL = 34; const padR = 16; const padT = 16; const padB = 30;
+            const maxLevel = Math.max(5, ...levels); const minLevel = 0;
+            const stepX = (w - padL - padR) / (levels.length - 1);
+            const yFor = (lvl) => padT + (h - padT - padB) * (1 - (lvl - minLevel) / (maxLevel - minLevel));
+            const points = levels.map((lvl, i) => `${padL + i * stepX},${yFor(lvl).toFixed(1)}`).join(' ');
+            const gridLines = [1, 2, 3, 4, 5].filter(l => l <= maxLevel).map(l => `<line x1="${padL}" y1="${yFor(l).toFixed(1)}" x2="${w - padR}" y2="${yFor(l).toFixed(1)}" stroke="currentColor" stroke-opacity="0.1" stroke-width="1"/><text x="4" y="${(yFor(l) + 4).toFixed(1)}" font-size="10" fill="currentColor" fill-opacity="0.5">${l}</text>`).join('');
+            const dots = levels.map((lvl, i) => `<circle cx="${(padL + i * stepX).toFixed(1)}" cy="${yFor(lvl).toFixed(1)}" r="4" fill="var(--primary)" stroke="white" stroke-width="1.5"/>`).join('');
+            container.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" class="text-gray-800 dark:text-gray-300">
+                ${gridLines}
+                <polyline points="${points}" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                ${dots}
+            </svg>`;
+        }
+
         function updateAlarmSound(value) {
             alarmSoundType = value;
             safeStorage.setItem("volcano_alarm_sound", value);
@@ -2104,6 +2158,10 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 if (textEl) { textEl.innerText = text; textEl.className = "text-[11px] font-black text-gray-500"; }
                 if (localBtn) localBtn.classList.add("hidden"); if (fabIcon) fabIcon.classList.add("animate-spin-once");
             }
+            // 🚀 新機能: スマホのヘッダー(アイコン右隣)にも同じステータスをミラー表示する
+            const mDot = document.getElementById("mobile-sync-dot"); const mText = document.getElementById("mobile-sync-text");
+            if (mDot && dot) mDot.className = dot.className;
+            if (mText && textEl) { mText.innerText = textEl.innerText; mText.className = "text-[11px] font-black text-white whitespace-nowrap"; }
         }
 
         function switchToLocalMode() {
@@ -2478,6 +2536,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             let actionHtml = `<button onclick="playEmergencyBroadcastById('${vol.id}')" class="readout-btn m3-btn w-full py-3 bg-[var(--primary-container)] hover:opacity-90 dark:bg-gray-800 dark:hover:bg-gray-700 text-[var(--on-primary-container)] dark:text-white rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">volume_up</span>読上</button>`;
             actionHtml += `<button onclick="copyVolcanoReport('${safeNameForBtn}', ${vol.level}, '${safeCommentForBtn}', '${safeTimeForBtn}')" class="m3-btn w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">content_copy</span>コピー</button>`;
             actionHtml += `<button onclick="shareVolcano('${safeNameForBtn}', ${vol.level})" class="m3-btn w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">share</span>共有</button>`;
+            actionHtml += `<button onclick="openStatsModal('${vol.id}')" class="m3-btn w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-m3-full text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">show_chart</span>統計</button>`;
             if (vol.level >= 3) { actionHtml += `<button onclick="openMap('${(vol.name || "名称未設定").replace(/'/g, "\\'")}')" class="m3-btn w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-red-200 dark:border-red-800/50 flex flex-col items-center justify-center gap-1 active:scale-95"><span class="material-symbols-rounded text-xl">map</span>避難所</button>`; }
             if (vol.customAudio) { actionHtml += `<button onclick="playCustomAudio('${vol.id}')" class="m3-btn w-full py-3 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-emerald-200 dark:border-emerald-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 col-span-2 mt-2"><span class="material-symbols-rounded text-xl">play_circle</span>噴火音声を再生</button>`; } 
             else { actionHtml += `<button onclick="window.open('https://www.jma.go.jp/bosai/map.html#contents=volcano', '_blank')" class="m3-btn w-full py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-m3-full text-xs font-black transition-all shadow-sm border border-blue-200 dark:border-blue-800/50 flex flex-col items-center justify-center gap-1 active:scale-95 col-span-2 mt-2"><span class="material-symbols-rounded text-xl">public</span>気象庁 火山マップを開く</button>`; }
@@ -2718,6 +2777,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                 <div class="flex gap-2">
                                     ${audioBtn}
                                     <div class="card-footer-actions flex gap-2">
+                                        <button onclick="event.stopPropagation(); openStatsModal('${volIdStr}')" title="統計(レベル推移)" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">show_chart</span></button>
                                         <button onclick="copyVolcanoReport('${safeName}', ${vol.level}, '${safeComment}', '${safeTime}')" title="レポートコピー" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">content_copy</span></button>
                                         <button onclick="shareVolcano('${safeName}', ${vol.level})" title="SNS等に共有" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">share</span></button>
                                         <button onclick="playEmergencyBroadcastById('${volIdStr}')" title="AI読み上げ" class="readout-btn m3-btn flex items-center gap-1.5 bg-[#E1E2EC]/50 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2 rounded-m3-full text-[11px] font-black transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-[16px]">volume_up</span>読上</button>
