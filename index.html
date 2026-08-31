@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.10">
+    <link rel="stylesheet" href="./tailwind.css?v=9.11">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +41,7 @@
             --primary-container-alpha: rgba(234, 221, 255, 0.2);
         }
         
-        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: -0.2em; }
         body { transition: color 0.4s ease, background-color 0.4s ease; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         
         /* 🔥 M3E ボタンクリック時のへこむアニメーション */
@@ -2748,7 +2748,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 const customBg = vol.cardColor ? `style="background-color: ${vol.cardColor};"` : "";
                 const cardBaseClass = vol.cardColor ? "" : "bg-white dark:bg-[#1E1F22]";
                 
-                const statusBadge = vol.level >= 100 ? `<span class="text-[10px] sm:text-xs text-red-500 font-black mt-1 flex items-center gap-1 animate-pulse"><span class="material-symbols-rounded text-sm">warning</span>超噴火危険警報</span>` : vol.level >= 6 ? `<span class="text-[10px] sm:text-xs text-red-500 font-black mt-1 flex items-center gap-1"><span class="material-symbols-rounded text-sm">warning</span>破局噴火危険状態</span>` : `<div class="text-[10px] sm:text-xs text-green-600 dark:text-green-400 font-bold mt-1 flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>${vol.status || "監視中"}</div>`;
+                const statusBadge = vol.level >= 100 ? `<span class="card-status-badge text-[10px] sm:text-xs text-red-500 font-black flex items-center gap-1 animate-pulse w-full mt-1"><span class="material-symbols-rounded text-sm">warning</span>超噴火危険警報</span>` : vol.level >= 6 ? `<span class="card-status-badge text-[10px] sm:text-xs text-red-500 font-black flex items-center gap-1 w-full mt-1"><span class="material-symbols-rounded text-sm">warning</span>破局噴火危険状態</span>` : `<div class="card-status-badge text-[10px] sm:text-xs text-green-600 dark:text-green-400 font-bold flex items-center gap-1 w-full mt-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-ping shrink-0"></span>${vol.status || "監視中"}</div>`;
                 const audioBtn = vol.customAudio ? `<button onclick="event.stopPropagation(); playCustomAudio('${volIdStr}')" title="噴火音を再生" class="m3-btn flex items-center justify-center w-10 h-10 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm border border-emerald-200 dark:border-emerald-800/50"><span class="material-symbols-rounded text-[18px]">play_circle</span></button>` : '';
                 const emergencyClass = vol.level >= 100 ? 'ultra-emergency-card' : vol.level >= 4 ? 'emergency-card' : 'border-[#E1E2EC] dark:border-gray-800/60';
 
@@ -2760,7 +2760,13 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                 </div>
                                 <div class="card-info-wrap">
                                     <div class="flex justify-between items-start mb-4 card-title-row">
-                                        <div class="flex items-start gap-1.5 card-title-name-group"><h2 class="card-title text-2xl font-black ${vol.level >= 100 ? 'text-red-500 animate-pulse' : 'text-[#1C1B1F] dark:text-white group-hover:text-[var(--primary)]'} tracking-tight drop-shadow-sm transition-colors min-w-0 truncate">${safeName}</h2>${statusBadge}<button onclick="toggleVolcanoPin('${volIdStr}', event)" title="お気に入り" class="shrink-0 mt-1 w-6 h-6 flex items-center justify-center rounded-full ${isPinned ? 'text-amber-500' : 'text-gray-300 dark:text-gray-600'} hover:text-amber-500 transition-colors"><span class="material-symbols-rounded text-lg" style="font-variation-settings: 'FILL' ${isPinned ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24;">star</span></button></div>
+                                        <div class="flex flex-col card-title-name-group">
+                                            <div class="flex items-start gap-1.5">
+                                                <h2 class="card-title text-2xl font-black ${vol.level >= 100 ? 'text-red-500 animate-pulse' : 'text-[#1C1B1F] dark:text-white group-hover:text-[var(--primary)]'} tracking-tight drop-shadow-sm transition-colors min-w-0 truncate flex-1">${safeName}</h2>
+                                                <button onclick="toggleVolcanoPin('${volIdStr}', event)" title="お気に入り" class="shrink-0 mt-1 w-6 h-6 flex items-center justify-center rounded-full ${isPinned ? 'text-amber-500' : 'text-gray-300 dark:text-gray-600'} hover:text-amber-500 transition-colors"><span class="material-symbols-rounded text-lg" style="font-variation-settings: 'FILL' ${isPinned ? 1 : 0}, 'wght' 500, 'GRAD' 0, 'opsz' 24;">star</span></button>
+                                            </div>
+                                            ${statusBadge}
+                                        </div>
                                         <div class="${tClass} text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-m3-full shadow-sm tracking-wide border border-black/5 shrink-0"><span class="material-symbols-rounded text-[13px] align-middle" style="vertical-align:-2px;">warning</span> レベル ${vol.level || 1}</div>
                                     </div>
                                     <div class="card-tabs flex bg-[#E1E2EC]/60 dark:bg-gray-800/80 p-1.5 rounded-m3-full mb-4 backdrop-blur-sm" onclick="event.stopPropagation()"><button onclick="setTab('${volIdStr}', 0)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t0}">現在の状況</button><button onclick="setTab('${volIdStr}', 1)" class="flex-1 text-center py-2 text-xs font-bold rounded-m3-full transition shadow-sm ${t1}">活動履歴</button></div>
