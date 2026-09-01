@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.11">
+    <link rel="stylesheet" href="./tailwind.css?v=9.12">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -233,6 +233,33 @@
 
         /* M3 Switch Styles */
         .m3-switch { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+        /* 🚀 M3公式リストアイテム仕様(m3.material.io/components/lists)に沿った共通コンポーネント。
+           リーディングアイコンは40dpのトーナル円、見出し+補足テキスト、トレイリング要素(スイッチ等)という
+           統一構造にすることで、設定画面全体のアイコン・余白の一貫性を保証する。 */
+        .m3-list-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 4px;
+            min-height: 56px;
+        }
+        .m3-list-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 9999px;
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 20px;
+        }
+        .m3-list-text { flex: 1; min-width: 0; }
+        .m3-list-headline { font-size: 13px; font-weight: 700; }
+        .m3-list-supporting { font-size: 11px; color: #757780; margin-top: 2px; line-height: 1.4; }
+        .dark .m3-list-supporting { color: #9AA0A6; }
+        .m3-list-trailing { flex-shrink: 0; }
         .m3-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
         .m3-switch-track { width: 52px; height: 32px; background-color: #E1E2EC; border-radius: 16px; border: 2px solid #79747E; transition: all 0.2s; position: relative; }
         .dark .m3-switch-track { background-color: #49454F; border-color: #938F99; }
@@ -1086,30 +1113,33 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </div>
 
                     <!-- 🚀 新機能: パフォーマンス優先モード -->
-                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">speed</span> パフォーマンス</h4>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-bold dark:text-white block">パフォーマンス優先モード</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">端末が重い場合、ぼかし効果や演出を画面幅に関係なく常に軽量化します</span>
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5 mb-1"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">speed</span> パフォーマンス</h4>
+                        <div class="m3-list-row">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">bolt</span></div>
+                            <div class="m3-list-text">
+                                <div class="m3-list-headline dark:text-white">パフォーマンス優先モード</div>
+                                <div class="m3-list-supporting">端末が重い場合、ぼかし効果や演出を画面幅に関係なく常に軽量化します</div>
                             </div>
-                            <label class="m3-switch shrink-0 ml-3">
+                            <label class="m3-switch m3-list-trailing">
                                 <input type="checkbox" id="perf-mode-toggle" onchange="togglePerfMode(this.checked)">
                                 <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
                             </label>
                         </div>
-                        <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
-                            <span class="text-xs font-bold dark:text-white">自動再同期</span>
-                            <select id="auto-sync-interval-select" onchange="updateAutoSyncInterval(this.value)" class="bg-transparent text-xs font-bold text-gray-800 dark:text-gray-200 focus:outline-none appearance-none cursor-pointer">
+                        <div class="m3-list-row border-t border-gray-200 dark:border-gray-700">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">sync</span></div>
+                            <div class="m3-list-text"><div class="m3-list-headline dark:text-white">自動再同期</div></div>
+                            <select id="auto-sync-interval-select" onchange="updateAutoSyncInterval(this.value)" class="m3-list-trailing bg-transparent text-xs font-bold text-gray-800 dark:text-gray-200 focus:outline-none appearance-none cursor-pointer">
                                 <option value="0">オフ(手動のみ)</option>
                                 <option value="5">5分ごと</option>
                                 <option value="15">15分ごと</option>
                                 <option value="30">30分ごと</option>
                             </select>
                         </div>
-                        <div class="pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400">最終同期</span>
-                            <span id="last-sync-display" class="text-[10px] font-mono text-gray-600 dark:text-gray-300">未同期</span>
+                        <div class="m3-list-row border-t border-gray-200 dark:border-gray-700">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">schedule</span></div>
+                            <div class="m3-list-text"><div class="m3-list-headline dark:text-white">最終同期</div></div>
+                            <span id="last-sync-display" class="m3-list-trailing text-[10px] font-mono text-gray-600 dark:text-gray-300">未同期</span>
                         </div>
                     </div>
 
@@ -1120,21 +1150,23 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </div>
 
                     <!-- 🚀 新機能: サイレントタイム -->
-                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">bedtime</span> サイレントタイム</h4>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-bold dark:text-white block">時間帯で自動読上を停止</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">就寝時間帯など、指定した時間は自動読み上げ・効果音を鳴らしません</span>
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5 mb-1"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">bedtime</span> サイレントタイム</h4>
+                        <div class="m3-list-row">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">nightlight</span></div>
+                            <div class="m3-list-text">
+                                <div class="m3-list-headline dark:text-white">時間帯で自動読上を停止</div>
+                                <div class="m3-list-supporting">就寝時間帯など、指定した時間は自動読み上げ・効果音を鳴らしません</div>
                             </div>
-                            <label class="m3-switch shrink-0 ml-3">
+                            <label class="m3-switch m3-list-trailing">
                                 <input type="checkbox" id="silent-time-toggle" onchange="updateSilentTimeSetting()">
                                 <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
                             </label>
                         </div>
-                        <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                            <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 shrink-0">時間帯</span>
-                            <div class="flex items-center gap-1.5">
+                        <div class="m3-list-row border-t border-gray-200 dark:border-gray-700">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">schedule</span></div>
+                            <div class="m3-list-text"><div class="m3-list-headline dark:text-white">時間帯</div></div>
+                            <div class="m3-list-trailing flex items-center gap-1.5">
                                 <select id="silent-time-start" onchange="updateSilentTimeSetting()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-2 py-1 text-[10px] font-bold dark:text-white focus:outline-none"></select>
                                 <span class="text-[10px] text-gray-400">〜</span>
                                 <select id="silent-time-end" onchange="updateSilentTimeSetting()" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-2 py-1 text-[10px] font-bold dark:text-white focus:outline-none"></select>
@@ -1143,13 +1175,14 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </div>
 
                     <!-- 🚀 新機能: 触覚フィードバック -->
-                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-bold dark:text-white block flex items-center gap-1.5"><span class="material-symbols-rounded text-sm">vibration</span>触覚フィードバック</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">タブ切替などの操作時に軽く振動させます(対応端末のみ)</span>
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
+                        <div class="m3-list-row">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">vibration</span></div>
+                            <div class="m3-list-text">
+                                <div class="m3-list-headline dark:text-white">触覚フィードバック</div>
+                                <div class="m3-list-supporting">タブ切替などの操作時に軽く振動させます(対応端末のみ)</div>
                             </div>
-                            <label class="m3-switch shrink-0 ml-3">
+                            <label class="m3-switch m3-list-trailing">
                                 <input type="checkbox" id="haptic-toggle" onchange="toggleHaptic(this.checked)">
                                 <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
                             </label>
@@ -1162,18 +1195,20 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </button>
 
                     <!-- 🚀 新機能: 通知(トースト)の表示設定 -->
-                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">notifications</span> アプリ内通知</h4>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold dark:text-white">効果音(UI操作音)</span>
-                            <label class="m3-switch shrink-0 ml-3">
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5 mb-1"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">notifications</span> アプリ内通知</h4>
+                        <div class="m3-list-row">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">volume_up</span></div>
+                            <div class="m3-list-text"><div class="m3-list-headline dark:text-white">効果音(UI操作音)</div></div>
+                            <label class="m3-switch m3-list-trailing">
                                 <input type="checkbox" id="ui-sound-toggle" onchange="toggleUiSound(this.checked)">
                                 <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
                             </label>
                         </div>
-                        <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
-                            <span class="text-xs font-bold dark:text-white">通知の表示時間</span>
-                            <select id="toast-duration-select" onchange="updateToastDuration(this.value)" class="bg-transparent text-xs font-bold text-gray-800 dark:text-gray-200 focus:outline-none appearance-none cursor-pointer">
+                        <div class="m3-list-row border-t border-gray-200 dark:border-gray-700">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">timer</span></div>
+                            <div class="m3-list-text"><div class="m3-list-headline dark:text-white">通知の表示時間</div></div>
+                            <select id="toast-duration-select" onchange="updateToastDuration(this.value)" class="m3-list-trailing bg-transparent text-xs font-bold text-gray-800 dark:text-gray-200 focus:outline-none appearance-none cursor-pointer">
                                 <option value="3000">3秒</option>
                                 <option value="4500">4.5秒</option>
                                 <option value="6000">6秒</option>
@@ -1183,14 +1218,15 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </div>
 
                     <!-- 🚀 新機能: アプリロック(端末の生体認証/画面ロックで解除) -->
-                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] space-y-3">
-                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">lock</span> セキュリティ</h4>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-bold dark:text-white block">アプリロック</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">4桁のPINコードでアプリを保護します</span>
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
+                        <h4 class="text-xs font-black dark:text-white uppercase flex items-center gap-1.5 mb-1"><span class="material-symbols-rounded w-6 h-6 shrink-0 flex items-center justify-center rounded-full bg-[var(--primary-container)] text-[var(--on-primary-container)]" style="font-size:14px; line-height:1; display:flex;">lock</span> セキュリティ</h4>
+                        <div class="m3-list-row">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">pin</span></div>
+                            <div class="m3-list-text">
+                                <div class="m3-list-headline dark:text-white">アプリロック</div>
+                                <div class="m3-list-supporting">4桁のPINコードでアプリを保護します</div>
                             </div>
-                            <label class="m3-switch shrink-0 ml-3">
+                            <label class="m3-switch m3-list-trailing">
                                 <input type="checkbox" id="app-lock-toggle" onchange="toggleAppLockSetting(this.checked)">
                                 <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
                             </label>
@@ -1258,13 +1294,14 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     </div>
 
                     <!-- 🚀 新機能: 画面の自動スリープ防止 -->
-                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01] shadow-sm">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-bold dark:text-white block flex items-center gap-1.5"><span class="material-symbols-rounded text-sm">visibility</span>画面のスリープを防止</span>
-                                <span class="text-[10px] text-gray-500 dark:text-gray-400">監視中にアプリを開いたままにしておきたい時に</span>
+                    <div class="bg-gray-50 dark:bg-[#111318] p-4 rounded-m3-large border border-gray-100 dark:border-gray-800 transition-transform hover:scale-[1.01]">
+                        <div class="m3-list-row">
+                            <div class="m3-list-icon"><span class="material-symbols-rounded">visibility</span></div>
+                            <div class="m3-list-text">
+                                <div class="m3-list-headline dark:text-white">画面のスリープを防止</div>
+                                <div class="m3-list-supporting">監視中にアプリを開いたままにしておきたい時に</div>
                             </div>
-                            <label class="m3-switch shrink-0 ml-3">
+                            <label class="m3-switch m3-list-trailing">
                                 <input type="checkbox" id="wake-lock-toggle" onchange="toggleWakeLock(this.checked)">
                                 <div class="m3-switch-track"><div class="m3-switch-thumb"><span class="m3-switch-icon"></span></div></div>
                             </label>
