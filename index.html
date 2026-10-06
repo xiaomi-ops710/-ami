@@ -656,6 +656,21 @@ button.m3-nav:active{background:var(--m3-line)!important}
 @keyframes m3Shake{0%,100%{transform:translate(0,0)}25%{transform:translate(1.5px,-1px)}50%{transform:translate(-1.5px,1px)}75%{transform:translate(1px,1.5px)}}
 #m3-skip{opacity:0;pointer-events:none;margin-top:6px;min-height:44px;padding:0 24px;border:0;border-radius:9999px;background:var(--primary-container);color:var(--on-primary-container);font-weight:800;font-size:14px;transition:opacity .4s}
 #m3-skip.on{opacity:1;pointer-events:auto}
+
+/* --- Liquid Glass タブバー(iOS 26 風) --- */
+#floating-tabbar-wrap{background:linear-gradient(135deg,rgba(255,255,255,.24),rgba(255,255,255,.05) 48%,rgba(255,255,255,.14)),rgba(22,22,30,.30)!important;-webkit-backdrop-filter:blur(22px) saturate(2.2) brightness(1.1) contrast(1.04)!important;backdrop-filter:blur(22px) saturate(2.2) brightness(1.1) contrast(1.04)!important;border:1px solid rgba(255,255,255,.34)!important;padding:6px!important;gap:2px!important;box-shadow:0 14px 34px rgba(0,0,0,.30),0 3px 10px rgba(0,0,0,.16),inset 0 1.5px 1px rgba(255,255,255,.75),inset 0 -1.5px 2px rgba(255,255,255,.22),inset 0 0 22px rgba(255,255,255,.10)!important;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.dark #floating-tabbar-wrap{background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.03) 48%,rgba(255,255,255,.09)),rgba(12,12,18,.36)!important;border-color:rgba(255,255,255,.22)!important}
+#floating-tabbar-wrap::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(120% 95% at 18% -8%,rgba(255,255,255,.50),transparent 52%),radial-gradient(90% 70% at 88% 118%,rgba(255,255,255,.26),transparent 60%)}
+#floating-tabbar-wrap:active{transform:scale(1.025)}
+#tab-glass-indicator{background:linear-gradient(180deg,rgba(255,255,255,.40),rgba(255,255,255,.12)),rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(8px) saturate(2.6) brightness(1.3)!important;backdrop-filter:blur(8px) saturate(2.6) brightness(1.3)!important;border:1px solid rgba(255,255,255,.60)!important;box-shadow:inset 0 1.5px 2px rgba(255,255,255,.9),inset 0 -2px 5px rgba(255,255,255,.28),inset 0 0 12px rgba(255,255,255,.18),0 5px 16px rgba(0,0,0,.28)!important;transform-origin:center;transition:left .38s cubic-bezier(.34,1.56,.64,1),width .38s cubic-bezier(.34,1.56,.64,1),transform .28s cubic-bezier(.34,1.56,.64,1)!important}
+#floating-tabbar-wrap:active #tab-glass-indicator{transform:scale(1.10,1.20)}
+#floating-tabbar-wrap .tab-item .material-symbols-rounded{filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));transition:transform .25s}
+#floating-tabbar-wrap .tab-item:active .material-symbols-rounded{transform:scale(1.18)}
+/* --- カードの山の名前を見やすく --- */
+.card-title-row{gap:12px!important;align-items:flex-start!important}
+.card-title-name-group{flex:1 1 auto;min-width:0}
+.card-title{font-size:26px!important;line-height:1.2!important;font-weight:900!important;white-space:normal!important;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden!important;text-overflow:clip!important;overflow-wrap:anywhere;letter-spacing:.01em}
+.card-title-row>div:last-child{flex-shrink:0;align-self:flex-start;margin-top:3px}
 </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
@@ -695,7 +710,7 @@ button.m3-nav:active{background:var(--m3-line)!important}
             <div class="absolute w-full h-full rounded-full border-2 border-[var(--primary)] opacity-20 animate-ping"></div>
         </div>
         <h1 class="text-3xl font-black tracking-widest mb-2 drop-shadow-md">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v9.7 Ultimate Evolution</p>
+        <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v9.14 Ultimate Evolution</p>
     </div>
 
     <!-- 🚀 新機能: アプリロック画面(PINコードで解除) -->
@@ -812,7 +827,8 @@ button.m3-nav:active{background:var(--m3-line)!important}
                 <button onclick="closeHistoryModal()" class="w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v9.7 (Liquid Glass & 安定性強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】スマホのタブバーを、液体ガラス風の楕円インジケーターがタップ/ドラッグで滑らかに移動するデザインに刷新</li><li>【新機能】オフライン検知バナー・画面の自動スリープ防止(Wake Lock)・読み上げ音声の選択機能を追加</li><li>【新機能】火山名での検索、サイレントタイム(時間帯で自動読上を停止)、防災ハンドブックを追加</li><li>アプリのバージョン表記とキャッシュのバージョンがズレていた問題を解消し、今後は同期させる運用に変更</li><li>ヘッダーの同期ステータスが2重表示されてしまうバグを修正</li><li>ダークモードの背景・カードの角丸・起動アニメーションが崩れることがあった問題に対し、外部CSSファイルに依存しない防御策を追加</li><li>通知履歴・設定をスマホでは独立したタブとして扱うよう変更(閉じるボタンを廃止しタブバーで一貫して行き来できるように)</li><li>パフォーマンス優先モードを強化し、低スペック端末でもぼかし効果を完全にオフにできるように</li><li>読み上げ速度スライダーをMaterial 3 Expressiveデザインに変更</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v9.14 (Liquid Glass 強化・安定性向上版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】タブバーをiOSのLiquid Glassに近い質感に刷新(多層ハイライト・押下時にレンズが膨らむ動き)</li><li>【改善】山のカードの名前を大きく・2行まで表示し、操作ボタンを大きく整列</li><li>【改善】設定メニューを用途別に再編成し、全項目をアイコン付きのMaterial 3デザインに統一</li><li>【新機能】初回起動時のセットアップ画面(進行に合わせて噴火が激しくなる火山アニメーション)</li><li>【修正】最新版なのに「更新してください」と表示される問題を修正(バージョンを数値で比較)</li><li>【修正】起動中の同期待ちで接続エラーと誤表示される問題を修正</li><li>【安定性】通信が遅い時はキャッシュを先に表示/復帰時の自動再同期/通知タップで該当ページへ移動</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-700 dark:text-gray-300 text-base mb-1.5">v9.7 (Liquid Glass & 安定性強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】スマホのタブバーを、液体ガラス風の楕円インジケーターがタップ/ドラッグで滑らかに移動するデザインに刷新</li><li>【新機能】オフライン検知バナー・画面の自動スリープ防止(Wake Lock)・読み上げ音声の選択機能を追加</li><li>【新機能】火山名での検索、サイレントタイム(時間帯で自動読上を停止)、防災ハンドブックを追加</li><li>アプリのバージョン表記とキャッシュのバージョンがズレていた問題を解消し、今後は同期させる運用に変更</li><li>ヘッダーの同期ステータスが2重表示されてしまうバグを修正</li><li>ダークモードの背景・カードの角丸・起動アニメーションが崩れることがあった問題に対し、外部CSSファイルに依存しない防御策を追加</li><li>通知履歴・設定をスマホでは独立したタブとして扱うよう変更(閉じるボタンを廃止しタブバーで一貫して行き来できるように)</li><li>パフォーマンス優先モードを強化し、低スペック端末でもぼかし効果を完全にオフにできるように</li><li>読み上げ速度スライダーをMaterial 3 Expressiveデザインに変更</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-90"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-700 dark:text-gray-300 text-base mb-1">v9.2〜v9.6 (デザイン・安定性の継続改善)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>ポップアップ通知をiOS風のスプリングアニメーション・液体ガラス風デザインに変更</li><li>スマホ表示のカードをさらにコンパクト化し、画像・山名を見やすいバランスに調整</li><li>山名が1文字ずつ縦に改行されてしまう表示崩れを修正</li><li>お気に入り(ピン留め)機能を追加</li><li>ヘッダー・速報テロップをスクロール時も常に上部に固定表示するよう変更</li><li>検索ボタンの配置・避難所検索の挙動を調整</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v9.1 (M3 Expressive & 実用機能強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>【新機能】お気に入り(ピン留め)機能 - よく見る火山を一覧の先頭に固定表示</li><li>【新機能】防災チェックリスト機能を追加(水・非常食など標準項目つき、自由にカスタマイズ可能)</li><li>【新機能】避難所ボタンが現在地からの経路をGoogleマップで直接表示するように強化</li><li>【新機能】管理者用データバックアップ機能(現在の火山データをJSONファイルとして書き出し)</li><li>アプリロックから生体認証機能を削除し、確実に動作するPINコード方式に一本化</li><li>詳細画面(全画面カード表示)の操作ボタンを右側から左側(状況・アドバイスの下)に移動</li><li>同期時などのポップアップ通知を、画面下部から上部(スマホの通知シェード風)にデザイン一新</li><li>Tailwindの事前ビルドCSSに新しいクラスが反映されていなかった不具合を修正(アプリロック等の表示崩れの根本原因)</li><li>絵文字アイコンをMaterial Symbolsアイコンに順次置き換え、全体的な角丸をより丸みの強いMaterial 3 Expressiveデザインに強化</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v9.0 (安定・セキュリティ強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>【新機能】アプリのバージョン自動確認・キャッシュ由来の旧バージョン残留を検知して更新を促す機能を追加</li><li>【新機能】4桁のPINコードでアプリ自体をロックできる「アプリロック」機能を追加</li><li>【新機能】起動アニメーションをより豪華に(噴火口グロー・追加の噴石・画面フラッシュ演出)</li><li>設定画面のアイコンが中心からズレていた表示崩れを修正</li><li>GChat Webhook機能を削除し、プッシュ通知まわりをシンプル化</li><li>スマートフォン(縦長画面)のレベル1〜5凡例を非表示にし、画面占有を削減</li><li>火山カードに添付した音声が再生できなかった不具合を修正(再生ボタンの追加と再生失敗時のエラー表示)</li><li>スマートフォン表示のカードを大幅コンパクト化(画像を左・状況を右に配置、履歴/共有等は詳細画面へ集約)</li><li>カード内の「気象局発表」表記を削除</li><li>設定画面を含む全体的なMaterial 3 Expressiveデザインの底上げ</li></ul></div>
@@ -1213,7 +1229,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         </div>
                         <div id="settings-admin-version-panel" class="hidden pt-2">
                             <button onclick="publishCurrentVersionToServer()" class="w-full py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-[10px] font-black rounded-m3-full transition flex items-center justify-center gap-1.5 dark:text-white">
-                                <span class="material-symbols-rounded text-sm">cloud_upload</span> 現在のバージョン(v9.7)を全端末に配信登録
+                                <span class="material-symbols-rounded text-sm">cloud_upload</span> 現在のバージョン(v9.14)を全端末に配信登録
                             </button>
                         </div>
                     </div>
@@ -1526,7 +1542,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 </div>
             </div>
             <div class="border-t dark:border-gray-800 pt-4 text-center">
-                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v9.7 (Ultimate Custom Pro)</span>
+                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v9.14 (Ultimate Custom Pro)</span>
             </div>
         </div>
     </div>
@@ -2510,13 +2526,19 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // サーバー側に保存されたバージョンと、今開いているアプリ自身のバージョンを比較し、
         // 食い違っていれば「アップデートがあります」バナーを表示する。
         // これにより、端末のキャッシュが原因で古いバージョンのまま使い続けてしまう事故を防ぐ。
+        function cmpVer(a, b) {
+            const pa = String(a).replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+            const pb = String(b).replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+            for (let i = 0; i < Math.max(pa.length, pb.length); i++) { const d = (pa[i] || 0) - (pb[i] || 0); if (d) return d > 0 ? 1 : -1; }
+            return 0;
+        }
         async function checkForAppUpdate() {
             try {
                 if (!db) return;
                 const metaDoc = await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('meta').doc('version').get();
                 if (!metaDoc.exists) return;
                 const latest = metaDoc.data().latest;
-                if (latest && latest !== APP_VERSION) {
+                if (latest && cmpVer(latest, APP_VERSION) > 0) {
                     const banner = document.getElementById("update-available-banner");
                     if (banner) { banner.classList.remove("hidden"); document.getElementById("update-available-text").innerText = `新しいバージョン(v${latest})が公開されています`; }
                 }
@@ -3373,7 +3395,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
   if(mdot) mdot.parentNode.insertBefore(sp2,mdot);
 
   var first=false;
-  try{ var raw=safeStorage.getItem(LOCAL_STORAGE_KEY); first=!raw||raw==='[]'; }catch(e){ first=false; }
+  try{ first=!localStorage.getItem('m3_setup_done_v1'); if(first&&typeof volcanoData!=='undefined'&&volcanoData&&volcanoData.length) first=false; }catch(e){ first=false; }
   var ov=null, timer=null, stepT=null, cur=-1;
   var NAMES=['サーバーに接続','安全に認証','火山データを取得','画面を準備'];
   var NOW=['サーバーに接続しています…','安全に認証しています…','火山データを取得しています…','画面を準備しています…'];
@@ -3415,6 +3437,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     sp1.classList.toggle('on',on); sp2.classList.toggle('on',on);
     if(dot) dot.style.display=on?'none':''; if(mdot) mdot.style.display=on?'none':'';
     if(on&&/同期中/.test(text||'')) setStep(2);
+    if(status==='connected'){ try{localStorage.setItem('m3_setup_done_v1','1');}catch(e){} }
     if(status==='connected'||status==='local'||status==='offline'){ closeSetup(); }
   };
 })();
@@ -3512,6 +3535,12 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
   });
   // 想定外の例外でアプリ全体が止まらないよう、記録だけ残す
   window.addEventListener('unhandledrejection',function(e){ console.warn('未処理のPromiseエラー(動作は継続)',e.reason); });
+})();
+</script><script>
+(function(){
+  if(typeof switchToMobileTab!=='function') return;
+  var _sw=switchToMobileTab, last=null;
+  switchToMobileTab=function(t){ try{ if(t===last&&t==='home') window.scrollTo({top:0,behavior:'smooth'}); }catch(e){} last=t; return _sw.apply(this,arguments); };
 })();
 </script></body>
 </html>
