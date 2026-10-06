@@ -586,6 +586,20 @@ button.m3-nav:active{background:var(--m3-line)!important}
 .card-footer .readout-btn{background:var(--primary-container)!important;color:var(--on-primary-container)!important;padding:0 14px!important}
 .card-footer .card-footer-map button{width:100%;height:52px!important;border-radius:16px!important;font-size:14px;font-weight:700}
 .card-footer-map:empty{display:none}
+
+/* --- 設定: 全行を「左アイコン + タイトル + 右コントロール」に統一 --- */
+#settings-sheet .m3-list-row{display:flex!important;align-items:center;gap:14px;min-height:64px;padding:8px 4px!important;border:0!important;border-bottom:1px solid var(--m3-line)!important;border-radius:0;background:transparent!important;font-size:15px;cursor:pointer}
+#settings-sheet .m3-sec-body>.m3-list-row:last-child{border-bottom:0!important}
+#settings-sheet .m3-list-icon{width:40px;height:40px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--primary-container);color:var(--on-primary-container)}
+#settings-sheet .m3-list-icon .material-symbols-rounded{font-size:22px}
+#settings-sheet .m3-list-text{flex:1;min-width:0}
+#settings-sheet .m3-list-headline{font-size:15px;font-weight:600;line-height:1.35}
+#settings-sheet .m3-list-supporting{font-size:12px;opacity:.65;line-height:1.4;margin-top:2px}
+#settings-sheet .m3-list-trailing{flex:none}
+#settings-sheet .m3-list-row select{max-width:46%;min-width:96px;background:var(--m3-surf)!important;border-radius:12px!important;padding:8px 12px!important;min-height:40px;font-size:13px;font-weight:700;text-align:right}
+/* 入れ子の暗い箱を解除して全セクションの見た目を揃える */
+#settings-sheet .m3-sec-body div[class*="bg-gray-50"]{background:transparent!important;border:0!important;box-shadow:none!important;padding:4px 0!important;transform:none!important}
+#settings-sheet .m3-sec-body .space-y-3>*{margin-top:0!important}
 </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
@@ -3364,6 +3378,36 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     var ref=box.children[1]||null;
     [A,bgS,palS,B,C].forEach(function(x){ if(x) box.insertBefore(x,ref); });
     touched.forEach(function(sec){ var b=sec.querySelector('.m3-sec-body'); if(b&&!b.textContent.trim()&&!b.querySelector('input,select,button,canvas,svg')) sec.remove(); });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
+})();
+</script>
+
+<script>
+/* 旧レイアウトの行(ラベル+コントロールのみ)を、アイコン付きの標準行に変換 */
+(function(){
+  var ICONS={'darkmode-toggle':'dark_mode','compact-toggle':'density_small','text-size-select':'format_size','alarm-sound-select':'notifications_active','auto-tts-toggle':'record_voice_over','level-filter-select':'filter_alt','perf-mode-toggle':'speed','auto-sync-interval-select':'sync','silent-time-toggle':'bedtime','silent-time-start':'schedule','silent-time-end':'schedule','app-lock-toggle':'lock','tts-voice-select':'record_voice_over','ui-sound-toggle':'volume_up','haptic-toggle':'vibration','toast-duration-select':'timer','wake-lock-toggle':'visibility'};
+  function run(){
+    var root=document.getElementById('settings-sheet'); if(!root||root.dataset.m3n) return; root.dataset.m3n='1';
+    root.querySelectorAll('div').forEach(function(row){
+      if(row.querySelector('.m3-list-icon')||row.children.length!==2) return;
+      var lab=row.children[0], ctl=row.children[1];
+      if(lab.tagName!=='SPAN'||!/font-bold/.test(lab.className)) return;
+      var input=ctl.matches('select')?ctl:ctl.querySelector('input[type=checkbox],select');
+      if(!input||!(ctl.matches('select')||ctl.matches('label.m3-switch'))) return;
+      var icon=ICONS[input.id]||'tune', text=lab.textContent.trim();
+      var ic=document.createElement('div'); ic.className='m3-list-icon'; ic.innerHTML='<span class="material-symbols-rounded">'+icon+'</span>';
+      var tx=document.createElement('div'); tx.className='m3-list-text'; var hd=document.createElement('div'); hd.className='m3-list-headline dark:text-white'; hd.textContent=text; tx.appendChild(hd);
+      ctl.classList.add('m3-list-trailing');
+      row.className='m3-list-row'; row.innerHTML=''; row.appendChild(ic); row.appendChild(tx); row.appendChild(ctl);
+      var cb=ctl.querySelector&&ctl.querySelector('input[type=checkbox]');
+      if(cb) row.addEventListener('click',function(e){if(!e.target.closest('input,label,select,button'))cb.click()});
+    });
+    // 既に標準行だったものにも「行全体タップでON/OFF」を付与
+    root.querySelectorAll('.m3-list-row').forEach(function(r){
+      if(r.dataset.m3t) return; r.dataset.m3t='1'; var cb=r.querySelector('input[type=checkbox]');
+      if(cb&&!r.classList.contains('m3-row')) r.addEventListener('click',function(e){if(!e.target.closest('input,label,select,button'))cb.click()});
+    });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
 })();
