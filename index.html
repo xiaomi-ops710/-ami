@@ -507,6 +507,44 @@
         #tts-rate-slider::-moz-range-progress { height: 20px; border-radius: 9999px; background: var(--primary); }
     </style>
 
+
+<style id="m3-refresh">
+/* ===== Material 3 リフレッシュ(設定メニュー & カード) ===== */
+:root{--m3-surf:color-mix(in srgb,var(--primary) 5%,#fff);--m3-surf-hi:color-mix(in srgb,var(--primary) 9%,#fff);--m3-line:color-mix(in srgb,var(--primary) 14%,transparent)}
+.dark{--m3-surf:color-mix(in srgb,var(--primary) 8%,#1E1F22);--m3-surf-hi:color-mix(in srgb,var(--primary) 14%,#1E1F22);--m3-line:color-mix(in srgb,var(--primary) 22%,transparent)}
+#settings-sheet{background:var(--m3-surf)!important;backdrop-filter:none!important;padding:16px 14px 0!important;border-radius:28px 0 0 28px}
+#settings-sheet>div:first-child{display:flex;flex-direction:column;height:100%}
+#settings-sheet>div:first-child>div:first-child{position:sticky;top:0;z-index:5;border:0!important;margin:0 0 8px!important;padding:8px 6px 12px!important;background:var(--m3-surf)}
+#settings-sheet h3{font-size:22px!important;font-weight:700!important}
+#settings-sheet .space-y-6{max-height:none!important;flex:1;padding:0 2px 96px!important;display:flex;flex-direction:column;gap:12px}
+#settings-sheet .space-y-6>*{margin:0!important}
+/* セクション = M3 ツナルカード(折りたたみ式) */
+#settings-sheet .space-y-6>div{background:var(--m3-surf-hi)!important;border:0!important;border-radius:24px!important;padding:0!important;box-shadow:none!important;transform:none!important;overflow:hidden}
+#settings-sheet .space-y-6>div:hover{transform:none!important}
+.m3-sec-head{display:flex!important;align-items:center;gap:14px;min-height:64px;padding:12px 16px!important;margin:0!important;cursor:pointer;font-size:16px!important;font-weight:600!important;text-transform:none!important;letter-spacing:0;-webkit-user-select:none;user-select:none}
+.m3-sec-head>.material-symbols-rounded:first-child{width:40px!important;height:40px!important;font-size:22px!important;border-radius:14px!important}
+.m3-sec-head::after{content:'expand_more';font-family:'Material Symbols Rounded';font-size:24px;margin-left:auto;opacity:.6;transition:transform .25s}
+.m3-sec.m3-open .m3-sec-head::after{transform:rotate(180deg)}
+.m3-sec-body{padding:4px 16px 16px;display:none}
+.m3-sec.m3-open .m3-sec-body{display:block}
+#settings-sheet .m3-list-row,#settings-sheet .m3-sec-body>.flex.items-center.justify-between{min-height:56px;padding:8px 0;border-color:var(--m3-line)!important}
+#settings-sheet .border-t{border-color:var(--m3-line)!important}
+#settings-sheet input[type=text],#settings-sheet input[type=password],#settings-sheet input[type=number],#settings-sheet select,#settings-sheet textarea{min-height:48px;border-radius:16px!important;padding:10px 14px!important;font-size:14px}
+#settings-sheet button{min-height:44px;min-width:44px;border-radius:9999px}
+#settings-sheet label{min-height:44px}
+/* ===== カード ===== */
+.card-container{border-radius:28px!important;padding:20px!important;border-color:var(--m3-line)!important}
+.card-container:not([style*="background-color"]){background:var(--m3-surf)!important}
+.card-container .card-title{font-size:22px!important;line-height:1.25}
+.card-container .card-visual{border-radius:20px!important}
+.card-tabs{padding:4px!important;gap:4px}
+.card-tabs button{min-height:44px;font-size:13px!important;border-radius:9999px!important}
+.card-container .card-title-row>div:first-child button{width:44px!important;height:44px!important;margin:-8px -6px 0 0}
+.card-footer{border-color:var(--m3-line)!important;padding-top:14px!important;gap:12px!important}
+.card-footer button,.card-footer a{min-height:48px!important;min-width:48px!important;border-radius:9999px!important;font-weight:700}
+.card-footer button:active,.card-tabs button:active{transform:scale(.96)}
+.card-container .tab-panel-status,.card-container .tab-panel-history{border-radius:20px!important;border:0!important;background:var(--m3-surf-hi)!important}
+</style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
     
@@ -1417,7 +1455,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // 🚨ここを書き換えてください🚨
         const MY_VAPID_KEY = "BM_xWes_gaETd4XGGGKlu4MNH2ggSt5AOGVdOz74scBSopthlLKseYK-NSmggg23326PY0nVBSwg6SivQoJSofw"; 
 
-        const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbw7EVIolvgUPaV5YUWxDHfnKuf0hRsd-KTfbxdcMidrihmWXaPONNrYR3D01Kzl5Fc/exec";
+        const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbwUYhNMvF1e-_-vUn-CQz8MlvDofw09wmI6aWyi4evrrKkpmaP3aDTcj_qSM8h1CoBl/exec";
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'volcano-app-pwa-m3';
         // 🚀 新機能: アプリバージョン管理(キャッシュにより古いバージョンが開き続ける問題への対策)
@@ -3187,5 +3225,29 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     }
 }
     </script>
+
+<script>
+/* 設定メニューを折りたたみ式セクションに再構成(既存のID・イベントはそのまま) */
+(function(){
+  function build(){
+    var box=document.querySelector('#settings-sheet .space-y-6'); if(!box||box.dataset.m3) return; box.dataset.m3='1';
+    Array.prototype.forEach.call(box.children,function(sec,i){
+      var h=sec.querySelector('h4'); if(!h) return;
+      var head=h; while(head.parentElement&&head.parentElement!==sec) head=head.parentElement;
+      var body=document.createElement('div'); body.className='m3-sec-body';
+      var n=head.nextSibling, moved=[]; while(n){moved.push(n); n=n.nextSibling;}
+      if(!moved.length) return;
+      moved.forEach(function(x){body.appendChild(x);}); sec.appendChild(body);
+      sec.classList.add('m3-sec'); head.classList.add('m3-sec-head');
+      head.setAttribute('role','button'); head.setAttribute('tabindex','0');
+      function toggle(){sec.classList.toggle('m3-open');}
+      head.addEventListener('click',function(e){ if(e.target.closest('button,input,select,a,label')&&e.target!==head) return; toggle(); });
+      head.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();} });
+      if(i===0) sec.classList.add('m3-open');
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',build); else build();
+})();
+</script>
 </body>
 </html>
