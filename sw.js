@@ -2,11 +2,11 @@
 // 火山防災情報局 PWA 用 Service Worker
 // PWABuilder の「Service Workerが検出されない」警告を解消するための最小実装です。
 
-const CACHE_NAME = 'kazan-bousai-cache-v9.12';
+const CACHE_NAME = 'kazan-bousai-cache-v9.13';
 const OFFLINE_URLS = [
   '/-ami/index.html',
   '/-ami/manifest.json',
-  '/-ami/tailwind.css?v=9.12',
+  '/-ami/tailwind.css?v=9.13',
   '/-ami/icon-192.png',
   '/-ami/icon-512.png'
 ];
@@ -37,22 +37,68 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// キャッシュ対象にする外部ホスト(アプリの起動に必要な静的ライブラリ・フォントのみ)
+// ※ Firestore / Auth / FCM / GAS などのAPI通信は絶対にキャッシュしない
+const CACHEABLE_EXTERNAL = [
+  'www.gstatic.com',        // Firebase SDK
+  'cdn.jsdelivr.net',       // SortableJS
+  'fonts.googleapis.com',
+  'fonts.gstatic.com'
+];
+
+function shouldHandle(request) {
+  if (request.method !== 'GET') return false;
+  if (request.headers.has('range')) return false; // 206(部分応答)はキャッシュしない
+  const url = new URL(request.url);
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+  if (url.origin === self.location.origin) return true;
+  return CACHEABLE_EXTERNAL.includes(url.hostname) &&
+    (url.hostname !== 'www.gstatic.com' || url.pathname.startsWith('/firebasejs/'));
+}
+
 // fetch時：ネットワーク優先、失敗したらキャッシュにフォールバック
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  const request = event.request;
+  if (!shouldHandle(request)) return; // 対象外はブラウザの通常処理に任せる
 
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
+  event.respondWith((async () => {
+    try {
+      const response = await fetch(request);
+      // 正常な(200)かつ取得可能なレスポンスだけを保存する。opaque・エラー・部分応答は保存しない
+      if (response && response.status === 200 && (response.type === 'basic' || response.type === 'cors')) {
         const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
-        return response;
-      })
-      .catch(() => caches.match(event.request))
-  );
+        event.waitUntil(
+          caches.open(CACHE_NAME)
+            .then((cache) => cache.put(request, responseClone))
+            .catch(() => { /* 容量不足などで保存できなくても表示には影響させない */ })
+        );
+      }
+      return response;
+    } catch (err) {
+      // オフライン時：キャッシュ→(ページ遷移なら)index.html の順で探す
+      const cached = await caches.match(request);
+      if (cached) return cached;
+      if (request.mode === 'navigate') {
+        const fallback = await caches.match('/-ami/index.html');
+        if (fallback) return fallback;
+      }
+      return new Response('', { status: 504, statusText: 'Offline' });
+    }
+  })());
 });
+
+// 通知タップ時に開くページ(同一オリジン・アプリのスコープ内のみ許可)
+const DEFAULT_URL = '/-ami/index.html';
+function resolveTargetUrl(raw) {
+  try {
+    if (!raw) return DEFAULT_URL;
+    const u = new URL(raw, self.location.origin);
+    if (u.origin !== self.location.origin || !u.pathname.startsWith('/-ami/')) return DEFAULT_URL;
+    return u.pathname + u.search + u.hash;
+  } catch (e) {
+    return DEFAULT_URL;
+  }
+}
 
 // プッシュ通知受信時
 self.addEventListener('push', (event) => {
@@ -63,19 +109,24 @@ self.addEventListener('push', (event) => {
     payload = { title: '火山防災情報局', body: event.data ? event.data.text() : '新着情報があります' };
   }
 
-  // 🚀 バグ修正: 通知内容が固定文言になる問題への対策。
   // FCMのペイロードは送信方法によって形が異なる(以下のいずれかで届く):
   //  ①{ notification: { title, body }, data: {...} }  ← 通知メッセージ形式
   //  ②{ data: { title, body, ... } }                   ← データメッセージ形式
   //  ③{ title, body }                                  ← トップレベル直書き
-  // すべてのパターンに対応できるよう、優先順位をつけて実際の値を探す。
   const src = payload.notification || payload.data || payload;
   const title = src.title || payload.title || '火山防災情報局';
+
+  // タップ時の遷移先: webpush.fcm_options.link(fcmOptions / fcm_options)→ data.url / data.link の順で探す
+  const fcmOpt = payload.fcmOptions || payload.fcm_options || {};
+  const data = payload.data || {};
+  const targetUrl = resolveTargetUrl(fcmOpt.link || data.url || data.link || src.url || src.click_action);
+
   const options = {
     body: src.body || payload.body || '新着の火山情報があります。',
     // 大アイコンは非表示（iconフィールドを指定しない）
     // ステータスバーに表示される小アイコン（★白一色・透過背景のPNGを用意すること）
-    badge: '/-ami/notification-badge.png'
+    badge: '/-ami/notification-badge.png',
+    data: { url: targetUrl }
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
@@ -84,16 +135,21 @@ self.addEventListener('push', (event) => {
 // 通知クリック時
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: 'window' }).then((clientList) => {
-      for (const client of clientList) {
-        if (client.url.includes('/-ami/') && 'focus' in client) {
-          return client.focus();
+  const target = resolveTargetUrl(event.notification.data && event.notification.data.url);
+  const targetAbs = new URL(target, self.location.origin).href;
+
+  event.waitUntil((async () => {
+    const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientList) {
+      if (client.url.includes('/-ami/') && 'focus' in client) {
+        await client.focus();
+        // 開いているアプリが別ページなら、遷移先へ移動させる
+        if (client.url !== targetAbs && 'navigate' in client) {
+          try { await client.navigate(targetAbs); } catch (e) { /* 移動できなくてもフォーカスは成功している */ }
         }
+        return;
       }
-      if (clients.openWindow) {
-        return clients.openWindow('/-ami/index.html');
-      }
-    })
-  );
+    }
+    if (clients.openWindow) return clients.openWindow(targetAbs);
+  })());
 });
