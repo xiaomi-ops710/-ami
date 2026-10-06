@@ -671,6 +671,17 @@ button.m3-nav:active{background:var(--m3-line)!important}
 .card-title-name-group{flex:1 1 auto;min-width:0}
 .card-title{font-size:26px!important;line-height:1.2!important;font-weight:900!important;white-space:normal!important;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden!important;text-overflow:clip!important;overflow-wrap:anywhere;letter-spacing:.01em}
 .card-title-row>div:last-child{flex-shrink:0;align-self:flex-start;margin-top:3px}
+
+/* --- Liquid Glass v2: 高透過・液体レンズ(参考画像に寄せた再調整) --- */
+#mobile-tab-bar #floating-tabbar-wrap{background:linear-gradient(180deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.07) 30%,rgba(255,255,255,.05) 70%,rgba(255,255,255,.16) 100%),rgba(28,28,44,.16)!important;-webkit-backdrop-filter:blur(9px) saturate(1.9) brightness(1.06)!important;backdrop-filter:blur(9px) saturate(1.9) brightness(1.06)!important;border:0!important;padding:7px!important;box-shadow:0 12px 30px rgba(10,10,30,.26),0 2px 6px rgba(10,10,30,.14),inset 0 0 0 1px rgba(255,255,255,.26),inset 2px 2px 3px rgba(255,255,255,.55),inset -2px -2px 3px rgba(255,255,255,.32),inset 0 0 16px 2px rgba(255,255,255,.14)!important}
+.dark #mobile-tab-bar #floating-tabbar-wrap{background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.05) 30%,rgba(255,255,255,.04) 70%,rgba(255,255,255,.12) 100%),rgba(20,20,36,.20)!important}
+#mobile-tab-bar #floating-tabbar-wrap::before{background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 38%),radial-gradient(70% 55% at 12% 0%,rgba(255,255,255,.28),transparent 60%)!important}
+/* 液体レンズ: バーの上下にはみ出し、縁に虹色の屈折フリンジ */
+#mobile-tab-bar #tab-glass-indicator{top:-7px!important;bottom:-7px!important;background:radial-gradient(90% 70% at 30% 12%,rgba(255,255,255,.34),transparent 62%),radial-gradient(80% 60% at 78% 100%,rgba(190,215,255,.30),transparent 62%),rgba(255,255,255,.07)!important;-webkit-backdrop-filter:blur(2.5px) saturate(1.7) brightness(1.18) contrast(1.05)!important;backdrop-filter:blur(2.5px) saturate(1.7) brightness(1.18) contrast(1.05)!important;border:0!important;transform:scaleX(1.07);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.50),inset 3px 3px 4px rgba(255,255,255,.70),inset -3px -4px 6px rgba(150,190,255,.45),inset 0 0 22px rgba(255,255,255,.22),0 0 0 1px rgba(255,255,255,.10),0 10px 24px rgba(10,10,40,.34)!important}
+#mobile-tab-bar #tab-glass-indicator::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:2.5px;pointer-events:none;background:conic-gradient(from 200deg,#ff6fd8,#ffd36b,#6bffb4,#6bc8ff,#a98bff,#ff6fd8);opacity:.62;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;filter:blur(.7px)}
+#mobile-tab-bar #tab-glass-indicator::after{content:'';position:absolute;left:12%;right:12%;top:5%;height:30%;border-radius:9999px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.60),rgba(255,255,255,0));opacity:.8}
+#mobile-tab-bar #floating-tabbar-wrap:active #tab-glass-indicator{transform:scale(1.17,1.10);-webkit-backdrop-filter:blur(1.5px) saturate(2) brightness(1.28)!important;backdrop-filter:blur(1.5px) saturate(2) brightness(1.28)!important}
+#floating-tabbar-wrap .tab-item span{text-shadow:0 1px 3px rgba(0,0,0,.45)}
 </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
