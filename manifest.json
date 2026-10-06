@@ -45,14 +45,23 @@
   ],
   "shortcuts": [
     {
-      "name": "通知履歴",
-      "url": "/-ami/index.html?tab=notifications",
-      "description": null
+      "name": "今すぐ同期",
+      "short_name": "同期",
+      "url": "/-ami/index.html?action=sync"
     },
     {
-      "name": "アプリの設定",
-      "url": "/-ami/index.html?tab=settings",
-      "description": null
+      "name": "山を比較",
+      "short_name": "比較",
+      "url": "/-ami/index.html?action=compare"
+    },
+    {
+      "name": "防災ハンドブック",
+      "short_name": "ハンドブック",
+      "url": "/-ami/index.html?action=handbook"
+    },
+    {
+      "name": "通知履歴",
+      "url": "/-ami/index.html?tab=notifications"
     }
   ],
   "categories": [
