@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.12">
+    <link rel="stylesheet" href="./tailwind.css?v=9.13">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1417,11 +1417,11 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // 🚨ここを書き換えてください🚨
         const MY_VAPID_KEY = "BM_xWes_gaETd4XGGGKlu4MNH2ggSt5AOGVdOz74scBSopthlLKseYK-NSmggg23326PY0nVBSwg6SivQoJSofw"; 
 
-        const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbwUYhNMvF1e-_-vUn-CQz8MlvDofw09wmI6aWyi4evrrKkpmaP3aDTcj_qSM8h1CoBl/exec";
+        const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbw7EVIolvgUPaV5YUWxDHfnKuf0hRsd-KTfbxdcMidrihmWXaPONNrYR3D01Kzl5Fc/exec";
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'volcano-app-pwa-m3';
         // 🚀 新機能: アプリバージョン管理(キャッシュにより古いバージョンが開き続ける問題への対策)
-        const APP_VERSION = "9.7";
+        const APP_VERSION = "9.13";
 
         let volcanoData = [];
         let currentTabs = {}; 
@@ -2173,11 +2173,31 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         // =======================
         // ☁️ Firebase 接続とエラーハンドリング
         // =======================
+        // 🚀 起動時の誤エラー対策: サーバーからの初回応答を受け取ったかどうかを管理する
+        let serverSyncConfirmed = false;
+        function armSyncWatchdog() {
+            if (connectionTimeout) clearTimeout(connectionTimeout);
+            serverSyncConfirmed = false;
+            // 8秒たっても応答がなければ「時間がかかっています」(赤エラーにはしない)
+            connectionTimeout = setTimeout(() => {
+                if (serverSyncConfirmed) return;
+                updateSyncStatus('connecting', '接続に時間がかかっています...');
+                // さらに15秒待っても応答がなければ、初めてエラー表示にする
+                connectionTimeout = setTimeout(() => {
+                    connectionTimeout = null;
+                    if (serverSyncConfirmed) return;
+                    updateSyncStatus('offline', navigator.onLine ? '⚠️ 同期タイムアウト' : 'オフライン読込中');
+                }, 15000);
+            }, 8000);
+        }
+
         function updateSyncStatus(status, text) {
             const badge = document.getElementById("sync-status-badge"); const dot = document.getElementById("sync-dot"); const textEl = document.getElementById("sync-text");
             const localBtn = document.getElementById("switch-local-btn"); const diagBox = document.getElementById("diagnostics-box"); const fabIcon = document.getElementById("fab-sync-icon");
 
             if (status === 'connected') {
+                serverSyncConfirmed = true;
+                if (connectionTimeout) { clearTimeout(connectionTimeout); connectionTimeout = null; }
                 updateLastSyncDisplay();
                 if (badge) badge.className = "cursor-pointer hover:opacity-80 flex items-center gap-2";
                 document.getElementById("sync-status-container").className = "flex items-center gap-2 bg-[#E6F4EA]/90 dark:bg-[#1B3624]/90 backdrop-blur-sm border border-[#A3E2B6] dark:border-[#3C5A42] rounded-m3-full p-1.5 pl-4 shadow-sm transition-all";
@@ -2211,7 +2231,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
         function tryAutoConnectFirebase() {
             if (connectionTimeout) clearTimeout(connectionTimeout);
-            connectionTimeout = setTimeout(() => { const textEl = document.getElementById("sync-text"); if (textEl && textEl.innerText.includes("接続中")) { updateSyncStatus('offline', '⚠️ 同期タイムアウト'); } }, 6000);
+            armSyncWatchdog();
             if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) { connectFirebase(JSON.stringify(firebaseConfig)).catch(e => console.error("Auto connect failed", e)); } else { updateSyncStatus('offline', '⚠️ 未接続・設定エラー'); }
         }
 
@@ -2226,7 +2246,16 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 if (firebase.apps.length === 0) { const config = JSON.parse(configJson); firebase.initializeApp(config); }
                 auth = firebase.auth(); db = firebase.firestore();
                 try { messaging = firebase.messaging(); } catch(e){ console.warn("FCM Load skipped", e); }
-                await auth.signInAnonymously();
+                // 🚀 起動直後はネットワークが安定しておらず匿名ログインが一時的に失敗することがあるため、最大3回まで自動リトライ
+                for (let signInAttempt = 1; signInAttempt <= 3; signInAttempt++) {
+                    try { await auth.signInAnonymously(); break; }
+                    catch (signInErr) {
+                        const code = (signInErr && signInErr.code) || '';
+                        const transient = code === 'auth/network-request-failed' || code === 'auth/internal-error' || !navigator.onLine;
+                        if (signInAttempt < 3 && transient) { await new Promise(r => setTimeout(r, 1000 * signInAttempt)); continue; }
+                        throw signInErr;
+                    }
+                }
 
                 if (currentSyncUnsubscribe) currentSyncUnsubscribe();
                 if (currentTickerUnsubscribe) currentTickerUnsubscribe();
@@ -2239,7 +2268,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
 
                 // 🌟 山データの監視（山が消えたり通知が一気に来るバグを完全解消）
                 const colRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('volcanos');
-                currentSyncUnsubscribe = colRef.onSnapshot((snapshot) => {
+                let snapshotRetryCount = 0;
+                const handleVolcanoSnapshot = (snapshot) => {
                     const list = []; snapshot.forEach(doc => { list.push({ docId: doc.id, ...doc.data() }); });
                     
                     // 🚨 初期キャッシュ読み込み時に空配列が来たら、ローカルデータを消去せずに待機する
@@ -2284,15 +2314,39 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                     
                     volcanoData = newVolcanoData; saveLocalVolcanos(); renderUI(); 
                     
-                    if (!snapshot.metadata.fromCache) { isFirstLoad = false; }
-                    if (connectionTimeout) clearTimeout(connectionTimeout);
-                    
-                    // 🌟 本当の接続ステータスをfromCache判定をもとにリアルタイムに表示
-                    const statusText = snapshot.metadata.fromCache ? "オフライン読込中" : `データベース同期完了 (${getNowTimeStr()})`;
-                    const statusType = snapshot.metadata.fromCache ? "offline" : "connected";
-                    updateSyncStatus(statusType, statusText);
-                    if (!snapshot.metadata.fromCache) { checkForAppUpdate(); }
-                }, (error) => { handleFirebaseError(error, "Firestore Database"); });
+                    if (!snapshot.metadata.fromCache) { isFirstLoad = false; snapshotRetryCount = 0; }
+
+                    if (snapshot.metadata.fromCache) {
+                        // 🚀 起動直後のキャッシュ由来スナップショットは「まだサーバー応答待ち」であって、エラーではない。
+                        // 本当にオフラインの場合、または待機の末にタイムアウトした場合のみ赤表示にする。
+                        if (!navigator.onLine) {
+                            if (connectionTimeout) { clearTimeout(connectionTimeout); connectionTimeout = null; }
+                            updateSyncStatus('offline', 'オフライン読込中');
+                        } else if (connectionTimeout) {
+                            updateSyncStatus('connecting', 'サーバーと同期中...');
+                        } else {
+                            updateSyncStatus('offline', 'オフライン読込中');
+                        }
+                    } else {
+                        updateSyncStatus('connected', `データベース同期完了 (${getNowTimeStr()})`);
+                        checkForAppUpdate();
+                    }
+                };
+                const subscribeVolcanos = () => {
+                    currentSyncUnsubscribe = colRef.onSnapshot(handleVolcanoSnapshot, (error) => {
+                        // 🚀 リスナーはエラーで停止するため、一時的な通信エラーは自動で張り直す(赤エラーを出さない)
+                        const code = (error && error.code) || '';
+                        const transient = ['unavailable', 'deadline-exceeded', 'aborted', 'internal', 'cancelled'].includes(code);
+                        if (transient && snapshotRetryCount < 3) {
+                            snapshotRetryCount++;
+                            updateSyncStatus('connecting', '再接続中...');
+                            setTimeout(() => { if (db) subscribeVolcanos(); }, 2000 * snapshotRetryCount);
+                            return;
+                        }
+                        handleFirebaseError(error, "Firestore Database");
+                    });
+                };
+                subscribeVolcanos();
 
                 currentTickerUnsubscribe = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('ticker').onSnapshot((doc) => {
                     if (doc.exists) { const data = doc.data(); triggerEarthquakeTickerLocal(data.show, data.text); } else { triggerEarthquakeTickerLocal(false, ""); }
