@@ -2,11 +2,11 @@
 // 火山防災情報局 PWA 用 Service Worker
 // PWABuilder の「Service Workerが検出されない」警告を解消するための最小実装です。
 
-const CACHE_NAME = 'kazan-bousai-cache-v9.13';
+const CACHE_NAME = 'kazan-bousai-cache-v9.14';
 const OFFLINE_URLS = [
   '/-ami/index.html',
   '/-ami/manifest.json',
-  '/-ami/tailwind.css?v=9.13',
+  '/-ami/tailwind.css?v=9.14',
   '/-ami/icon-192.png',
   '/-ami/icon-512.png'
 ];
@@ -62,20 +62,30 @@ self.addEventListener('fetch', (event) => {
   if (!shouldHandle(request)) return; // 対象外はブラウザの通常処理に任せる
 
   event.respondWith((async () => {
-    try {
-      const response = await fetch(request);
-      // 正常な(200)かつ取得可能なレスポンスだけを保存する。opaque・エラー・部分応答は保存しない
+    const store = (response) => {
       if (response && response.status === 200 && (response.type === 'basic' || response.type === 'cors')) {
-        const responseClone = response.clone();
+        const copy = response.clone();
         event.waitUntil(
-          caches.open(CACHE_NAME)
-            .then((cache) => cache.put(request, responseClone))
-            .catch(() => { /* 容量不足などで保存できなくても表示には影響させない */ })
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {})
         );
       }
+    };
+    try {
+      const netPromise = fetch(request);
+      // 通信が遅い(5秒超)場合、キャッシュがあればそれを先に表示して起動の待ち時間を短縮する
+      const slow = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
+      let response = await Promise.race([netPromise, slow]);
+      if (response === null) {
+        const cachedFast = await caches.match(request);
+        if (cachedFast) {
+          netPromise.then(store).catch(() => {}); // 後から届いた最新版はキャッシュだけ更新
+          return cachedFast;
+        }
+        response = await netPromise; // キャッシュが無ければ通信完了まで待つ
+      }
+      store(response);
       return response;
     } catch (err) {
-      // オフライン時：キャッシュ→(ページ遷移なら)index.html の順で探す
       const cached = await caches.match(request);
       if (cached) return cached;
       if (request.mode === 'navigate') {
