@@ -544,6 +544,26 @@
 .card-footer button,.card-footer a{min-height:48px!important;min-width:48px!important;border-radius:9999px!important;font-weight:700}
 .card-footer button:active,.card-tabs button:active{transform:scale(.96)}
 .card-container .tab-panel-status,.card-container .tab-panel-history{border-radius:20px!important;border:0!important;background:var(--m3-surf-hi)!important}
+
+/* --- レイアウト崩れ修正: flex子要素が縮んで潰れていた問題 --- */
+#settings-sheet{height:100dvh;max-height:100dvh;overflow:hidden}
+#settings-sheet>div:first-child{min-height:0;height:100%}
+#settings-sheet .space-y-6{overflow-y:auto!important;min-height:0;-webkit-overflow-scrolling:touch}
+#settings-sheet .space-y-6>*{flex:0 0 auto!important}
+/* --- Googleスタイルのローディング --- */
+.m3-spin{display:none;width:18px;height:18px;flex:none;color:var(--primary)}
+.m3-spin.on{display:inline-block}
+.m3-spin.light{color:#fff}
+.m3-spin circle{fill:none}
+#m3-setup{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;text-align:center;background:#FEF7FF;color:#1C1B1F;transition:opacity .5s}
+.dark #m3-setup{background:#1D1B20;color:#E6E0E9}
+#m3-setup.hide{opacity:0;pointer-events:none}
+#m3-setup .m3-spin{display:block;width:56px;height:56px;color:var(--primary)}
+.dark #m3-setup .m3-spin{color:#D0BCFF}
+#m3-setup h2{font-size:20px;font-weight:800}
+#m3-setup p{font-size:13px;opacity:.7;line-height:1.7;max-width:280px}
+#m3-setup .step{font-size:12px;font-weight:700;color:var(--primary);min-height:18px}
+.dark #m3-setup .step{color:#D0BCFF}
 </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
@@ -3247,6 +3267,41 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',build); else build();
+})();
+</script>
+
+<script>
+/* Googleスタイルのローディング表示 + 初回セットアップ画面 */
+(function(){
+  var SVG='<svg class="google-spinner m3-spin %C%" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20"/></svg>';
+  function mk(c){var d=document.createElement('div');d.innerHTML=SVG.replace('%C%',c||'');return d.firstChild;}
+  var sp1=mk(''), sp2=mk('light');
+  var dot=document.getElementById('sync-dot'), mdot=document.getElementById('mobile-sync-dot');
+  if(dot) dot.parentNode.insertBefore(sp1,dot);
+  if(mdot) mdot.parentNode.insertBefore(sp2,mdot);
+
+  // 初回(キャッシュ無し)の起動時のみセットアップ画面を出す
+  var first=false;
+  try{ var raw=safeStorage.getItem(LOCAL_STORAGE_KEY); first=!raw||raw==='[]'; }catch(e){ first=false; }
+  var ov=null, timer=null, stepT=null;
+  if(first){
+    ov=document.createElement('div'); ov.id='m3-setup';
+    ov.innerHTML=SVG.replace('%C%','')+'<h2>山の情報をセットアップしています</h2><p>初回のみ、データの準備に少し時間がかかります。このままお待ちください。</p><div class="step" id="m3-setup-step">サーバーに接続中...</div>';
+    document.body.appendChild(ov);
+    var steps=['サーバーに接続中...','火山データを取得中...','画面を準備中...'], k=0;
+    stepT=setInterval(function(){k=Math.min(k+1,steps.length-1);var e=document.getElementById('m3-setup-step');if(e)e.textContent=steps[k];},3500);
+    timer=setTimeout(closeSetup,30000);
+  }
+  function closeSetup(){ if(!ov) return; clearInterval(stepT); clearTimeout(timer); ov.classList.add('hide'); var o=ov; ov=null; setTimeout(function(){o.remove();},600); }
+
+  var orig=updateSyncStatus;
+  updateSyncStatus=function(status,text){
+    orig(status,text);
+    var on=(status==='connecting');
+    sp1.classList.toggle('on',on); sp2.classList.toggle('on',on);
+    if(dot) dot.style.display=on?'none':''; if(mdot) mdot.style.display=on?'none':'';
+    if(status==='connected'||status==='local'||status==='offline'){ closeSetup(); }
+  };
 })();
 </script>
 </body>
