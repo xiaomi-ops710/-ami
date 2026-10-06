@@ -564,6 +564,28 @@
 #m3-setup p{font-size:13px;opacity:.7;line-height:1.7;max-width:280px}
 #m3-setup .step{font-size:12px;font-weight:700;color:var(--primary);min-height:18px}
 .dark #m3-setup .step{color:#D0BCFF}
+
+/* --- 設定: 行レイアウトの統一 --- */
+.m3-row{display:flex!important;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:8px 4px!important;margin:0!important;border:0!important;border-bottom:1px solid var(--m3-line)!important;font-size:15px;font-weight:600;cursor:pointer;border-radius:0}
+.m3-row:last-child{border-bottom:0!important}
+.m3-row select{max-width:48%;min-width:130px}
+.m3-row p,.m3-row .text-xs,.m3-row .text-\[10px\]{font-size:12px;opacity:.7;font-weight:500}
+.m3-sec-body>.m3-nav{margin-top:8px}
+button.m3-nav{display:flex!important;align-items:center;gap:14px;width:100%;min-height:56px;padding:0 16px!important;border-radius:18px!important;background:var(--m3-surf)!important;border:0!important;color:inherit;font-size:15px;font-weight:600;text-align:left;justify-content:flex-start!important}
+button.m3-nav::after{content:'chevron_right';font-family:'Material Symbols Rounded';font-size:24px;margin-left:auto;opacity:.5}
+button.m3-nav:active{background:var(--m3-line)!important}
+/* --- カード: 下部ボタンを整列 --- */
+.card-container{display:flex!important;flex-direction:column;align-self:stretch}
+.card-container>*:first-child{flex:1 1 auto}
+.card-footer{margin-top:auto!important}
+.card-footer>div:first-child{display:flex;flex-wrap:wrap!important;gap:10px!important;align-items:center}
+.card-footer>div:first-child>div:first-child{flex:1 0 100%}
+.card-footer>div:first-child>div:nth-child(2){flex:1 0 100%;display:grid!important;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px!important}
+.card-footer-actions{display:contents!important}
+.card-footer-actions button,.card-footer>div:first-child>div:nth-child(2)>button{height:52px!important;width:auto!important;border-radius:16px!important;background:var(--m3-surf-hi)!important;color:inherit;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px}
+.card-footer .readout-btn{background:var(--primary-container)!important;color:var(--on-primary-container)!important;padding:0 14px!important}
+.card-footer .card-footer-map button{width:100%;height:52px!important;border-radius:16px!important;font-size:14px;font-weight:700}
+.card-footer-map:empty{display:none}
 </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
@@ -3302,6 +3324,48 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
     if(dot) dot.style.display=on?'none':''; if(mdot) mdot.style.display=on?'none':'';
     if(status==='connected'||status==='local'||status==='offline'){ closeSetup(); }
   };
+})();
+</script>
+
+<script>
+/* 設定メニューを用途別に再編成(既存のID・イベントはそのまま移動するだけ) */
+(function(){
+  function run(){
+    var box=document.querySelector('#settings-sheet .space-y-6'); if(!box||box.dataset.m3g) return; box.dataset.m3g='1';
+    var $=function(id){return document.getElementById(id)};
+    function hasLabel(el){var c=el.cloneNode(true);c.querySelectorAll('select,option,input,script').forEach(function(n){n.remove()});return c.textContent.trim().length>0}
+    function rowOf(el){if(!el)return null;var n=el.parentElement;while(n&&!hasLabel(n)){n=n.parentElement}
+      if(!n||n.classList.contains('m3-sec-body')||n.classList.contains('m3-sec')||n===box)return null;return n}
+    var touched=[];
+    function mk(icon,title,open){
+      var sec=document.createElement('div'); sec.className='m3-sec'+(open?' m3-open':'');
+      var head=document.createElement('div'); head.className='m3-sec-head'; head.setAttribute('role','button'); head.tabIndex=0;
+      head.innerHTML='<span class="material-symbols-rounded" style="display:flex;align-items:center;justify-content:center;background:var(--primary-container);color:var(--on-primary-container)">'+icon+'</span><span>'+title+'</span>';
+      var body=document.createElement('div'); body.className='m3-sec-body'; sec.appendChild(head); sec.appendChild(body);
+      var t=function(){sec.classList.toggle('m3-open')};
+      head.addEventListener('click',t); head.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();t()}});
+      return sec;
+    }
+    function addRow(body,el){var r=rowOf(el); if(!r)return;
+      var old=r.closest('.m3-sec'); if(old&&touched.indexOf(old)<0)touched.push(old);
+      r.classList.add('m3-row'); body.appendChild(r);
+      var cb=r.querySelector('input[type=checkbox]');
+      if(cb) r.addEventListener('click',function(e){if(!e.target.closest('input,label,select,button'))cb.click()});
+    }
+    function addNav(body,btn){ if(!btn)return; var old=btn.closest('.m3-sec'); if(old&&touched.indexOf(old)<0)touched.push(old);
+      var host=btn.parentElement; btn.classList.add('m3-nav'); body.appendChild(btn); }
+    var A=mk('palette','外観・表示',true), B=mk('touch_app','操作・フィードバック',false), C=mk('help','ヘルプ・データ',false);
+    ['darkmode-toggle','compact-toggle','text-size-select','wake-lock-toggle'].forEach(function(id){addRow(A.lastChild,$(id))});
+    ['haptic-toggle','ui-sound-toggle','toast-duration-select'].forEach(function(id){addRow(B.lastChild,$(id))});
+    ['openHandbookModal','openHistoryModal','openChecklistModal','exportVolcanoDataBackup'].forEach(function(f){addNav(C.lastChild,document.querySelector('button[onclick^="'+f+'"]'))});
+    // 並び順: 管理者 → 外観・表示 → 背景 → アクセントカラー → 操作 → ヘルプ → 残り
+    var bg=$('theme-card-bg-icon'), pal=$('theme-card-palette-icon');
+    var bgS=bg&&bg.closest('.m3-sec'), palS=pal&&pal.closest('.m3-sec');
+    var ref=box.children[1]||null;
+    [A,bgS,palS,B,C].forEach(function(x){ if(x) box.insertBefore(x,ref); });
+    touched.forEach(function(sec){ var b=sec.querySelector('.m3-sec-body'); if(b&&!b.textContent.trim()&&!b.querySelector('input,select,button,canvas,svg')) sec.remove(); });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
 })();
 </script>
 </body>
