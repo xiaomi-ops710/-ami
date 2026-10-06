@@ -682,6 +682,27 @@ button.m3-nav:active{background:var(--m3-line)!important}
 #mobile-tab-bar #tab-glass-indicator::after{content:'';position:absolute;left:12%;right:12%;top:5%;height:30%;border-radius:9999px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.60),rgba(255,255,255,0));opacity:.8}
 #mobile-tab-bar #floating-tabbar-wrap:active #tab-glass-indicator{transform:scale(1.17,1.10);-webkit-backdrop-filter:blur(1.5px) saturate(2) brightness(1.28)!important;backdrop-filter:blur(1.5px) saturate(2) brightness(1.28)!important}
 #floating-tabbar-wrap .tab-item span{text-shadow:0 1px 3px rgba(0,0,0,.45)}
+
+/* ===== Material 3 Expressive フローティングタブバー(ガラス効果を廃止) ===== */
+#mobile-tab-bar{gap:10px}
+.m3x-bar{background:color-mix(in srgb, var(--primary) 6%, #FFFFFF)!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid rgba(0,0,0,.06)!important;box-shadow:0 8px 20px rgba(0,0,0,.16),0 2px 6px rgba(0,0,0,.10)!important;padding:6px!important}
+.dark .m3x-bar{background:color-mix(in srgb, var(--primary) 10%, #211F26)!important;border-color:rgba(255,255,255,.07)!important;box-shadow:0 8px 22px rgba(0,0,0,.42),0 2px 6px rgba(0,0,0,.30)!important}
+.m3x-bar::before,.m3x-bar::after{content:none!important}
+.m3x-item{display:flex!important;align-items:center;height:48px;padding:0 16px;border-radius:9999px;cursor:pointer;-webkit-user-select:none;user-select:none;position:relative;z-index:1;background:transparent;transition:background-color .4s cubic-bezier(.2,0,0,1),padding .4s cubic-bezier(.2,0,0,1);flex-direction:row!important}
+.m3x-item:active{transform:scale(.96)}
+.m3x-item.m3x-active{background:var(--primary-container);padding:0 18px 0 12px}
+.m3x-ic{display:flex;align-items:center;justify-content:center;width:0;max-width:0;opacity:0;overflow:hidden;margin-right:0;transition:max-width .4s cubic-bezier(.34,1.56,.64,1),opacity .25s ease .05s,margin-right .4s cubic-bezier(.34,1.56,.64,1)}
+.m3x-item.m3x-active .m3x-ic{max-width:26px;width:26px;opacity:1;margin-right:8px}
+.m3x-ic .material-symbols-rounded{font-size:20px;line-height:1;color:var(--on-primary-container)}
+.m3x-lb{font-size:13px;font-weight:700;white-space:nowrap;color:#79747E;transition:color .3s,font-weight .3s}
+.dark .m3x-lb{color:#938F99}
+.m3x-item.m3x-active .m3x-lb{color:var(--on-primary-container);font-weight:800}
+.m3x-badge{display:inline-block;width:7px;height:7px;border-radius:50%;background:#DE3730;margin-left:5px;vertical-align:middle}
+.m3x-badge.hidden{display:none}
+.m3x-sync{width:48px;height:48px;flex:none;border-radius:9999px;display:flex;align-items:center;justify-content:center;background:var(--primary-container);color:var(--on-primary-container);box-shadow:0 8px 20px rgba(0,0,0,.16),0 2px 6px rgba(0,0,0,.10);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.dark .m3x-sync{box-shadow:0 8px 22px rgba(0,0,0,.42),0 2px 6px rgba(0,0,0,.30)}
+.m3x-sync:active{transform:scale(.88) rotate(40deg)}
+.m3x-sync .material-symbols-rounded{font-size:24px}
 </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
@@ -935,30 +956,26 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         </div>
     </div>
 
-    <!-- 📱 モバイル用 フローティングボトムナビゲーション(すりガラス風) -->
-    <nav id="mobile-tab-bar" class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex justify-center pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
-        <div id="floating-tabbar-wrap" class="floating-tabbar pointer-events-auto flex items-center gap-1 bg-[#1D1B20]/18 dark:bg-[#0D0E11]/22 backdrop-blur-3xl backdrop-saturate-150 border border-white/25 rounded-full shadow-2xl px-2 py-2 relative">
-            <!-- 🚀 新機能: 液体ガラス風のスライド式インジケーター(タップ/ドラッグで移動) -->
-            <div id="tab-glass-indicator" class="absolute top-2 bottom-2 rounded-full bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/15 shadow-sm pointer-events-none" style="transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
-            <div onclick="switchToMobileTab('home')" data-tab="home" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
-                <div class="w-14 h-8 flex items-center justify-center"><span id="nav-tab-home-icon" class="material-symbols-rounded text-xl" style="color: var(--on-primary-container);">space_dashboard</span></div>
-                <span id="nav-tab-home-label" class="text-[10px] font-black mt-1 text-white">ホーム</span>
+    <!-- 📱 モバイル用 フローティングボトムナビゲーション(Material 3 Expressive) -->
+    <nav id="mobile-tab-bar" class="md:hidden fixed bottom-0 inset-x-0 z-[40] flex items-center justify-center gap-3 pb-[calc(env(safe-area-inset-bottom)+14px)] px-4 pointer-events-none">
+        <div id="floating-tabbar-wrap" class="m3x-bar pointer-events-auto flex items-center gap-1 rounded-full px-2 py-2 relative">
+            <div onclick="switchToMobileTab('home')" data-tab="home" class="tab-item m3x-item">
+                <span class="m3x-ic"><span id="nav-tab-home-icon" class="material-symbols-rounded">space_dashboard</span></span>
+                <span id="nav-tab-home-label" class="m3x-lb">ホーム</span>
             </div>
-            <div onclick="switchToMobileTab('notifications')" data-tab="notifications" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
-                <div class="w-14 h-8 flex items-center justify-center relative"><span id="nav-tab-notifications-icon" class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">notifications</span><span id="nav-notif-badge" class="absolute top-1 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#1D1B20] hidden"></span></div>
-                <span id="nav-tab-notifications-label" class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">通知履歴</span>
+            <div onclick="switchToMobileTab('notifications')" data-tab="notifications" class="tab-item m3x-item">
+                <span class="m3x-ic"><span id="nav-tab-notifications-icon" class="material-symbols-rounded">notifications</span></span>
+                <span id="nav-tab-notifications-label" class="m3x-lb">通知履歴<span id="nav-notif-badge" class="m3x-badge hidden"></span></span>
             </div>
-            <div onclick="switchToMobileTab('settings')" data-tab="settings" class="tab-item flex flex-col items-center justify-center px-5 py-1.5 cursor-pointer group active:scale-95 transition-transform relative z-10">
-                <div class="w-14 h-8 flex items-center justify-center"><span id="nav-tab-settings-icon" class="material-symbols-rounded text-xl text-gray-300 group-hover:text-white">settings</span></div>
-                <span id="nav-tab-settings-label" class="text-[10px] font-black mt-1 text-gray-300 group-hover:text-white transition-colors">設定</span>
+            <div onclick="switchToMobileTab('settings')" data-tab="settings" class="tab-item m3x-item">
+                <span class="m3x-ic"><span id="nav-tab-settings-icon" class="material-symbols-rounded">settings</span></span>
+                <span id="nav-tab-settings-label" class="m3x-lb">設定</span>
             </div>
         </div>
+        <button onclick="forceSyncFromFirebase()" class="m3x-sync pointer-events-auto" aria-label="今すぐ同期">
+            <span id="fab-sync-icon" class="material-symbols-rounded">sync</span>
+        </button>
     </nav>
-
-    <!-- 📱 モバイル用 同期FAB -->
-    <button onclick="forceSyncFromFirebase()" class="md:hidden fixed bottom-[105px] right-5 z-[45] w-14 h-14 bg-[var(--primary-container)] text-[var(--on-primary-container)] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center transition-all hover:shadow-lg border border-white/20 active:scale-95">
-        <span id="fab-sync-icon" class="material-symbols-rounded text-3xl">sync</span>
-    </button>
 
     <div id="install-banner" class="hidden bg-[#D3E4FF] dark:bg-[#004A77] text-[#001C38] dark:text-[#DFE2EB] px-6 py-4 flex flex-col md:flex-row items-center justify-between sticky top-0 z-50 shadow-md gap-3">
         <div class="flex items-center gap-4">
@@ -1697,79 +1714,13 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
             }
             updateMobileTabActiveState(tab);
         }
-        // 🚀 新機能: 液体ガラスのスライド式インジケーター。タップで滑らかに移動し、
-        // ドラッグ(スワイプ)でも指の位置に追従して別のタブへ切り替えられる。
+        // 🚀 Material 3 Expressive: アクティブなタブだけがピル状に広がり、アイコンが現れる
         function updateMobileTabActiveState(tab) {
-            const tabs = { home: 'nav-tab-home', notifications: 'nav-tab-notifications', settings: 'nav-tab-settings' };
-            Object.keys(tabs).forEach(key => {
-                const label = document.getElementById(tabs[key] + '-label'); const icon = document.getElementById(tabs[key] + '-icon');
-                if (!label || !icon) return;
-                if (key === tab) {
-                    const isDarkMode = document.documentElement.classList.contains('dark');
-                    const activeColor = isDarkMode ? '#FFFFFF' : '#1D1B20';
-                    label.classList.remove("text-gray-300", "text-white"); label.style.color = activeColor;
-                    icon.classList.remove("text-gray-300"); icon.style.color = activeColor;
-                } else {
-                    label.style.color = ""; label.classList.add("text-gray-300");
-                    icon.style.color = ""; icon.classList.add("text-gray-300");
-                }
+            ['home', 'notifications', 'settings'].forEach((key) => {
+                const item = document.querySelector(`.tab-item[data-tab="${key}"]`);
+                if (item) item.classList.toggle('m3x-active', key === tab);
             });
-            const activeEl = document.querySelector(`.tab-item[data-tab="${tab}"]`);
-            const indicator = document.getElementById("tab-glass-indicator");
-            if (activeEl && indicator) {
-                indicator.style.left = activeEl.offsetLeft + 'px';
-                indicator.style.width = activeEl.offsetWidth + 'px';
-            }
         }
-
-        // 🚀 タブバーのドラッグ(スワイプ)対応: 楕円を指で押しながら動かすと、
-        // 離した位置に一番近いタブへスナップして切り替わる
-        (function setupTabBarDrag() {
-            let dragging = false;
-            function init() {
-                const wrap = document.getElementById("floating-tabbar-wrap");
-                const indicator = document.getElementById("tab-glass-indicator");
-                if (!wrap || !indicator) return;
-                const start = (e) => {
-                    dragging = true;
-                    indicator.style.transition = 'none';
-                    indicator.classList.add("scale-105");
-                };
-                const move = (e) => {
-                    if (!dragging) return;
-                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    const rect = wrap.getBoundingClientRect();
-                    let x = clientX - rect.left - (indicator.offsetWidth / 2);
-                    x = Math.max(8, Math.min(x, rect.width - indicator.offsetWidth - 8));
-                    indicator.style.left = x + 'px';
-                };
-                const end = (e) => {
-                    if (!dragging) return;
-                    dragging = false;
-                    indicator.style.transition = 'left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                    indicator.classList.remove("scale-105");
-                    // 一番近いタブを探してスナップ
-                    const items = Array.from(wrap.querySelectorAll('.tab-item'));
-                    const indicatorCenter = indicator.offsetLeft + (indicator.offsetWidth / 2);
-                    let closest = items[0]; let minDist = Infinity;
-                    items.forEach(item => {
-                        const center = item.offsetLeft + (item.offsetWidth / 2);
-                        const dist = Math.abs(center - indicatorCenter);
-                        if (dist < minDist) { minDist = dist; closest = item; }
-                    });
-                    switchToMobileTab(closest.dataset.tab);
-                    triggerHaptic([10, 30, 10]);
-                };
-                indicator.addEventListener('touchstart', start, { passive: true });
-                indicator.addEventListener('mousedown', start);
-                window.addEventListener('touchmove', move, { passive: true });
-                window.addEventListener('mousemove', move);
-                window.addEventListener('touchend', end);
-                window.addEventListener('mouseup', end);
-            }
-            if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
-        })();
-        window.addEventListener('resize', () => { updateMobileTabActiveState(currentMobileTab || 'home'); });
 
         function toggleSettingsModal(s) {
             const m = document.getElementById("settings-modal"); const sh = document.getElementById("settings-sheet");
