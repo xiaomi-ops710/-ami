@@ -12,7 +12,7 @@
     <link class="pwa-icon" rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- 🚀 Tailwindを事前ビルド済みCSSとして読み込み(実行時JITコンパイルを廃止し初期表示を高速化) -->
-    <link rel="stylesheet" href="./tailwind.css?v=9.23">
+    <link rel="stylesheet" href="./tailwind.css?v=9.24">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -677,7 +677,7 @@ button.m3-nav:active{background:var(--m3-line)!important}
 .m3x-sync:active{transform:scale(.88) rotate(40deg)}
 .m3x-sync .material-symbols-rounded{font-size:24px}
 
-/* ===== v9.23 新機能 ===== */
+/* ===== v9.24 新機能 ===== */
 #main-header{position:sticky!important;top:max(8px,env(safe-area-inset-top))!important;z-index:35;border-radius:32px!important;background:color-mix(in srgb,var(--primary) 16%,#1D1B20)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid rgba(255,255,255,.08)!important;transition:padding .3s cubic-bezier(.2,0,0,1),border-radius .3s,box-shadow .3s}
 #main-header.m3f-compact{padding-top:8px!important;padding-bottom:8px!important;border-radius:9999px!important;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 #main-header.m3f-compact #header-clock-display{display:none!important}
@@ -725,7 +725,7 @@ button.m3-nav:active{background:var(--m3-line)!important}
 .card-container .card-footer-actions .m3-btn{transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
 .card-container .card-footer-actions .m3-btn:active{transform:scale(.9)}
 
-/* ===== v9.23: 重複ステータス修正 / M3E FAB / 詳細シート刷新 ===== */
+/* ===== v9.24: 重複ステータス修正 / M3E FAB / 詳細シート刷新 ===== */
 @media (max-width:820px){#sync-status-container{display:none!important}}
 /* FAB: M3E 角丸スクエア */
 .m3x-sync{width:60px!important;height:60px!important;border-radius:20px!important;background:var(--primary)!important;color:var(--on-primary)!important;box-shadow:0 8px 20px rgba(0,0,0,.25),0 2px 6px rgba(0,0,0,.15)!important;transition:transform .3s cubic-bezier(.34,1.56,.64,1),border-radius .3s cubic-bezier(.34,1.56,.64,1)}
@@ -754,7 +754,7 @@ button.m3-nav:active{background:var(--m3-line)!important}
  #detail-visual{height:230px!important}
 }
 
-/* ===== v9.23: コントロールパネル & 各UI M3E ===== */
+/* ===== v9.24: コントロールパネル & 各UI M3E ===== */
 #admin-panel{border-radius:32px!important;background:color-mix(in srgb,var(--primary) 5%,#FFFFFF)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid rgba(128,128,128,.15)!important;padding:20px!important;box-shadow:0 10px 30px rgba(0,0,0,.14)}
 .dark #admin-panel{background:color-mix(in srgb,var(--primary) 8%,#1E1F22)!important}
 #admin-panel>div:first-child{border:0!important;padding:0!important;margin:0 0 16px!important}
@@ -789,7 +789,7 @@ button.m3-nav:active{background:var(--m3-line)!important}
 #emergency-ticker{border-radius:20px!important}
 .card-tabs{border-radius:9999px!important}
 
-/* ===== v9.23: スマホ版 通知・設定を全画面アプリ画面+タブ化 ===== */
+/* ===== v9.24: スマホ版 通知・設定を全画面アプリ画面+タブ化 ===== */
 #m3f-stabs,#m3f-ntabs{display:none}
 @media (max-width:820px){
  #notification-modal,#settings-modal{background:color-mix(in srgb,var(--primary) 4%,#FBFBFF)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:0!important;align-items:stretch!important;justify-content:stretch!important}
@@ -826,7 +826,7 @@ button.m3-nav:active{background:var(--m3-line)!important}
 .m3f-tab.on .material-symbols-rounded{max-width:24px;opacity:1;margin-right:6px}
 .m3f-tab:active{transform:scale(.93)}
 
-/* ===== v9.23 アニメーション強化 ===== */
+/* ===== v9.24 アニメーション強化 ===== */
 @keyframes m3fIn{from{opacity:0;transform:translateY(26px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes m3fPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--lv,#6b7280) 75%,transparent)}100%{box-shadow:0 0 0 24px transparent}}
 @keyframes m3fSwap{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
@@ -848,14 +848,14 @@ button.m3-nav:active{background:var(--m3-line)!important}
 @media (prefers-reduced-motion:reduce){.card-container.m3f-in,.card-container.m3f-pulse,.m3f-swap,.m3f-li,.m3f-first .m3f-tile,.m3f-first #m3f-dash-actions,.m3f-rip{animation:none!important}}
 html.perf-mode .card-container.m3f-in,html.perf-mode .card-container.m3f-pulse,html.perf-mode .m3f-li,html.perf-mode .m3f-swap{animation:none!important}
 
-/* ===== v9.23.1 iPad: システムメニューバー(ぼかし)の下に収める ===== */
+/* ===== v9.24.1 iPad: システムメニューバー(ぼかし)の下に収める ===== */
 :root{--m3f-bar:0px}
 @media (min-width:821px) and (pointer:coarse){:root{--m3f-bar:48px}}
 #main-header{top:max(calc(var(--m3f-bar) + 8px),env(safe-area-inset-top))!important;margin-top:var(--m3f-bar)}
 #emergency-ticker{top:var(--m3f-bar)!important}
 #m3f-offline{top:calc(var(--m3f-bar) + 10px)}
 
-/* ===== v9.23 プロセストラッカー ===== */
+/* ===== v9.24 プロセストラッカー ===== */
 #m3f-proc{position:fixed;z-index:95;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);width:min(92vw,400px);transform:translate(-50%,40px) scale(.96);opacity:0;pointer-events:none;border-radius:28px;padding:14px 16px 16px;background:color-mix(in srgb,var(--primary) 8%,#FFFFFF);color:#1C1B1F;box-shadow:0 14px 38px rgba(0,0,0,.30),0 2px 8px rgba(0,0,0,.14);transition:transform .5s cubic-bezier(.34,1.4,.64,1),opacity .3s}
 .dark #m3f-proc{background:color-mix(in srgb,var(--primary) 10%,#26272B);color:#E2E2E9}
 #m3f-proc.on{transform:translate(-50%,0) scale(1);opacity:1;pointer-events:auto}
@@ -904,7 +904,7 @@ html.perf-mode .card-container.m3f-in,html.perf-mode .card-container.m3f-pulse,h
 @keyframes m3fPkt{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
 @media (prefers-reduced-motion:reduce){#m3f-proc *,#m3f-proc{animation:none!important;transition-duration:.01s!important}}
 
-/* ===== v9.23 ツールバー統合 + 豪華アニメーション ===== */
+/* ===== v9.24 ツールバー統合 + 豪華アニメーション ===== */
 #m3f-dash-actions{display:none}
 .m3f-tbwrap{flex-wrap:wrap!important;justify-content:flex-end;align-items:center;gap:8px!important}
 .m3f-tbtn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:9999px;border:0;font-size:12px;font-weight:800;background:var(--primary-container);color:var(--on-primary-container);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
@@ -935,7 +935,7 @@ html.perf-mode .card-container.m3f-in,html.perf-mode .card-container.m3f-pulse,h
 @media (prefers-reduced-motion:reduce){.card-container.m3f-hot,.card-container.m3f-hot::after,#main-header,#monitor-section>div:first-child,.m3f-col,.m3f-trow,.m3x-item .m3x-ic .material-symbols-rounded,.m3f-swap .m3-list-row,#detail-card #detail-action-buttons .m3-btn,#detail-card #detail-history li{animation:none!important}}
 html.perf-mode .card-container.m3f-hot,html.perf-mode .card-container.m3f-hot::after{animation:none!important}
 
-/* ===== v9.23.1 ===== */
+/* ===== v9.24.1 ===== */
 /* ダッシュボードをコンパクトに */
 #m3f-dash{grid-template-columns:repeat(3,1fr)!important;gap:8px!important;margin:0 0 12px!important}
 .m3f-tile{min-height:0!important;padding:8px 14px!important;border-radius:18px!important;gap:0!important}
@@ -992,7 +992,7 @@ html.perf-mode .card-container.m3f-hot,html.perf-mode .card-container.m3f-hot::a
 #m3f-lvb.on .ic .material-symbols-rounded{animation:m3fBounce .7s cubic-bezier(.34,1.56,.64,1)}
 #m3f-lvb b{display:block;font-size:14px;font-weight:900}#m3f-lvb small{font-size:12px;font-weight:700;opacity:.8}
 
-/* ===== v9.23 認証画面 / メニュー / ボタン整理 ===== */
+/* ===== v9.24 認証画面 / メニュー / ボタン整理 ===== */
 .m3f-login{padding:22px!important;border-radius:32px!important;background:color-mix(in srgb,var(--primary) 8%,transparent)!important;border:0!important}
 .m3f-login>h4{display:none!important}
 .m3f-lg-hd{display:flex;gap:14px;align-items:center;margin-bottom:18px}
@@ -1021,7 +1021,7 @@ html.perf-mode .card-container.m3f-hot,html.perf-mode .card-container.m3f-hot::a
 #m3f-menu .mi:active{background:var(--primary-container)}
 #m3f-menu .mic{width:36px;height:36px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--primary-container);color:var(--on-primary-container)}
 
-/* ===== v9.23 カードの読み上げボタン / プレイヤー / 音声管理 ===== */
+/* ===== v9.24 カードの読み上げボタン / プレイヤー / 音声管理 ===== */
 .card-container .readout-btn{min-width:64px;justify-content:center;padding-left:0!important;padding-right:0!important}
 .card-container .readout-btn .material-symbols-rounded{font-size:24px!important}
 #m3f-pl{position:fixed;inset:0;z-index:130;background:rgba(0,0,0,0);display:flex;align-items:flex-end;justify-content:center;transition:background-color .35s}
@@ -1078,6 +1078,43 @@ html.perf-mode .card-container.m3f-hot,html.perf-mode .card-container.m3f-hot::a
 .m3f-aud .use{height:6px;border-radius:6px;background:rgba(128,128,128,.25);overflow:hidden}.m3f-aud .use i{display:block;height:100%;background:var(--primary);border-radius:6px;transition:width .4s}
 .m3f-aud small{font-size:11px;font-weight:700;opacity:.65}
 @media (prefers-reduced-motion:reduce){#m3f-pl.playing .eq i,#m3f-pl .tl li.pl .mic{animation:none!important}}
+
+/* ===== v9.24 アプリロック (Android風 M3E) ===== */
+#app-lock-screen{background:radial-gradient(130% 80% at 50% 0%,color-mix(in srgb,var(--primary) 38%,#1D1B20),#121014 70%)!important;justify-content:space-between!important;padding:calc(env(safe-area-inset-top) + 36px) 24px calc(env(safe-area-inset-bottom) + 28px)!important;transition:opacity .45s cubic-bezier(.2,0,0,1),transform .45s cubic-bezier(.2,0,0,1)}
+#app-lock-screen.unlocking{opacity:0;transform:scale(1.12) translateY(-20px);pointer-events:none}
+#app-lock-screen .lk-top{text-align:center}
+#app-lock-screen .lk-time{font-size:clamp(64px,18vw,92px);font-weight:500;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+#app-lock-screen .lk-date{font-size:15px;font-weight:700;opacity:.75;margin-top:6px}
+#app-lock-screen .lk-mid{display:flex;flex-direction:column;align-items:center}
+#app-lock-screen .lk-ic{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--primary-container);color:var(--on-primary-container);margin-bottom:14px;transition:border-radius .6s cubic-bezier(.34,1.56,.64,1),transform .5s cubic-bezier(.34,1.56,.64,1);animation:m3fMorph 3.2s ease-in-out infinite}
+#app-lock-screen.unlocking .lk-ic{animation:none;transform:scale(1.35);background:#C8F0D0;color:#0B5A1E}
+#app-lock-screen .lk-ic .material-symbols-rounded{font-size:32px}
+#app-lock-screen h2{font-size:20px;font-weight:800;margin:0}
+#app-lock-screen .lk-mid>p:not(.lk-err){font-size:13px;font-weight:600;opacity:.65;margin:4px 0 22px}
+.lk-dots,#app-lock-setup-dots{display:flex;gap:18px;justify-content:center}
+.lk-dots span,#app-lock-setup-dots span{width:16px!important;height:16px!important;border-radius:50%!important;border:2px solid rgba(255,255,255,.55)!important;background:transparent!important;transition:transform .35s cubic-bezier(.34,2,.64,1),background-color .2s,border-color .2s}
+#app-lock-setup-dots span{border-color:rgba(128,128,128,.6)!important}
+.lk-dots span.on,#app-lock-setup-dots span.on{background:var(--primary)!important;border-color:var(--primary)!important;transform:scale(1.35)}
+.lk-dots.bad span{background:#F2B8B5!important;border-color:#F2B8B5!important}
+.lk-dots.shake{animation:m3fShake .55s}
+#app-lock-screen .lk-err{font-size:12px;font-weight:700;color:#F2B8B5;margin-top:14px;text-align:center;min-height:16px}
+#app-lock-screen .lk-pad,#app-lock-setup-modal .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:330px;margin-left:auto;margin-right:auto;justify-items:center}
+.lk-pad.dis{opacity:.35;pointer-events:none}
+#app-lock-screen .app-lock-key,#app-lock-setup-modal .app-lock-key{width:clamp(66px,19vw,82px)!important;height:clamp(66px,19vw,82px)!important;padding:0!important;border-radius:50%!important;font-size:30px!important;font-weight:500!important;display:flex;align-items:center;justify-content:center;border:0;color:#fff;background:color-mix(in srgb,var(--primary) 20%,#2B2930)!important;transition:border-radius .35s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1),background-color .2s;-webkit-tap-highlight-color:transparent}
+#app-lock-setup-modal .app-lock-key{color:#1C1B1F!important;background:color-mix(in srgb,var(--primary) 14%,#EEF0F6)!important}
+.dark #app-lock-setup-modal .app-lock-key{color:#fff!important;background:color-mix(in srgb,var(--primary) 20%,#2B2930)!important}
+#app-lock-screen .app-lock-key:active,#app-lock-setup-modal .app-lock-key:active{border-radius:30%!important;transform:scale(.92);background:var(--primary)!important;color:var(--on-primary)!important}
+#app-lock-screen .app-lock-key.del{background:transparent!important}
+#app-lock-screen .app-lock-key.del:active{background:color-mix(in srgb,var(--primary) 30%,transparent)!important}
+#app-lock-screen .app-lock-key .material-symbols-rounded{font-size:28px}
+#app-lock-setup-modal{backdrop-filter:blur(6px)}
+#app-lock-setup-modal>div{border-radius:36px!important;max-width:380px!important;padding:28px 22px 22px!important;background:color-mix(in srgb,var(--primary) 6%,#FFFFFF)!important}
+.dark #app-lock-setup-modal>div{background:color-mix(in srgb,var(--primary) 10%,#1E1F22)!important}
+#app-lock-setup-modal>div>.material-symbols-rounded{width:60px;height:60px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--primary-container);color:var(--on-primary-container)!important;font-size:30px!important}
+#app-lock-setup-modal h3{font-size:19px!important;font-weight:900!important}
+#app-lock-setup-dots{margin:6px 0 22px!important}
+#app-lock-setup-modal button[onclick*="cancelAppLockSetup"]{min-height:48px;padding:0 24px;border-radius:9999px;margin-top:10px;background:color-mix(in srgb,var(--primary) 10%,transparent)}
+@media(prefers-reduced-motion:reduce){#app-lock-screen .lk-ic{animation:none}}
 </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
@@ -1117,7 +1154,7 @@ html.perf-mode .card-container.m3f-hot,html.perf-mode .card-container.m3f-hot::a
             <div class="absolute w-full h-full rounded-full border-2 border-[var(--primary)] opacity-20 animate-ping"></div>
         </div>
         <h1 class="text-3xl font-black tracking-widest mb-2 drop-shadow-md">火山防災情報局</h1>
-        <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v9.23 Ultimate Evolution</p>
+        <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-8">v9.24 Ultimate Evolution</p>
     </div>
 
     <!-- 🚀 新機能: アプリロック画面(PINコードで解除) -->
@@ -1234,7 +1271,7 @@ html.perf-mode .card-container.m3f-hot,html.perf-mode .card-container.m3f-hot::a
                 <button onclick="closeHistoryModal()" class="w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v9.23 (Liquid Glass 強化・安定性向上版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】タブバーをiOSのLiquid Glassに近い質感に刷新(多層ハイライト・押下時にレンズが膨らむ動き)</li><li>【改善】山のカードの名前を大きく・2行まで表示し、操作ボタンを大きく整列</li><li>【改善】設定メニューを用途別に再編成し、全項目をアイコン付きのMaterial 3デザインに統一</li><li>【新機能】初回起動時のセットアップ画面(進行に合わせて噴火が激しくなる火山アニメーション)</li><li>【修正】最新版なのに「更新してください」と表示される問題を修正(バージョンを数値で比較)</li><li>【修正】起動中の同期待ちで接続エラーと誤表示される問題を修正</li><li>【安定性】通信が遅い時はキャッシュを先に表示/復帰時の自動再同期/通知タップで該当ページへ移動</li></ul></div>
+                <div class="relative pl-5 border-l-4 border-[var(--primary)]"><div class="absolute w-3 h-3 bg-[var(--primary)] rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_var(--primary)]"></div><h4 class="font-black text-[var(--primary)] text-base mb-1.5">v9.24 (Liquid Glass 強化・安定性向上版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】タブバーをiOSのLiquid Glassに近い質感に刷新(多層ハイライト・押下時にレンズが膨らむ動き)</li><li>【改善】山のカードの名前を大きく・2行まで表示し、操作ボタンを大きく整列</li><li>【改善】設定メニューを用途別に再編成し、全項目をアイコン付きのMaterial 3デザインに統一</li><li>【新機能】初回起動時のセットアップ画面(進行に合わせて噴火が激しくなる火山アニメーション)</li><li>【修正】最新版なのに「更新してください」と表示される問題を修正(バージョンを数値で比較)</li><li>【修正】起動中の同期待ちで接続エラーと誤表示される問題を修正</li><li>【安定性】通信が遅い時はキャッシュを先に表示/復帰時の自動再同期/通知タップで該当ページへ移動</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-700 dark:text-gray-300 text-base mb-1.5">v9.7 (Liquid Glass & 安定性強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200"><li>【新機能】スマホのタブバーを、液体ガラス風の楕円インジケーターがタップ/ドラッグで滑らかに移動するデザインに刷新</li><li>【新機能】オフライン検知バナー・画面の自動スリープ防止(Wake Lock)・読み上げ音声の選択機能を追加</li><li>【新機能】火山名での検索、サイレントタイム(時間帯で自動読上を停止)、防災ハンドブックを追加</li><li>アプリのバージョン表記とキャッシュのバージョンがズレていた問題を解消し、今後は同期させる運用に変更</li><li>ヘッダーの同期ステータスが2重表示されてしまうバグを修正</li><li>ダークモードの背景・カードの角丸・起動アニメーションが崩れることがあった問題に対し、外部CSSファイルに依存しない防御策を追加</li><li>通知履歴・設定をスマホでは独立したタブとして扱うよう変更(閉じるボタンを廃止しタブバーで一貫して行き来できるように)</li><li>パフォーマンス優先モードを強化し、低スペック端末でもぼかし効果を完全にオフにできるように</li><li>読み上げ速度スライダーをMaterial 3 Expressiveデザインに変更</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-90"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-700 dark:text-gray-300 text-base mb-1">v9.2〜v9.6 (デザイン・安定性の継続改善)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>ポップアップ通知をiOS風のスプリングアニメーション・液体ガラス風デザインに変更</li><li>スマホ表示のカードをさらにコンパクト化し、画像・山名を見やすいバランスに調整</li><li>山名が1文字ずつ縦に改行されてしまう表示崩れを修正</li><li>お気に入り(ピン留め)機能を追加</li><li>ヘッダー・速報テロップをスクロール時も常に上部に固定表示するよう変更</li><li>検索ボタンの配置・避難所検索の挙動を調整</li></ul></div>
                 <div class="relative pl-5 border-l-4 border-gray-300 dark:border-gray-700 opacity-95"><div class="absolute w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full -left-[8px] top-1.5"></div><h4 class="font-black text-gray-800 dark:text-gray-200 text-base mb-1">v9.1 (M3 Expressive & 実用機能強化版)</h4><ul class="list-disc pl-4 space-y-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400"><li>【新機能】お気に入り(ピン留め)機能 - よく見る火山を一覧の先頭に固定表示</li><li>【新機能】防災チェックリスト機能を追加(水・非常食など標準項目つき、自由にカスタマイズ可能)</li><li>【新機能】避難所ボタンが現在地からの経路をGoogleマップで直接表示するように強化</li><li>【新機能】管理者用データバックアップ機能(現在の火山データをJSONファイルとして書き出し)</li><li>アプリロックから生体認証機能を削除し、確実に動作するPINコード方式に一本化</li><li>詳細画面(全画面カード表示)の操作ボタンを右側から左側(状況・アドバイスの下)に移動</li><li>同期時などのポップアップ通知を、画面下部から上部(スマホの通知シェード風)にデザイン一新</li><li>Tailwindの事前ビルドCSSに新しいクラスが反映されていなかった不具合を修正(アプリロック等の表示崩れの根本原因)</li><li>絵文字アイコンをMaterial Symbolsアイコンに順次置き換え、全体的な角丸をより丸みの強いMaterial 3 Expressiveデザインに強化</li></ul></div>
@@ -1632,7 +1669,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                         </div>
                         <div id="settings-admin-version-panel" class="hidden pt-2">
                             <button onclick="publishCurrentVersionToServer()" class="w-full py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-[10px] font-black rounded-m3-full transition flex items-center justify-center gap-1.5 dark:text-white">
-                                <span class="material-symbols-rounded text-sm">cloud_upload</span> 現在のバージョン(v9.23)を全端末に配信登録
+                                <span class="material-symbols-rounded text-sm">cloud_upload</span> 現在のバージョン(v9.24)を全端末に配信登録
                             </button>
                         </div>
                     </div>
@@ -1945,7 +1982,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                 </div>
             </div>
             <div class="border-t dark:border-gray-800 pt-4 text-center">
-                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v9.23 (Ultimate Custom Pro)</span>
+                <span class="text-[9px] text-gray-400 font-mono">disaster-monitoring-m3 v9.24 (Ultimate Custom Pro)</span>
             </div>
         </div>
     </div>
@@ -1990,7 +2027,7 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
         const LOCAL_STORAGE_KEY = "volcano_disaster_monitor_data_v2";
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'volcano-app-pwa-m3';
         // 🚀 新機能: アプリバージョン管理(キャッシュにより古いバージョンが開き続ける問題への対策)
-        const APP_VERSION = "9.23";
+        const APP_VERSION = "9.24";
 
         let volcanoData = [];
         let currentTabs = {}; 
@@ -4003,7 +4040,7 @@ function adminHelpers(){
 }
 
 
-/* v9.23 設定タブ & 通知タブ */
+/* v9.24 設定タブ & 通知タブ */
 var mq=window.matchMedia('(max-width:820px)'),scur=0,lastCur=-1,nf='all';
 function tabBtn(icon,label,on,fn){var b=document.createElement('button');b.type='button';b.className='m3f-tab'+(on?' on':'');b.innerHTML='<span class="material-symbols-rounded">'+icon+'</span>'+label;b.onclick=fn;return b}
 function applyTabs(){
@@ -4093,7 +4130,7 @@ if(typeof window.playPingSound==='function'){var _p=window.playPingSound;window.
 if(typeof window.saveLocalVolcanos==='function'){var _s=window.saveLocalVolcanos;window.saveLocalVolcanos=function(){if(navigator.onLine)store.set('m3_last_fetch',Date.now());return _s.apply(this,arguments)}}
 
 
-/* v9.23 同期の安定化 */
+/* v9.24 同期の安定化 */
 var syncSt='unknown',lastOk=0,running=null,silent=false,retryN=0,retryT=null,t0=Date.now();
 if(typeof window.updateSyncStatus==='function'){var _u=window.updateSyncStatus;window.updateSyncStatus=function(st){syncSt=st;if(st==='connected'){lastOk=Date.now();retryN=0}return _u.apply(this,arguments)}}
 if(typeof window.showToast==='function'){var _t=window.showToast;window.showToast=function(t){if(silent&&/手動同期|再試行中|同期エラー|同期完了|同期を保留/.test(String(t)))return;return _t.apply(this,arguments)}}
@@ -4111,7 +4148,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&syn
 setInterval(function(){if(Date.now()-t0>20000&&syncSt!=='connected')autoRecover()},45000);
 window.addEventListener('error',function(e){console.warn('error',e&&e.message)});
 
-/* v9.23 リップル */
+/* v9.24 リップル */
 document.addEventListener('pointerdown',function(e){
   var el=e.target.closest&&e.target.closest('.m3-btn,.m3f-btn,.m3f-tab,.m3f-chip,#m3f-filter button,.m3x-item,.m3x-sync');
   if(!el||document.documentElement.classList.contains('perf-mode'))return;
@@ -4122,7 +4159,7 @@ document.addEventListener('pointerdown',function(e){
 },{passive:true});
 
 
-/* v9.23 プロセストラッカー */
+/* v9.24 プロセストラッカー */
 var P=null,pEl=null,pTick=null,pHideT=null;
 var PIPE=[['smartphone','端末'],['cloud','Firebase'],['dns','配信サーバー'],['notifications_active','受信端末']];
 function pBuild(){
@@ -4212,7 +4249,7 @@ if(typeof window.requestNotificationPermission==='function'){var _rp=window.requ
     return Promise.resolve(_o.apply(this,arguments)).then(function(v){if(mine&&P&&P.running&&P.kind===a[1])pDone(true,'');return v},function(e){if(mine&&P&&P.running)pDone(false,'処理に失敗しました');throw e})}});
 
 
-/* v9.23.1 相対時間 / レベル変動バナー / ショートカット / 更新フォーム強化 */
+/* v9.24.1 相対時間 / レベル変動バナー / ショートカット / 更新フォーム強化 */
 function relTick(){document.querySelectorAll('.m3f-rel').forEach(function(e){var m=Math.floor((Date.now()-Number(e.dataset.t))/60000);e.textContent=m<1?'たった今':m<60?m+'分前':Math.floor(m/60)+'時間前'})}
 setInterval(relTick,30000);
 function levelBanner(){
@@ -4267,7 +4304,7 @@ function syncUpd(){
 }
 
 
-/* v9.23 ポップアップメニュー / カードのボタン整理 / 認証画面 */
+/* v9.24 ポップアップメニュー / カードのボタン整理 / 認証画面 */
 function menu(anchor,items){
   var old=$('#m3f-menu');if(old){old.remove();if(old._a===anchor)return}
   var m=document.createElement('div');m.id='m3f-menu';m._a=anchor;
@@ -4322,7 +4359,7 @@ function enhanceLogin(){
 }
 
 
-/* v9.23 複数噴火音 + プレイヤー */
+/* v9.24 複数噴火音 + プレイヤー */
 var LIM=940000,PEND={update:[],create:[]};
 function tracks(v){var a=(v.audios||[]).slice();if(v.customAudio&&!a.some(function(x){return x.data===v.customAudio}))a.unshift({id:'legacy',name:'噴火音',data:v.customAudio});return a}
 function docSize(v){return tracks(v).reduce(function(n,t){return n+(t.data||'').length},0)+((v.customImage||'').length)}
@@ -4445,6 +4482,57 @@ if(typeof _sc==='function'){window.submitCreateVolcano=function(){
       if(v){v.audios=pend.map(function(t){return {id:t.id,name:t.name||'噴火音',data:t.data}});persistAudios(v);PEND.create=[];renderAudBox('create')}
       else if(n<12)setTimeout(function(){tryAttach(n+1)},500)})(0);
     return x})}}
+
+
+/* v9.24 アプリロック画面(Android風 M3E) */
+var lockUntil=Number(store.get('m3_lock_until',0))||0,lockFails=0,lockTick=null;
+function buildLock(){
+  var el=document.getElementById('app-lock-screen');if(!el||el.dataset.m3)return;el.dataset.m3=1;
+  var keys=['1','2','3','4','5','6','7','8','9','','0','del'];
+  el.innerHTML='<div class="lk-top"><div class="lk-time" id="lk-time">--:--</div><div class="lk-date" id="lk-date"></div></div>'+
+   '<div class="lk-mid"><div class="lk-ic"><span class="material-symbols-rounded" id="lk-icon">lock</span></div><h2>PINを入力</h2><p>アプリのロックを解除します</p>'+
+   '<div id="app-lock-pin-dots" class="lk-dots"><span></span><span></span><span></span><span></span></div><p id="app-lock-error-text" class="lk-err hidden"></p></div>'+
+   '<div class="lk-pad">'+keys.map(function(k){return k===''?'<span class="lk-sp"></span>':'<button type="button" class="app-lock-key'+(k==='del'?' del':'')+'" onclick="appLockKeyPress(\''+k+'\')" aria-label="'+(k==='del'?'削除':k)+'">'+(k==='del'?'<span class="material-symbols-rounded">backspace</span>':k)+'</button>'}).join('')+'</div>';
+  lockClock();
+}
+function lockClock(){
+  var t=$('#lk-time'),d=$('#lk-date');if(!t)return;var n=new Date();
+  t.textContent=('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2);
+  d.textContent=(n.getMonth()+1)+'月'+n.getDate()+'日 '+'日月火水木金土'[n.getDay()]+'曜日';
+}
+setInterval(function(){var l=document.getElementById('app-lock-screen');if(l&&!l.classList.contains('hidden'))lockClock()},10000);
+window.updateAppLockDots=function(){var n=typeof appLockUnlockBuffer==='string'?appLockUnlockBuffer.length:0;document.querySelectorAll('#app-lock-pin-dots span').forEach(function(d,i){d.classList.toggle('on',i<n)})};
+window.updateAppLockSetupDots=function(){var n=typeof appLockSetupBuffer==='string'?appLockSetupBuffer.length:0;document.querySelectorAll('#app-lock-setup-dots span').forEach(function(d,i){d.classList.toggle('on',i<n)})};
+function lockCountdown(){
+  var e=document.getElementById('app-lock-error-text'),pad=$('.lk-pad');clearInterval(lockTick);
+  var upd=function(){var r=Math.ceil((lockUntil-Date.now())/1000);
+    if(r<=0){clearInterval(lockTick);if(pad)pad.classList.remove('dis');if(e)e.classList.add('hidden');lockFails=0;store.set('m3_lock_until',0);return}
+    if(pad)pad.classList.add('dis');if(e){e.textContent='試行回数が多すぎます。'+r+'秒後にもう一度お試しください';e.classList.remove('hidden')}};
+  upd();lockTick=setInterval(upd,500);
+}
+if(typeof window.appLockKeyPress==='function'){var _ak=window.appLockKeyPress;
+  window.appLockKeyPress=async function(key){
+    if(lockUntil>Date.now())return;
+    if(navigator.vibrate)try{navigator.vibrate(key==='del'?8:12)}catch(e){}
+    var r=await _ak.apply(this,arguments);
+    var e=document.getElementById('app-lock-error-text'),scr=document.getElementById('app-lock-screen');
+    if(e&&!e.classList.contains('hidden')&&scr&&!scr.classList.contains('hidden')){
+      lockFails++;var dots=document.getElementById('app-lock-pin-dots');dots.classList.remove('shake');void dots.offsetWidth;dots.classList.add('shake','bad');
+      if(navigator.vibrate)try{navigator.vibrate([40,50,40])}catch(x){}
+      setTimeout(function(){dots.classList.remove('shake','bad')},650);
+      if(lockFails>=5){lockUntil=Date.now()+30000;store.set('m3_lock_until',lockUntil);lockCountdown()}}
+    return r}}
+if(typeof window.hideAppLockScreen==='function'){var _hl=window.hideAppLockScreen;
+  window.hideAppLockScreen=function(){var el=document.getElementById('app-lock-screen'),ic=document.getElementById('lk-icon');
+    if(!el||el.classList.contains('hidden')){return _hl.apply(this,arguments)}
+    lockFails=0;if(ic)ic.textContent='lock_open';el.classList.add('unlocking');
+    setTimeout(function(){_hl();el.classList.remove('unlocking');if(ic)ic.textContent='lock'},520)}}
+document.addEventListener('keydown',function(e){
+  var l=document.getElementById('app-lock-screen');if(!l||l.classList.contains('hidden'))return;
+  if(/^[0-9]$/.test(e.key)){e.preventDefault();window.appLockKeyPress(e.key)}else if(e.key==='Backspace'){e.preventDefault();window.appLockKeyPress('del')}
+});
+buildLock();
+if(lockUntil>Date.now())lockCountdown();
 
 /* A. ヘッダー縮小 */
 var hd=$('#main-header'),tk=false;
