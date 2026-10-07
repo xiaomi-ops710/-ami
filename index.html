@@ -712,6 +712,18 @@ button.m3-nav:active{background:var(--m3-line)!important}
 #m3f-sq{position:sticky;top:0;z-index:5;padding:0 0 10px;background:inherit}
 #m3f-sq input{width:100%;min-height:48px;border-radius:9999px;padding:0 20px;border:1px solid rgba(128,128,128,.4);background:rgba(128,128,128,.12);color:inherit;font-weight:700;font-size:15px;outline:none}
 @media(max-width:520px){#m3f-dash{grid-template-columns:1fr 1fr}.m3f-tile:first-child{grid-column:1/-1}}
+
+/* ===== 山カード刷新 v2 ===== */
+.card-container.m3-card{position:relative;overflow:hidden;box-shadow:0 12px 32px color-mix(in srgb,var(--lv,#6b7280) 20%,transparent),0 2px 8px rgba(0,0,0,.18)}
+.card-container.m3-card::before{content:'';position:absolute;left:0;right:0;top:0;height:7px;z-index:2;pointer-events:none;background:linear-gradient(90deg,var(--lv,#6b7280),color-mix(in srgb,var(--lv,#6b7280) 25%,transparent))}
+.card-container .card-title{font-size:30px!important;line-height:1.12!important;font-weight:900!important;letter-spacing:.03em;-webkit-line-clamp:2;text-shadow:0 2px 10px rgba(0,0,0,.25)}
+.card-container .card-title::after{content:'';display:block;width:48px;height:5px;border-radius:5px;margin-top:8px;background:var(--lv,#6b7280);box-shadow:0 0 12px var(--lv,#6b7280)}
+.card-container .card-visual{box-shadow:0 0 0 2px color-mix(in srgb,var(--lv,#6b7280) 65%,transparent),0 12px 26px rgba(0,0,0,.30)}
+.card-container .card-visual::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.42))}
+.card-container .card-title-row>div:last-child{box-shadow:0 4px 16px color-mix(in srgb,var(--lv,#6b7280) 50%,transparent)!important;font-size:13px!important;padding:8px 16px!important}
+.card-container .card-footer-actions{flex-wrap:wrap;justify-content:flex-end}
+.card-container .card-footer-actions .m3-btn{transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.card-container .card-footer-actions .m3-btn:active{transform:scale(.9)}
 </style>
 </head>
 <body id="app-body" class="text-[#1C1B1F] dark:text-[#E2E2E9] min-h-screen antialiased m3-expressive font-bold">
@@ -3020,6 +3032,8 @@ v1.0: 鈴木麟汰様の噴火アプリに感銘を受け開発開始
                                         <button onclick="event.stopPropagation(); openStatsModal('${volIdStr}')" title="統計(レベル推移)" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">show_chart</span></button>
                                         <button onclick="copyVolcanoReport('${safeName}', ${vol.level}, '${safeComment}', '${safeTime}')" title="レポートコピー" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">content_copy</span></button>
                                         <button onclick="shareVolcano('${safeName}', ${vol.level})" title="SNS等に共有" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">share</span></button>
+                                        <button onclick="event.stopPropagation(); m3fCompare('${volIdStr}')" title="他の山と比較" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">compare_arrows</span></button>
+                                        <button onclick="event.stopPropagation(); m3fImg('${volIdStr}')" title="画像として保存・共有" class="m3-btn flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all cursor-pointer active:scale-95 shadow-sm"><span class="material-symbols-rounded text-[18px]">image</span></button>
                                         <button onclick="playEmergencyBroadcastById('${volIdStr}')" title="AI読み上げ" class="readout-btn m3-btn flex items-center gap-1.5 bg-[#E1E2EC]/50 hover:bg-[#E1E2EC] dark:bg-gray-800 dark:hover:bg-gray-700 text-[#1C1B1F] dark:text-white px-4 py-2 rounded-m3-full text-[11px] font-black transition-all shadow-sm cursor-pointer active:scale-95"><span class="material-symbols-rounded text-[16px]">volume_up</span>読上</button>
                                     </div>
                                 </div>
@@ -3582,6 +3596,11 @@ function shareImage(x){
   },'image/png');
 }
 
+
+window.m3fCompare=function(id){sel=[String(id)];var o=vols().filter(function(x){return String(x.id)!==String(id)})[0];if(o)sel.push(String(o.id));openCompare()};
+window.m3fImg=function(id){shareImage(vols().filter(function(x){return String(x.id)===String(id)})[0])};
+function tintCards(){document.querySelectorAll('.card-container[data-id]').forEach(function(c){var x=vols().filter(function(y){return String(y.id)===c.dataset.id})[0];if(x)c.style.setProperty('--lv',lvColor(x.level))})}
+
 /* 9. 山ごとの通知しきい値 */
 function openThr(){
   var t=store.get('m3_thr',{}),v=vols();
@@ -3625,7 +3644,7 @@ function offline(){
 window.addEventListener('online',offline);window.addEventListener('offline',offline);
 
 /* 関数ラップ */
-if(typeof window.renderUI==='function'){var _r=window.renderUI;window.renderUI=function(){evalChange();var r=_r.apply(this,arguments);try{buildDash()}catch(e){}return r}}
+if(typeof window.renderUI==='function'){var _r=window.renderUI;window.renderUI=function(){evalChange();var r=_r.apply(this,arguments);try{buildDash();tintCards()}catch(e){}return r}}
 if(typeof window.playPingSound==='function'){var _p=window.playPingSound;window.playPingSound=function(){if(passFlag===false)return;return _p.apply(this,arguments)}}
 if(typeof window.saveLocalVolcanos==='function'){var _s=window.saveLocalVolcanos;window.saveLocalVolcanos=function(){if(navigator.onLine)store.set('m3_last_fetch',Date.now());return _s.apply(this,arguments)}}
 
@@ -3641,7 +3660,7 @@ function runAction(){
   else if(a==='handbook'&&typeof openHandbookModal==='function')openHandbookModal();
 }
 
-function init(){setupSettings();offline();try{buildDash()}catch(e){}setTimeout(runAction,1500);setInterval(setupSettings,3000)}
+function init(){setupSettings();offline();try{buildDash();tintCards()}catch(e){}setTimeout(runAction,1500);setInterval(setupSettings,3000)}
 if(document.readyState==='complete')init();else window.addEventListener('load',init);
 })();
 </script>
